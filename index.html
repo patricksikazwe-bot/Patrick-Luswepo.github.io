@@ -1,633 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Patrick | Developer & Creator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0a0a08;
-      --bg2: #111110;
-      --gold: #c9a84c;
-      --gold-dim: #8a6e2f;
-      --cream: #f0ead8;
-      --muted: #6b6659;
-      --accent: #e86740;
-      --border: rgba(201,168,76,0.18);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--cream);
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 18px;
-      line-height: 1.7;
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    /* Custom cursor */
-    .cursor {
-      position: fixed;
-      width: 10px; height: 10px;
-      background: var(--gold);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease, background 0.2s;
-    }
-    .cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1px solid var(--gold);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease, width 0.2s, height 0.2s, border-color 0.2s;
-      opacity: 0.5;
-    }
-
-    /* Noise texture overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.4;
-    }
-
-    /* ─── NAV ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.4rem 4rem;
-      z-index: 100;
-      mix-blend-mode: normal;
-      background: linear-gradient(to bottom, rgba(10,10,8,0.95) 0%, transparent 100%);
-    }
-    .nav-logo {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      color: var(--gold);
-      text-transform: uppercase;
-      text-decoration: none;
-    }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      color: var(--muted);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--gold); }
-
-    /* ─── HERO ─── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 0 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-number {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      color: var(--gold-dim);
-      margin-bottom: 2.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease forwards 0.2s;
-    }
-    .hero-name {
-      font-size: clamp(4rem, 11vw, 10rem);
-      font-weight: 300;
-      line-height: 0.95;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-      opacity: 0;
-      animation: fadeUp 1s ease forwards 0.4s;
-    }
-    .hero-name em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .hero-tagline {
-      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--muted);
-      max-width: 560px;
-      margin-bottom: 3.5rem;
-      opacity: 0;
-      animation: fadeUp 1s ease forwards 0.6s;
-    }
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 1rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--cream);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 1rem 2rem;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-      opacity: 0;
-      animation: fadeUp 1s ease forwards 0.8s;
-    }
-    .hero-cta:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
-    .hero-cta .arrow { transition: transform 0.3s; }
-    .hero-cta:hover .arrow { transform: translateX(6px); }
-
-    /* Decorative line */
-    .hero-deco {
-      position: absolute;
-      right: 4rem;
-      top: 50%;
-      transform: translateY(-50%);
-      writing-mode: vertical-rl;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      opacity: 0.5;
-    }
-    .hero-line {
-      position: absolute;
-      bottom: 0;
-      left: 4rem;
-      right: 4rem;
-      height: 1px;
-      background: var(--border);
-    }
-    .scroll-hint {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      animation: bounce 2s ease infinite 2s;
-    }
-    .scroll-hint::after {
-      content: '';
-      width: 1px; height: 40px;
-      background: linear-gradient(to bottom, var(--gold-dim), transparent);
-    }
-
-    /* ─── ABOUT ─── */
-    #about {
-      padding: 8rem 4rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-      align-items: center;
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-    .section-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-    }
-    .about-heading {
-      font-size: clamp(2.4rem, 4vw, 3.8rem);
-      font-weight: 300;
-      line-height: 1.1;
-      margin-bottom: 2rem;
-    }
-    .about-heading em { font-style: italic; color: var(--gold); }
-    .about-text { color: rgba(240,234,216,0.75); font-size: 1.05rem; margin-bottom: 1.2rem; }
-    .about-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    .stat-num {
-      font-size: 3rem;
-      font-weight: 300;
-      color: var(--gold);
-      line-height: 1;
-    }
-    .stat-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 0.3rem;
-    }
-
-    /* ─── WORK / PROJECTS ─── */
-    #work {
-      padding: 6rem 4rem;
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1.5rem;
-      margin-bottom: 4rem;
-    }
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      font-weight: 300;
-    }
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 2px;
-    }
-    .project-card {
-      background: var(--bg2);
-      padding: 2.8rem;
-      border: 1px solid var(--border);
-      transition: background 0.3s, transform 0.3s;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-    }
-    .project-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-    .project-card:hover::before { opacity: 1; }
-    .project-card:hover { background: #16160f; transform: translateY(-3px); }
-    .project-tag {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 1.2rem;
-    }
-    .project-title { font-size: 1.6rem; font-weight: 300; margin-bottom: 1rem; }
-    .project-desc { font-size: 0.95rem; color: rgba(240,234,216,0.65); line-height: 1.7; margin-bottom: 1.8rem; }
-    .project-link {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      color: var(--gold);
-      text-decoration: none;
-      text-transform: uppercase;
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      transition: gap 0.3s;
-    }
-    .project-link:hover { gap: 1rem; }
-    .project-num {
-      position: absolute;
-      top: 1.5rem; right: 2rem;
-      font-size: 5rem;
-      font-weight: 300;
-      color: rgba(201,168,76,0.06);
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    /* ─── SKILLS ─── */
-    #skills {
-      padding: 6rem 4rem;
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .skills-inner { max-width: 1300px; margin: 0 auto; }
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 3rem;
-      margin-top: 4rem;
-    }
-    .skill-group-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .skill-item {
-      font-size: 1rem;
-      color: rgba(240,234,216,0.75);
-      padding: 0.35rem 0;
-      border-bottom: 1px solid rgba(201,168,76,0.07);
-      transition: color 0.2s, padding-left 0.2s;
-    }
-    .skill-item:hover { color: var(--cream); padding-left: 0.5rem; }
-
-    /* ─── CONTACT ─── */
-    #contact {
-      padding: 8rem 4rem;
-      max-width: 900px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .contact-heading {
-      font-size: clamp(3rem, 6vw, 6rem);
-      font-weight: 300;
-      line-height: 1.05;
-      margin-bottom: 2rem;
-    }
-    .contact-heading em { font-style: italic; color: var(--gold); }
-    .contact-sub { color: var(--muted); font-size: 1.1rem; margin-bottom: 3.5rem; }
-    .contact-email {
-      display: inline-block;
-      font-size: clamp(1.2rem, 2.5vw, 2rem);
-      color: var(--cream);
-      text-decoration: none;
-      border-bottom: 1px solid var(--gold);
-      padding-bottom: 0.3rem;
-      transition: color 0.3s;
-    }
-    .contact-email:hover { color: var(--gold); }
-    .socials { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; flex-wrap: wrap; }
-    .social-link {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.3s;
-    }
-    .social-link:hover { color: var(--gold); }
-
-    /* ─── FOOTER ─── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    footer span {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-    }
-
-    /* ─── ANIMATIONS ─── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-8px); }
-    }
-    .reveal {
-      opacity: 0;
-      transform: translateY(25px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 768px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links { display: none; }
-      #hero, #work, #contact, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
-      #about { grid-template-columns: 1fr; padding: 5rem 1.5rem; gap: 3rem; }
-      #skills { padding: 5rem 1.5rem; }
-      .hero-deco { display: none; }
-      .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUSWEPOTECH EDU SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0B1F3A;--accent:#1D6FF2;--gold:#F0A500;--light:#F0F4FA;--text:#111827;--muted:#6B7A99;--success:#16A34A;--danger:#DC2626;--border:#E2E8F0;--sw:200px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);}
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B1F3A,#1A3A6B);z-index:999;}
+.lbox{background:white;border-radius:20px;padding:36px;width:100%;max-width:360px;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.llogo{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--navy);margin-bottom:3px;}
+.llogo span{color:var(--gold);}
+.lsub{color:var(--muted);font-size:12px;margin-bottom:20px;}
+.lroles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
+.lrole{padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:.2s;font-size:11px;font-weight:600;color:var(--text);}
+.lrole:hover,.lrole.sel{border-color:var(--gold);background:rgba(240,165,0,.08);}
+.lrole .ri{font-size:18px;display:block;margin-bottom:3px;}
+.lf{margin-bottom:11px;}
+.lf label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.lf input{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.lf input:focus{border-color:var(--accent);}
+.lbtn{width:100%;padding:12px;background:var(--navy);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:.2s;margin-top:4px;}
+.lbtn:hover{background:var(--accent);}
+.lhint{background:var(--light);border-radius:8px;padding:11px 13px;margin-top:12px;font-size:11px;color:var(--muted);line-height:1.9;}
+#app{display:none;height:100vh;overflow:hidden;}
+.sb{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--navy);color:white;z-index:100;overflow-y:auto;display:flex;flex-direction:column;}
+.sbl{padding:16px 14px 11px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sbn{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
+.sbn span{color:var(--gold);}
+.sbu{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.un{font-size:11px;font-weight:600;}
+.ur{font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+.ss{padding:9px 11px 3px;font-size:8px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:2px;font-weight:600;}
+.ni{display:flex;align-items:center;gap:7px;padding:7px 12px;margin:1px 5px;border-radius:7px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.6);transition:.2s;font-weight:500;}
+.ni:hover{background:rgba(255,255,255,.07);color:white;}
+.ni.active{background:var(--accent);color:white;}
+.sf{margin-top:auto;padding:11px;border-top:1px solid rgba(255,255,255,.08);}
+.lo{width:100%;padding:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.6);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:.2s;}
+.lo:hover{background:var(--danger);color:white;border-color:var(--danger);}
+.mc{margin-left:var(--sw);height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.tb{background:white;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;}
+.tbt{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--navy);}
+.rbadge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.ca{padding:18px;flex:1;}
+.pg{display:none;animation:fu .3s ease;}
+.pg.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px;}
+.sc{background:white;border-radius:10px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.05);border-top:3px solid var(--accent);}
+.sc:nth-child(2){border-top-color:var(--gold);}
+.sc:nth-child(3){border-top-color:var(--success);}
+.sc:nth-child(4){border-top-color:var(--danger);}
+.sc:nth-child(5){border-top-color:#8B5CF6;}
+.sc:nth-child(6){border-top-color:#06B6D4;}
+.sn{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--navy);}
+.sl{font-size:11px;color:var(--muted);margin-top:2px;}
+.card{background:white;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden;}
+.ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ct{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--navy);}
+.cb{padding:16px;}
+.tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.tbl th{background:#F8FAFF;padding:7px 11px;text-align:left;font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.tbl td{padding:9px 11px;border-bottom:1px solid #F1F5F9;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#FAFBFF;}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;}
+.bg{background:rgba(22,163,74,.1);color:var(--success);}
+.br{background:rgba(220,38,38,.1);color:var(--danger);}
+.bb{background:rgba(29,111,242,.1);color:var(--accent);}
+.bo{background:rgba(240,165,0,.12);color:#B07800;}
+.bp{background:rgba(139,92,246,.1);color:#7C3AED;}
+.bx{background:#F1F5F9;color:var(--muted);}
+.btn{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;display:inline-flex;align-items:center;gap:4px;}
+.bp1{background:var(--accent);color:white;}.bp1:hover{background:#155ED4;}
+.bd{background:var(--danger);color:white;}
+.bg1{background:var(--gold);color:var(--navy);font-weight:600;}
+.bo1{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.bsm{padding:4px 9px;font-size:10px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px;}
+.fgrid .full{grid-column:1/-1;}
+label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+input,select,textarea{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:white;outline:none;transition:.2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;}
+.modal{background:white;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:mi .3s ease;}
+@keyframes mi{from{opacity:0;transform:scale(.95) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.mt{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;color:var(--navy);}
+.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.fb{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.si2{flex:1;min-width:130px;padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif;}
+.fs{padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;color:var(--text);background:white;cursor:pointer;outline:none;}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{padding:5px 11px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;transition:.2s;background:white;color:var(--muted);}
+.pill:hover,.pill.active{background:var(--navy);color:white;border-color:var(--navy);}
+.ttw{overflow-x:auto;}
+.tt{width:100%;border-collapse:collapse;font-size:11px;min-width:540px;}
+.tt th{background:var(--navy);color:white;padding:8px 10px;text-align:center;font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.5px;}
+.tt th:first-child{text-align:left;}
+.tt td{padding:5px;border:1px solid var(--border);background:white;text-align:center;vertical-align:middle;}
+.tt td:first-child{font-size:10px;font-weight:600;color:var(--navy);background:#F8FAFF;text-align:left;padding:5px 9px;}
+.ts{border-radius:5px;padding:4px 5px;font-size:10px;cursor:pointer;border:1px solid transparent;}
+.ts.math{background:rgba(29,111,242,.12);border-color:rgba(29,111,242,.3);color:#1A3A6B;}
+.ts.sci{background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.3);color:#14532D;}
+.ts.eng{background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.4);color:#92400E;}
+.ts.soc{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:#4C1D95;}
+.ts.brk{background:#F1F5F9;color:var(--muted);font-size:9px;font-style:italic;}
+.te{color:#CBD5E1;font-size:14px;cursor:pointer;}.te:hover{color:var(--accent);}
+.toast{position:fixed;bottom:16px;right:16px;background:var(--navy);color:white;padding:10px 15px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:.3s;z-index:9000;border-left:4px solid var(--accent);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left-color:var(--success);}
+.toast.err{border-left-color:var(--danger);}
+.ph{margin-bottom:16px;}
+.ph h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--navy);}
+.ph p{color:var(--muted);font-size:11px;margin-top:2px;}
+.phr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;}
+.empty{text-align:center;padding:28px 14px;color:var(--muted);}
+.empty-icon{font-size:32px;margin-bottom:8px;}
+.uz{border:2px dashed var(--border);border-radius:8px;padding:22px;text-align:center;cursor:pointer;transition:.2s;background:#FAFBFF;position:relative;}
+.uz:hover{border-color:var(--accent);}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
+.ph-hero{background:linear-gradient(135deg,var(--navy),#1A3A6B);color:white;border-radius:12px;padding:20px;margin-bottom:14px;}
+.ph-hero h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.ph-hero p{opacity:.6;font-size:11px;margin-top:2px;}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:12px;}
+.rr:last-child{border-bottom:none;}
+</style>
 </head>
 <body>
+<div id="login">
+<div class="lbox">
+  <div class="llogo">LUSWEPO<span>TECH</span></div>
+  <div class="lsub">School Management System</div>
+  <div class="lroles">
+    <div class="lrole sel" onclick="selR('admin',this)"><span class="ri">👑</span>Admin</div>
+    <div class="lrole" onclick="selR('teacher',this)"><span class="ri">👨‍🏫</span>Teacher</div>
+    <div class="lrole" onclick="selR('student',this)"><span class="ri">👨‍🎓</span>Student</div>
+    <div class="lrole" onclick="selR('parent',this)"><span class="ri">👨‍👧</span>Parent</div>
+  </div>
+  <div class="lf"><label>Username</label><input id="lu" value="admin"></div>
+  <div class="lf"><label>Password</label><input type="password" id="lp" value="admin123" onkeydown="if(event.key==='Enter')login()"></div>
+  <button class="lbtn" onclick="login()">Sign In →</button>
+  <div class="lhint">👑 admin/admin123 &nbsp;|&nbsp; 👨‍🏫 teacher/teach123<br>👨‍🎓 student/study123 &nbsp;|&nbsp; 👨‍👧 parent/parent123</div>
+</div>
+</div>
 
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
-
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">Patrick</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#work">Work</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <!-- HERO -->
-  <section id="hero">
-    <p class="hero-number">001 / Introduction</p>
-    <h1 class="hero-name">Patrick<br /><em>Luswepo</em></h1>
-    <p class="hero-tagline">Developer, educator & creative technologist building systems that matter.</p>
-    <a href="#work" class="hero-cta">View My Work <span class="arrow">→</span></a>
-    <span class="hero-deco">Portfolio · 2025</span>
-    <div class="hero-line"></div>
-    <div class="scroll-hint">Scroll</div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="reveal">
-      <p class="section-label">002 / About Me</p>
-      <h2 class="about-heading">I build things<br />that <em>work beautifully</em></h2>
-      <p class="about-text">I'm a developer and creative technologist with a passion for education systems, film storytelling, and AI-powered tools. I believe great software is as much about elegance as it is about function.</p>
-      <p class="about-text">From designing full-featured school management systems to producing AI-driven short films, I work at the intersection of technology and human impact.</p>
+<div id="app">
+<div class="sb">
+  <div class="sbl"><div class="sbn">LUSWEPO<span>TECH</span></div><div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:1px;">EDU SYSTEM</div></div>
+  <div class="sbu"><div class="av" id="av">A</div><div><div class="un" id="uname">Admin</div><div class="ur" id="urole" style="color:var(--gold)">Admin</div></div></div>
+  <div id="snav"></div>
+  <div class="sf"><button class="lo" onclick="logout()">🚪 Sign Out</button></div>
+</div>
+<div class="mc">
+  <div class="tb">
+    <div class="tbt" id="tbt">Dashboard</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-size:10px;color:var(--muted);" id="tbd"></div>
+      <span class="badge rbadge" id="rbadge">Admin</span>
     </div>
-    <div class="reveal">
-      <div class="about-stats">
-        <div>
-          <div class="stat-num">12+</div>
-          <div class="stat-label">System Modules Built</div>
-        </div>
-        <div>
-          <div class="stat-num">100%</div>
-          <div class="stat-label">Passion-Driven Work</div>
-        </div>
-        <div>
-          <div class="stat-num">EDU</div>
-          <div class="stat-label">Core Focus Area</div>
-        </div>
-        <div>
-          <div class="stat-num">AI</div>
-          <div class="stat-label">Creative Tools</div>
-        </div>
+  </div>
+  <div class="ca">
+
+    <!-- DASHBOARD -->
+    <div class="pg active" id="pg-dashboard">
+      <div class="sg">
+        <div class="sc"><div class="sn" id="ds">0</div><div class="sl">👨‍🎓 Students</div></div>
+        <div class="sc"><div class="sn" id="dt">0</div><div class="sl">👨‍🏫 Teachers</div></div>
+        <div class="sc"><div class="sn" id="df">K0</div><div class="sl">💰 Fees</div></div>
+        <div class="sc"><div class="sn" id="da">—</div><div class="sl">✅ Attendance</div></div>
+        <div class="sc"><div class="sn" id="dst">0</div><div class="sl">📦 Store Items</div></div>
+        <div class="sc"><div class="sn" id="dp">0</div><div class="sl">📄 ECZ Papers</div></div>
+      </div>
+      <div class="g21">
+        <div class="card"><div class="ch"><div class="ct">👨‍🎓 Recent Students</div><button class="btn bo1 bsm" onclick="go('students',null)">View All</button></div><table class="tbl" id="dstbl"><thead><tr><th>Name</th><th>Grade</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        <div class="card"><div class="ch"><div class="ct">📰 Activity</div></div><div class="cb" id="actf" style="padding:8px 12px;"></div></div>
       </div>
     </div>
-  </section>
 
-  <!-- WORK -->
-  <section id="work">
-    <div class="section-header reveal">
-      <h2 class="section-title">Selected Work</h2>
-      <p class="section-label">003 / Projects</p>
+    <!-- STUDENTS -->
+    <div class="pg" id="pg-students">
+      <div class="ph phr"><div class="ph"><h2>👨‍🎓 Students</h2><p>Manage enrolled students</p></div><button class="btn bp1" onclick="openM('smM')">＋ Add</button></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderS()"><select class="fs" onchange="renderS()" id="sfg"><option value="">All Grades</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div></div>
+      <table class="tbl" id="stbl"><thead><tr><th>#</th><th>Name</th><th>Grade</th><th>Gender</th><th>Guardian</th><th>Phone</th><th></th></tr></thead><tbody></tbody></table></div>
     </div>
-    <div class="projects-grid">
 
-      <div class="project-card reveal">
-        <div class="project-num">01</div>
-        <p class="project-tag">Education Tech</p>
-        <h3 class="project-title">LUSWEPOTECH EDU SYSTEM</h3>
-        <p class="project-desc">A full-featured school management system with 12 modules, role-based access control, and local data persistence — all in a single deployable file.</p>
-        <a href="#" class="project-link">View Project →</a>
-      </div>
-
-      <div class="project-card reveal">
-        <div class="project-num">02</div>
-        <p class="project-tag">AI Film Production</p>
-        <h3 class="project-title">The Price of Love</h3>
-        <p class="project-desc">An AI-produced short film with original screenplay, AI video pipeline, and audio production — a vision of creative storytelling powered by modern AI tools.</p>
-        <a href="#" class="project-link">View Project →</a>
-      </div>
-
-      <div class="project-card reveal">
-        <div class="project-num">03</div>
-        <p class="project-tag">Mobile Development</p>
-        <h3 class="project-title">EDU System Android App</h3>
-        <p class="project-desc">A mobile companion app for LUSWEPOTECH EDU SYSTEM — bringing school management to Android devices for staff and students on the go.</p>
-        <a href="#" class="project-link">In Development →</a>
-      </div>
-
+    <!-- TEACHERS -->
+    <div class="pg" id="pg-teachers">
+      <div class="ph phr"><div class="ph"><h2>👨‍🏫 Teachers</h2><p>Teaching staff</p></div><button class="btn bp1" onclick="openM('tmM')">＋ Add</button></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderT()"></div></div>
+      <table class="tbl" id="ttbl"><thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Qualification</th><th>Phone</th><th></th></tr></thead><tbody></tbody></table></div>
     </div>
-  </section>
 
-  <!-- SKILLS -->
-  <section id="skills">
-    <div class="skills-inner">
-      <div class="reveal">
-        <p class="section-label">004 / Expertise</p>
-        <h2 class="about-heading" style="font-size:clamp(2rem,4vw,3.2rem);">What I <em>work with</em></h2>
+    <!-- ATTENDANCE -->
+    <div class="pg" id="pg-attendance">
+      <div class="ph phr"><div class="ph"><h2>✅ Attendance</h2><p>Daily tracking</p></div><button class="btn bg1" onclick="expAtt()">⬇ Export</button></div>
+      <div class="card"><div class="ch"><div class="ct">Mark Attendance</div></div><div class="cb">
+        <div class="fgrid" style="max-width:380px;margin-bottom:12px;">
+          <div class="fg"><label>Date</label><input type="date" id="ad"></div>
+          <div class="fg"><label>Class</label><select id="ac"><option>Grade 8A</option><option>Grade 8B</option><option>Grade 9A</option><option>Grade 9B</option><option>Grade 10A</option><option>Grade 11A</option><option>Grade 12A</option></select></div>
+        </div>
+        <table class="tbl" id="attbl"><thead><tr><th>#</th><th>Student</th><th>Present</th><th>Absent</th><th>Late</th></tr></thead><tbody></tbody></table>
+        <div style="margin-top:10px;display:flex;justify-content:flex-end;"><button class="btn bp1" onclick="saveAtt()">💾 Save</button></div>
+      </div></div>
+      <div class="card"><div class="ch"><div class="ct">Records</div></div><table class="tbl" id="artbl"><thead><tr><th>Date</th><th>Class</th><th>Present</th><th>Absent</th><th>Rate</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- GRADES -->
+    <div class="pg" id="pg-grades">
+      <div class="ph phr"><div class="ph"><h2>📝 Grades</h2><p>Academic results</p></div><button class="btn bp1" onclick="openM('gmM')">＋ Add</button></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
+        <input class="si2" placeholder="🔍 Search..." oninput="renderG()">
+        <select class="fs" onchange="renderG()" id="gft"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+        <select class="fs" onchange="renderG()" id="gfs"><option value="">All Subjects</option><option>Mathematics</option><option>English Language</option><option>Science</option><option>Social Studies</option><option>Computer Studies</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select>
+      </div></div>
+      <table class="tbl" id="gtbl"><thead><tr><th>Student</th><th>Grade</th><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th><th>Remarks</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="pg" id="pg-reports">
+      <div class="ph"><h2>📋 Report Cards</h2></div>
+      <div class="card"><div class="ch"><div class="ct">Generate Report</div></div><div class="cb">
+        <div class="fgrid" style="max-width:380px;margin-bottom:12px;">
+          <div class="fg"><label>Student</label><select id="rcs"><option value="">-- Select --</option></select></div>
+          <div class="fg"><label>Term</label><select id="rct"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+        </div>
+        <button class="btn bp1" onclick="genR()">📋 Generate</button>
+      </div></div>
+      <div id="rcout"></div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div class="pg" id="pg-timetable">
+      <div class="ph phr"><div class="ph"><h2>📅 Timetable</h2></div><div id="ttact"></div></div>
+      <div class="card"><div class="ch"><div class="ct">Class Schedule</div><button class="btn bsm bg1" onclick="window.print()">🖨</button></div><div class="cb">
+        <div class="pills" id="cpills">
+          <div class="pill active" onclick="selCls(this,'Grade 8A')">8A</div>
+          <div class="pill" onclick="selCls(this,'Grade 8B')">8B</div>
+          <div class="pill" onclick="selCls(this,'Grade 9A')">9A</div>
+          <div class="pill" onclick="selCls(this,'Grade 9B')">9B</div>
+          <div class="pill" onclick="selCls(this,'Grade 10A')">10A</div>
+          <div class="pill" onclick="selCls(this,'Grade 11A')">11A</div>
+          <div class="pill" onclick="selCls(this,'Grade 12A')">12A</div>
+        </div>
+        <div class="ttw"><table class="tt"><thead><tr><th>Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead><tbody id="ttbody"></tbody></table></div>
+      </div></div>
+    </div>
+
+    <!-- ECZ -->
+    <div class="pg" id="pg-ecz">
+      <div class="ph phr"><div class="ph"><h2>📄 ECZ Past Papers</h2></div><div id="ezact"></div></div>
+      <div class="sg" style="grid-template-columns:repeat(4,1fr);">
+        <div class="sc"><div class="sn" id="ezt">0</div><div class="sl">Papers</div></div>
+        <div class="sc"><div class="sn" id="ezs">0</div><div class="sl">Subjects</div></div>
+        <div class="sc"><div class="sn" id="ezy">0</div><div class="sl">Years</div></div>
+        <div class="sc"><div class="sn">2</div><div class="sl">Levels</div></div>
       </div>
-      <div class="skills-grid reveal">
-        <div>
-          <p class="skill-group-title">Development</p>
-          <div class="skill-item">HTML / CSS / JavaScript</div>
-          <div class="skill-item">React & Frontend Frameworks</div>
-          <div class="skill-item">Android Development</div>
-          <div class="skill-item">System Architecture</div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
+        <input class="si2" placeholder="🔍 Search..." oninput="renderP()">
+        <select class="fs" onchange="renderP()" id="efs"><option value="">All Subjects</option><option>Mathematics</option><option>English Language</option><option>Science</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Geography</option><option>History</option></select>
+        <select class="fs" onchange="renderP()" id="efl"><option value="">All Levels</option><option>Grade 9 (JSC)</option><option>Grade 12 (GCE)</option></select>
+        <select class="fs" onchange="renderP()" id="efy"><option value="">All Years</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option></select>
+      </div></div>
+      <table class="tbl" id="etbl"><thead><tr><th>Subject</th><th>Year</th><th>Level</th><th>Type</th><th>File</th><th>Uploaded</th><th></th></tr></thead><tbody></tbody></table>
+      <div class="empty" id="eempty" style="display:none"><div class="empty-icon">📄</div><p>No papers yet.</p></div></div>
+    </div>
+
+    <!-- FEES -->
+    <div class="pg" id="pg-fees">
+      <div class="ph phr"><div class="ph"><h2>💰 Fee Payments</h2></div><button class="btn bp1" onclick="openM('fmM')">＋ Record</button></div>
+      <div class="sg" style="grid-template-columns:repeat(3,1fr);">
+        <div class="sc"><div class="sn" id="fc">K0</div><div class="sl">Collected</div></div>
+        <div class="sc"><div class="sn" id="fpd">K0</div><div class="sl">Pending</div></div>
+        <div class="sc"><div class="sn" id="fnn">0</div><div class="sl">Payments</div></div>
+      </div>
+      <div class="card"><table class="tbl" id="ftbl"><thead><tr><th>#</th><th>Student</th><th>Amount</th><th>Type</th><th>Date</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- PROCUREMENT -->
+    <div class="pg" id="pg-procurement">
+      <div class="ph phr"><div class="ph"><h2>🛒 Procurement</h2></div><button class="btn bp1" onclick="openM('pmM')">＋ New</button></div>
+      <div class="card"><table class="tbl" id="ptbl"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Vendor</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- STORES -->
+    <div class="pg" id="pg-stores">
+      <div class="ph phr"><div class="ph"><h2>📦 Stores</h2></div><button class="btn bp1" onclick="openM('stM')">＋ Add</button></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderSt()"><select class="fs" onchange="renderSt()" id="stf"><option value="">All Categories</option><option>Stationery</option><option>Lab Equipment</option><option>Furniture</option><option>Sports</option><option>Cleaning</option><option>IT Equipment</option></select></div></div>
+      <table class="tbl" id="sttbl"><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Reorder</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="pg" id="pg-finance">
+      <div class="ph phr"><div class="ph"><h2>💼 Finance</h2></div><button class="btn bp1" onclick="openM('finM')">＋ Add</button></div>
+      <div class="sg" style="grid-template-columns:repeat(3,1fr);">
+        <div class="sc"><div class="sn" id="fii">K0</div><div class="sl">Income</div></div>
+        <div class="sc"><div class="sn" id="fie">K0</div><div class="sl">Expenses</div></div>
+        <div class="sc"><div class="sn" id="fib">K0</div><div class="sl">Balance</div></div>
+      </div>
+      <div class="card"><table class="tbl" id="fintbl"><thead><tr><th>#</th><th>Description</th><th>Type</th><th>Amount</th><th>Category</th><th>Date</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- PERFORMANCE -->
+    <div class="pg" id="pg-performance">
+      <div class="ph phr"><div class="ph"><h2>⭐ Performance</h2></div><button class="btn bp1" onclick="openM('pfM')">＋ Evaluate</button></div>
+      <div class="card"><table class="tbl" id="pftbl"><thead><tr><th>#</th><th>Employee</th><th>Role</th><th>Score</th><th>Rating</th><th>Reviewer</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- PRODUCTION -->
+    <div class="pg" id="pg-production">
+      <div class="ph phr"><div class="ph"><h2>🏭 Production</h2></div><button class="btn bp1" onclick="openM('prodM')">＋ Add</button></div>
+      <div class="card"><table class="tbl" id="prodtbl"><thead><tr><th>#</th><th>Unit</th><th>Product</th><th>Qty</th><th>Date</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- TEACHER PORTAL -->
+    <div class="pg" id="pg-teacher-portal">
+      <div class="ph-hero"><h2>👨‍🏫 Teacher Portal</h2><p id="tpw">Welcome</p></div>
+      <div class="g2">
+        <div class="card"><div class="ch"><div class="ct">My Grades</div><button class="btn bsm bp1" onclick="openM('gmM')">＋</button></div>
+          <table class="tbl" id="tpgtbl"><thead><tr><th>Student</th><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th></tr></thead><tbody></tbody></table>
         </div>
         <div>
-          <p class="skill-group-title">Education Tech</p>
-          <div class="skill-item">School Management Systems</div>
-          <div class="skill-item">Role-Based Access Control</div>
-          <div class="skill-item">Student Data Systems</div>
-          <div class="skill-item">EdTech Product Design</div>
-        </div>
-        <div>
-          <p class="skill-group-title">Creative & AI</p>
-          <div class="skill-item">AI Video Production</div>
-          <div class="skill-item">Screenplay Writing</div>
-          <div class="skill-item">AI Audio Generation</div>
-          <div class="skill-item">Creative Direction</div>
-        </div>
-        <div>
-          <p class="skill-group-title">Deployment</p>
-          <div class="skill-item">Netlify / Vercel</div>
-          <div class="skill-item">Custom Domain Setup</div>
-          <div class="skill-item">Static Site Deployment</div>
-          <div class="skill-item">Performance Optimization</div>
+          <div class="card"><div class="ch"><div class="ct">✅ Attendance</div><button class="btn bsm bp1" onclick="go('attendance',null)">Mark</button></div><div class="cb" id="tpas" style="font-size:11px;color:var(--muted);"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📊 Quick Stats</div></div><div class="cb" id="tpst" style="font-size:12px;"></div></div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="reveal">
-      <p class="section-label">005 / Let's Talk</p>
-      <h2 class="contact-heading">Have a<br /><em>project in mind?</em></h2>
-      <p class="contact-sub">I'm open to collaborations, freelance work, and interesting conversations.</p>
-      <a href="mailto:hello@patrick.dev" class="contact-email">hello@patrick.dev</a>
-      <div class="socials">
-        <a href="#" class="social-link">GitHub</a>
-        <a href="#" class="social-link">LinkedIn</a>
-        <a href="#" class="social-link">Twitter / X</a>
-        <a href="#" class="social-link">YouTube</a>
+    <!-- STUDENT PORTAL -->
+    <div class="pg" id="pg-student-portal">
+      <div class="ph-hero"><h2>👨‍🎓 Student Portal</h2><p id="spw">Welcome</p></div>
+      <div class="g2">
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📝 My Results</div></div><div class="cb" id="spres" style="padding:12px 16px;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📅 My Timetable</div></div><div class="cb">
+            <div class="pills">
+              <div class="pill active" onclick="selCls(this,'Grade 8A')">8A</div>
+              <div class="pill" onclick="selCls(this,'Grade 8B')">8B</div>
+              <div class="pill" onclick="selCls(this,'Grade 9A')">9A</div>
+              <div class="pill" onclick="selCls(this,'Grade 9B')">9B</div>
+              <div class="pill" onclick="selCls(this,'Grade 10A')">10A</div>
+            </div>
+            <div class="ttw"><table class="tt"><thead><tr><th>Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead><tbody id="sptt"></tbody></table></div>
+          </div></div>
+        </div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📄 ECZ Papers</div></div><div class="cb" id="sppapers" style="padding:10px 12px;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📊 Performance</div></div><div class="cb" id="sppef" style="font-size:12px;"></div></div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <span>© 2025 Patrick Luswepo</span>
-    <span>Built with intention ✦</span>
-  </footer>
+    <!-- PARENT PORTAL -->
+    <div class="pg" id="pg-parent-portal">
+      <div class="ph-hero"><h2>👨‍👧 Parent Portal</h2><p>Monitor your child's progress</p></div>
+      <div class="g2">
+        <div class="card"><div class="ch"><div class="ct">Select Child</div></div><div class="cb">
+          <div class="fg" style="margin-bottom:10px;"><label>Child</label><select id="ppc" onchange="loadParent()"><option value="">-- Select Child --</option></select></div>
+          <div class="fg" style="margin-bottom:10px;"><label>Term</label><select id="ppt" onchange="loadParent()"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+          <div id="ppout"><div class="empty"><div class="empty-icon">👨‍👧</div><p>Select your child.</p></div></div>
+        </div></div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">Attendance</div></div><div class="cb" id="ppatt" style="font-size:11px;color:var(--muted);"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📄 ECZ Papers</div></div><div class="cb" id="pppap" style="padding:10px 12px;font-size:11px;"></div></div>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    // Custom cursor
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX; mouseY = e.clientY;
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-    });
-    function animateRing() {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-      ring.style.left = ringX + 'px';
-      ring.style.top = ringY + 'px';
-      requestAnimationFrame(animateRing);
-    }
-    animateRing();
-    document.querySelectorAll('a, button, .project-card').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(2.5)';
-        ring.style.width = '60px'; ring.style.height = '60px';
-        ring.style.borderColor = 'var(--accent)';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-        ring.style.width = '36px'; ring.style.height = '36px';
-        ring.style.borderColor = 'var(--gold)';
-      });
-    });
+    <!-- USERS -->
+    <div class="pg" id="pg-users">
+      <div class="ph phr"><div class="ph"><h2>👥 User Management</h2></div><button class="btn bp1" onclick="openM('umM')">＋ Add User</button></div>
+      <div class="card"><table class="tbl" id="utbl"><thead><tr><th>#</th><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
 
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); }
-      });
-    }, { threshold: 0.12 });
-    reveals.forEach(el => observer.observe(el));
+  </div>
+</div>
+</div>
 
-    // Update year in footer
-    document.querySelector('footer span').textContent =
-      `© ${new Date().getFullYear()} Patrick Luswepo`;
-  </script>
+<!-- MODALS -->
+<div class="ov" id="smM"><div class="modal"><div class="mt">👨‍🎓 Register Student</div>
+<div class="fgrid"><div class="fg"><label>First Name</label><input id="smf"></div><div class="fg"><label>Last Name</label><input id="sml"></div><div class="fg"><label>Grade</label><select id="smg"><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div><div class="fg"><label>Gender</label><select id="smgd"><option>Male</option><option>Female</option></select></div><div class="fg"><label>Guardian</label><input id="smgu"></div><div class="fg"><label>Phone</label><input id="smph"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('smM')">Cancel</button><button class="btn bp1" onclick="saveS()">Register</button></div></div></div>
+
+<div class="ov" id="tmM"><div class="modal"><div class="mt">👨‍🏫 Add Teacher</div>
+<div class="fgrid"><div class="fg"><label>First Name</label><input id="tmf"></div><div class="fg"><label>Last Name</label><input id="tml"></div><div class="fg"><label>Subject</label><select id="tms"><option>Mathematics</option><option>English Language</option><option>Science</option><option>Social Studies</option><option>Computer Studies</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Geography</option></select></div><div class="fg"><label>Qualification</label><input id="tmq"></div><div class="fg"><label>Phone</label><input id="tmp"></div><div class="fg"><label>Email</label><input id="tme"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('tmM')">Cancel</button><button class="btn bp1" onclick="saveTe()">Add</button></div></div></div>
+
+<div class="ov" id="gmM"><div class="modal"><div class="mt">📝 Record Grade</div>
+<div class="fgrid"><div class="fg full"><label>Student</label><select id="gms"><option value="">-- Select --</option></select></div><div class="fg"><label>Subject</label><select id="gmsub"><option>Mathematics</option><option>English Language</option><option>Science</option><option>Social Studies</option><option>Computer Studies</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select></div><div class="fg"><label>Term</label><select id="gmt"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div><div class="fg"><label>Score (%)</label><input type="number" id="gmsc" min="0" max="100"></div><div class="fg"><label>Remarks</label><input id="gmr"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('gmM')">Cancel</button><button class="btn bp1" onclick="saveGr()">Save</button></div></div></div>
+
+<div class="ov" id="pdM"><div class="modal"><div class="mt">📅 Add Period</div>
+<div class="fgrid"><div class="fg"><label>Day</label><select id="pdd"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></div><div class="fg"><label>Time</label><select id="pdt"><option>07:00-07:40</option><option>07:40-08:20</option><option>08:20-09:00</option><option>09:00-09:40</option><option>10:00-10:40</option><option>10:40-11:20</option><option>11:20-12:00</option><option>13:00-13:40</option><option>13:40-14:20</option><option>14:20-15:00</option></select></div><div class="fg full"><label>Subject</label><select id="pds"><option>Mathematics</option><option>English Language</option><option>Science</option><option>Social Studies</option><option>Civic Education</option><option>Computer Studies</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Geography</option><option>History</option></select></div><div class="fg"><label>Teacher</label><input id="pdte"></div><div class="fg"><label>Room</label><input id="pdr"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('pdM')">Cancel</button><button class="btn bp1" onclick="addPer()">Add</button></div></div></div>
+
+<div class="ov" id="ezM"><div class="modal"><div class="mt">📤 Upload ECZ Paper</div>
+<div class="fgrid"><div class="fg"><label>Subject</label><select id="ezs"><option value="">Select</option><option>Mathematics</option><option>English Language</option><option>Science</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Geography</option><option>History</option></select></div><div class="fg"><label>Year</label><select id="ezy2"><option value="">Select</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option></select></div><div class="fg"><label>Level</label><select id="ezl"><option value="">Select</option><option>Grade 9 (JSC)</option><option>Grade 12 (GCE)</option></select></div><div class="fg"><label>Type</label><select id="eztt"><option>Paper 1 (MCQ)</option><option>Paper 2 (Theory)</option><option>Paper 3 (Practical)</option><option>Marking Scheme</option></select></div></div>
+<div class="uz"><input type="file" accept=".pdf,.doc,.docx" onchange="handleEz(event)"><div style="font-size:22px;margin-bottom:4px;">📎</div><div style="font-weight:600;font-size:12px;" id="ezfn">Click or drag file here</div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('ezM')">Cancel</button><button class="btn bp1" onclick="saveP()">Upload</button></div></div></div>
+
+<div class="ov" id="fmM"><div class="modal"><div class="mt">💰 Record Payment</div>
+<div class="fgrid"><div class="fg full"><label>Student</label><select id="fms"><option value="">-- Select --</option></select></div><div class="fg"><label>Amount (K)</label><input type="number" id="fma"></div><div class="fg"><label>Fee Type</label><select id="fmt"><option>School Fees</option><option>Exam Fees</option><option>Sport Levy</option><option>Library Fees</option></select></div><div class="fg"><label>Date</label><input type="date" id="fmd"></div><div class="fg"><label>Method</label><select id="fmm"><option>Cash</option><option>Bank Transfer</option><option>Mobile Money</option></select></div><div class="fg"><label>Status</label><select id="fmst"><option>Paid</option><option>Partial</option><option>Pending</option></select></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('fmM')">Cancel</button><button class="btn bp1" onclick="saveFe()">Record</button></div></div></div>
+
+<div class="ov" id="pmM"><div class="modal"><div class="mt">🛒 Procurement Request</div>
+<div class="fgrid"><div class="fg full"><label>Item</label><input id="pmi"></div><div class="fg"><label>Qty</label><input type="number" id="pmq"></div><div class="fg"><label>Unit Price (K)</label><input type="number" id="pmp"></div><div class="fg"><label>Vendor</label><input id="pmv"></div><div class="fg"><label>Status</label><select id="pmst"><option>Pending</option><option>Approved</option><option>Ordered</option><option>Received</option></select></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('pmM')">Cancel</button><button class="btn bp1" onclick="savePr()">Submit</button></div></div></div>
+
+<div class="ov" id="stM"><div class="modal"><div class="mt">📦 Add Store Item</div>
+<div class="fgrid"><div class="fg full"><label>Item Name</label><input id="stn"></div><div class="fg"><label>Category</label><select id="stc"><option>Stationery</option><option>Lab Equipment</option><option>Furniture</option><option>Sports</option><option>Cleaning</option><option>IT Equipment</option></select></div><div class="fg"><label>Quantity</label><input type="number" id="stq" value="0"></div><div class="fg"><label>Unit</label><select id="stu"><option>Pieces</option><option>Boxes</option><option>Reams</option><option>Litres</option></select></div><div class="fg"><label>Reorder Level</label><input type="number" id="str" value="5"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('stM')">Cancel</button><button class="btn bp1" onclick="saveSt()">Add</button></div></div></div>
+
+<div class="ov" id="finM"><div class="modal"><div class="mt">💼 Add Transaction</div>
+<div class="fgrid"><div class="fg full"><label>Description</label><input id="find"></div><div class="fg"><label>Type</label><select id="fint"><option>Income</option><option>Expense</option></select></div><div class="fg"><label>Amount (K)</label><input type="number" id="fina"></div><div class="fg"><label>Category</label><select id="finc"><option>Fees</option><option>Salaries</option><option>Utilities</option><option>Supplies</option><option>Maintenance</option></select></div><div class="fg"><label>Date</label><input type="date" id="findt"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('finM')">Cancel</button><button class="btn bp1" onclick="saveFin()">Add</button></div></div></div>
+
+<div class="ov" id="pfM"><div class="modal"><div class="mt">⭐ Performance Evaluation</div>
+<div class="fgrid"><div class="fg"><label>Employee</label><input id="pfn"></div><div class="fg"><label>Role</label><select id="pfr"><option>Teacher</option><option>Admin Staff</option><option>Support Staff</option></select></div><div class="fg"><label>Period</label><input id="pfp"></div><div class="fg"><label>Score (0-100)</label><input type="number" id="pfs" min="0" max="100"></div><div class="fg"><label>Reviewer</label><input id="pfrv"></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('pfM')">Cancel</button><button class="btn bp1" onclick="savePf()">Save</button></div></div></div>
+
+<div class="ov" id="prodM"><div class="modal"><div class="mt">🏭 Production Record</div>
+<div class="fgrid"><div class="fg"><label>Unit Name</label><input id="pru"></div><div class="fg"><label>Product</label><input id="prp"></div><div class="fg"><label>Quantity</label><input type="number" id="prq"></div><div class="fg"><label>Unit</label><select id="prum"><option>Kg</option><option>Bags</option><option>Litres</option><option>Units</option></select></div><div class="fg"><label>Date</label><input type="date" id="prd"></div><div class="fg"><label>Status</label><select id="prst"><option>Produced</option><option>In Progress</option><option>Sold</option><option>Stored</option></select></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('prodM')">Cancel</button><button class="btn bp1" onclick="saveProd()">Add</button></div></div></div>
+
+<div class="ov" id="umM"><div class="modal"><div class="mt">👥 Add User Account</div>
+<div class="fgrid"><div class="fg"><label>Full Name</label><input id="umn"></div><div class="fg"><label>Username</label><input id="umu"></div><div class="fg"><label>Password</label><input type="password" id="ump"></div><div class="fg"><label>Role</label><select id="umr"><option value="admin">Admin</option><option value="teacher">Teacher</option><option value="student">Student</option><option value="parent">Parent</option></select></div></div>
+<div class="ma"><button class="btn bo1" onclick="closeM('umM')">Cancel</button><button class="btn bp1" onclick="saveU()">Create</button></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB={get(k){try{return JSON.parse(localStorage.getItem('lv4_'+k)||'[]');}catch{return[];}},set(k,v){localStorage.setItem('lv4_'+k,JSON.stringify(v));}};
+let S=DB.get('s'),T=DB.get('t'),G=DB.get('g'),A=DB.get('a'),F=DB.get('f'),PR=DB.get('pr'),ST=DB.get('st'),FN=DB.get('fn'),PF=DB.get('pf'),PD=DB.get('pd'),PP=DB.get('pp');
+let TT=DB.get('tt')[0]||{},curCls='Grade 8A',curRole='admin',curUser=null,ezfn='';
+let ACC=DB.get('acc');
+if(!ACC.length){ACC=[{id:1,u:'admin',p:'admin123',n:'Administrator',r:'admin'},{id:2,u:'teacher',p:'teach123',n:'Mr. Banda',r:'teacher'},{id:3,u:'student',p:'study123',n:'Chanda Mwale',r:'student'},{id:4,u:'parent',p:'parent123',n:'Parent User',r:'parent'}];DB.set('acc',ACC);}
+const TIMES=['07:00-07:40','07:40-08:20','08:20-09:00','09:00-09:40','BREAK','10:00-10:40','10:40-11:20','11:20-12:00','LUNCH','13:00-13:40','13:40-14:20','14:20-15:00'];
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const SC={Mathematics:'math','English Language':'eng',Science:'sci','Social Studies':'soc','Civic Education':'soc','Computer Studies':'math',Physics:'sci',Chemistry:'sci',Biology:'sci',Geography:'soc',History:'soc'};
+const RNAV={
+  admin:[{s:'Main'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'reports',i:'📋',l:'Report Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Admin'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'}],
+  teacher:[{s:'Portal'},{id:'teacher-portal',i:'🏠',l:'My Dashboard'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'}],
+  student:[{s:'Portal'},{id:'student-portal',i:'🏠',l:'My Dashboard'},{id:'ecz',i:'📄',l:'ECZ Papers'}],
+  parent:[{s:'Portal'},{id:'parent-portal',i:'🏠',l:"Child's Report"}]
+};
+const RC={admin:{c:'#1D6FF2',bg:'rgba(29,111,242,.1)'},teacher:{c:'#16A34A',bg:'rgba(22,163,74,.1)'},student:{c:'#8B5CF6',bg:'rgba(139,92,246,.1)'},parent:{c:'#D97706',bg:'rgba(217,119,6,.1)'}};
+const RDEF={admin:'dashboard',teacher:'teacher-portal',student:'student-portal',parent:'parent-portal'};
+let sR='admin';
+function selR(r,el){sR=r;document.querySelectorAll('.lrole').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');}
+function login(){
+  const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
+  const acc=ACC.find(a=>a.u===u&&a.p===p&&a.r===sR);
+  if(!acc){toast('❌ Invalid credentials','err');return;}
+  curUser=acc;curRole=acc.r;
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  setupRole();renderAll();setDates();
+}
+function logout(){document.getElementById('login').style.display='flex';document.getElementById('app').style.display='none';}
+function setupRole(){
+  const R=RC[curRole];
+  const av=document.getElementById('av');av.textContent=curUser.n[0];av.style.background=R.bg;av.style.color=R.c;
+  document.getElementById('uname').textContent=curUser.n;
+  document.getElementById('urole').textContent=curRole.charAt(0).toUpperCase()+curRole.slice(1);
+  document.getElementById('urole').style.color=R.c;
+  const rb=document.getElementById('rbadge');rb.textContent=curRole.charAt(0).toUpperCase()+curRole.slice(1);rb.style.background=R.bg;rb.style.color=R.c;
+  document.getElementById('snav').innerHTML=RNAV[curRole].map(n=>n.s?`<div class="ss">${n.s}</div>`:`<div class="ni" onclick="go('${n.id}',this)"><span>${n.i}</span>${n.l}</div>`).join('');
+  document.getElementById('ezact').innerHTML=curRole==='admin'||curRole==='teacher'?'<button class="btn bp1" onclick="openM(\'ezM\')">📤 Upload</button>':'';
+  document.getElementById('ttact').innerHTML=curRole==='admin'?'<button class="btn bp1" onclick="openM(\'pdM\')">＋ Add Period</button>':'';
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+RDEF[curRole]).classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.textContent.trim().toLowerCase().includes(RDEF[curRole].replace('-portal','').replace('-',' ')))n.classList.add('active');});
+  if(curRole==='student')loadSP();
+  if(curRole==='parent')loadPP();
+  if(curRole==='teacher')loadTP();
+}
+function go(page,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const titles={dashboard:'Dashboard',students:'Students',teachers:'Teachers',attendance:'Attendance',grades:'Grades',reports:'Report Cards',timetable:'Timetable',ecz:'ECZ Papers',fees:'Fees',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance',production:'Production',users:'Users','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal'};
+  document.getElementById('tbt').textContent=titles[page]||page;
+  if(page==='timetable'||page==='student-portal')renderTT();
+  if(page==='dashboard')updDash();
+  if(page==='attendance')loadAttS();
+  if(page==='ecz')renderP();
+  if(page==='student-portal')loadSP();
+  if(page==='parent-portal')loadPP();
+  if(page==='teacher-portal')loadTP();
+  if(page==='users')renderU();
+  if(page==='grades'){popDDs();renderG();}
+}
+function setDates(){
+  const d=new Date();
+  document.getElementById('tbd').textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  ['ad','fmd','findt','prd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=d.toISOString().split('T')[0];});
+}
+function openM(id){document.getElementById(id).classList.add('show');if(id==='gmM'||id==='fmM')popDDs();}
+function closeM(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
+function toast(msg,t=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(t==='ok'?'ok':t==='err'?'err':'');setTimeout(()=>el.classList.remove('show'),3000);}
+function gg(s){if(s>=80)return{g:'A',c:'bg'};if(s>=70)return{g:'B',c:'bb'};if(s>=60)return{g:'C',c:'bo'};if(s>=50)return{g:'D',c:'bp'};return{g:'F',c:'br'};}
+function updDash(){
+  document.getElementById('ds').textContent=S.length;document.getElementById('dt').textContent=T.length;
+  document.getElementById('dst').textContent=ST.length;document.getElementById('dp').textContent=PP.length;
+  const fc=F.filter(x=>x.st==='Paid').reduce((a,x)=>a+parseFloat(x.am||0),0);
+  document.getElementById('df').textContent='K'+fc.toLocaleString();
+  const lr=A.slice(-1)[0];document.getElementById('da').textContent=lr?Math.round(lr.p/(lr.p+lr.ab||1)*100)+'%':'—';
+  document.querySelector('#dstbl tbody').innerHTML=S.slice(-5).reverse().map(s=>`<tr><td>${s.f} ${s.l}</td><td>${s.g}</td><td><span class="badge bg">Active</span></td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:14px">No students yet</td></tr>';
+  const acts=[...S.slice(-2).map(s=>({i:'👨‍🎓',t:`${s.f} ${s.l} registered`})),...F.slice(-2).map(x=>({i:'💰',t:`Fee K${x.am} recorded`})),...PP.slice(-2).map(p=>({i:'📄',t:`${p.s} ${p.y} uploaded`}))].slice(0,4);
+  document.getElementById('actf').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;gap:7px;padding:7px 0;border-bottom:1px solid #F1F5F9;font-size:11px;"><span>${a.i}</span><span>${a.t}</span></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:14px;font-size:11px;">No activity</div>';
+}
+function saveS(){const f=document.getElementById('smf').value.trim(),l=document.getElementById('sml').value.trim();if(!f||!l){toast('⚠️ Enter name','err');return;}S.unshift({id:Date.now(),f,l,g:document.getElementById('smg').value,gd:document.getElementById('smgd').value,gu:document.getElementById('smgu').value,ph:document.getElementById('smph').value});DB.set('s',S);renderS();popDDs();updDash();closeM('smM');['smf','sml','smgu','smph'].forEach(id=>document.getElementById(id).value='');toast('✅ Student registered','ok');}
+function delS(id){if(!confirm('Remove?'))return;S=S.filter(s=>s.id!==id);DB.set('s',S);renderS();updDash();toast('🗑 Removed','');}
+function renderS(){const q=document.querySelector('#pg-students .si2')?.value.toLowerCase()||'';const gf=document.getElementById('sfg')?.value||'';const list=S.filter(s=>(!q||(s.f+' '+s.l).toLowerCase().includes(q))&&(!gf||s.g===gf));document.querySelector('#stbl tbody').innerHTML=list.length?list.map((s,i)=>`<tr><td>${i+1}</td><td><b>${s.f} ${s.l}</b></td><td>${s.g}</td><td>${s.gd}</td><td>${s.gu||'—'}</td><td>${s.ph||'—'}</td><td><button class="btn bsm bd" onclick="delS(${s.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No students</td></tr>';}
+function saveTe(){const f=document.getElementById('tmf').value.trim(),l=document.getElementById('tml').value.trim();if(!f||!l){toast('⚠️ Enter name','err');return;}T.unshift({id:Date.now(),f,l,sub:document.getElementById('tms').value,q:document.getElementById('tmq').value,ph:document.getElementById('tmp').value,em:document.getElementById('tme').value});DB.set('t',T);renderT();updDash();closeM('tmM');['tmf','tml','tmq','tmp','tme'].forEach(id=>document.getElementById(id).value='');toast('✅ Teacher added','ok');}
+function delTe(id){if(!confirm('Remove?'))return;T=T.filter(t=>t.id!==id);DB.set('t',T);renderT();toast('🗑 Removed','');}
+function renderT(){const q=document.querySelector('#pg-teachers .si2')?.value.toLowerCase()||'';const list=T.filter(t=>!q||(t.f+' '+t.l).toLowerCase().includes(q));document.querySelector('#ttbl tbody').innerHTML=list.length?list.map((t,i)=>`<tr><td>${i+1}</td><td><b>${t.f} ${t.l}</b></td><td>${t.sub}</td><td>${t.q||'—'}</td><td>${t.ph||'—'}</td><td><button class="btn bsm bd" onclick="delTe(${t.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No teachers</td></tr>';}
+function loadAttS(){const cls=document.getElementById('ac').value;const gmap={'Grade 8A':'Grade 8','Grade 8B':'Grade 8','Grade 9A':'Grade 9','Grade 9B':'Grade 9','Grade 10A':'Grade 10','Grade 11A':'Grade 11','Grade 12A':'Grade 12'};const list=S.filter(s=>s.g===gmap[cls]);document.querySelector('#attbl tbody').innerHTML=list.length?list.map((s,i)=>`<tr><td>${i+1}</td><td>${s.f} ${s.l}</td><td><input type="radio" name="att${s.id}" value="p" checked></td><td><input type="radio" name="att${s.id}" value="ab"></td><td><input type="radio" name="att${s.id}" value="l"></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">No students</td></tr>';renderAR();}
+function saveAtt(){const cls=document.getElementById('ac').value,date=document.getElementById('ad').value;if(!date){toast('⚠️ Select date','err');return;}let p=0,ab=0,l=0;document.querySelectorAll('#attbl tbody tr').forEach(r=>{r.querySelectorAll('input[type=radio]').forEach(rd=>{if(rd.checked){if(rd.value==='p')p++;else if(rd.value==='ab')ab++;else l++;}});});A.unshift({id:Date.now(),date,cls,p,ab,l,tot:p+ab+l});DB.set('a',A);renderAR();updDash();toast(`✅ Saved — ${p} present`,'ok');}
+function renderAR(){document.querySelector('#artbl tbody').innerHTML=A.slice(0,12).map(r=>`<tr><td>${r.date}</td><td>${r.cls}</td><td><span class="badge bg">${r.p}</span></td><td><span class="badge br">${r.ab}</span></td><td>${r.tot?Math.round(r.p/r.tot*100):0}%</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">No records</td></tr>';}
+function expAtt(){const rows=['Date,Class,Present,Absent'];A.forEach(r=>rows.push(`${r.date},${r.cls},${r.p},${r.ab}`));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='Attendance.csv';a.click();toast('📊 Exported','ok');}
+function popDDs(){const opts=S.map(s=>`<option value="${s.id}">${s.f} ${s.l} (${s.g})</option>`).join('');['gms','fms','rcs','ppc'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="">-- Select --</option>'+opts;});}
+function saveGr(){const sid=document.getElementById('gms').value,sc=parseInt(document.getElementById('gmsc').value);if(!sid){toast('⚠️ Select student','err');return;}if(isNaN(sc)||sc<0||sc>100){toast('⚠️ Enter valid score','err');return;}const st=S.find(s=>s.id==sid);G.unshift({id:Date.now(),sid,sn:st?st.f+' '+st.l:'Unknown',sg:st?.g||'',sub:document.getElementById('gmsub').value,term:document.getElementById('gmt').value,sc,rem:document.getElementById('gmr').value});DB.set('g',G);renderG();closeM('gmM');document.getElementById('gmsc').value='';document.getElementById('gmr').value='';toast('✅ Grade saved','ok');}
+function delGr(id){G=G.filter(g=>g.id!==id);DB.set('g',G);renderG();toast('🗑 Removed','');}
+function renderG(){const q=document.querySelector('#pg-grades .si2')?.value.toLowerCase()||'';const tf=document.getElementById('gft')?.value||'',sf=document.getElementById('gfs')?.value||'';const list=G.filter(g=>(!q||g.sn.toLowerCase().includes(q))&&(!tf||g.term===tf)&&(!sf||g.sub===sf));const cd=curRole==='admin'||curRole==='teacher';document.querySelector('#gtbl tbody').innerHTML=list.length?list.map(g=>{const gd=gg(g.sc);return`<tr><td><b>${g.sn}</b></td><td>${g.sg}</td><td>${g.sub}</td><td>${g.term}</td><td>${g.sc}%</td><td><span class="badge ${gd.c}">${gd.g}</span></td><td>${g.rem||'—'}</td><td>${cd?`<button class="btn bsm bd" onclick="delGr(${g.id})">🗑</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:16px">No grades</td></tr>';}
+function genR(sid,term,cont){const el=cont||document.getElementById('rcout');sid=sid||document.getElementById('rcs').value;term=term||document.getElementById('rct').value;if(!sid){toast('⚠️ Select student','err');return;}const st=S.find(s=>s.id==sid);if(!st)return;const sg=G.filter(g=>g.sid==sid&&g.term===term);const avg=sg.length?Math.round(sg.reduce((a,g)=>a+g.sc,0)/sg.length):0;const gd=gg(avg);el.innerHTML=`<div class="card" style="border:2px solid var(--navy);"><div style="background:var(--navy);color:white;padding:16px 20px;display:flex;justify-content:space-between;"><div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;">LUSWEPO<span style="color:var(--gold)">TECH</span></div><div style="font-size:10px;opacity:.5;">Report Card</div></div><div style="text-align:right;font-size:10px;opacity:.6;">${term} • ${new Date().getFullYear()}</div></div><div class="cb"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:10px;background:var(--light);border-radius:8px;"><div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600;">Student</div><div style="font-weight:700;font-size:13px;margin-top:2px;">${st.f} ${st.l}</div></div><div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600;">Class</div><div style="font-weight:700;font-size:13px;margin-top:2px;">${st.g}</div></div><div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600;">Term</div><div style="font-weight:700;font-size:13px;margin-top:2px;">${term}</div></div><div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600;">Average</div><div style="font-weight:800;font-size:18px;color:var(--accent);">${avg}% <span class="badge ${gd.c}">${gd.g}</span></div></div></div>${sg.length?`<table class="tbl"><thead><tr><th>Subject</th><th>Score</th><th>Grade</th><th>Remarks</th></tr></thead><tbody>${sg.map(g=>{const gx=gg(g.sc);return`<tr><td><b>${g.sub}</b></td><td>${g.sc}%</td><td><span class="badge ${gx.c}">${gx.g}</span></td><td>${g.rem||'—'}</td></tr>`}).join('')}</tbody></table>`:'<div class="empty"><div class="empty-icon">📝</div><p>No grades for this term.</p></div>'}<div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:var(--muted);">Generated: ${new Date().toLocaleDateString('en-GB')}</span><button class="btn bg1" onclick="window.print()">🖨 Print</button></div></div></div>`;if(!cont)toast('✅ Report generated','ok');}
+function selCls(el,cls){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');curCls=cls;renderTT();}
+function renderTT(){const data=TT[curCls]||{};const canEdit=curRole==='admin';const html=TIMES.map(time=>{if(time==='BREAK'||time==='LUNCH'){return`<tr><td style="font-size:9px;color:var(--muted);font-style:italic;">${time}</td>${DAYS.map(()=>`<td><div class="ts brk">—</div></td>`).join('')}</tr>`;}return`<tr><td>${time}</td>${DAYS.map(day=>{const k=day+'|'+time,slot=data[k];if(slot){const c=SC[slot.s]||'soc';return`<td><div class="ts ${c}" ${canEdit?`onclick="remPer('${k}')"`:''}><div style="font-weight:600">${slot.s}</div><div style="font-size:9px;opacity:.65">${slot.te||''}</div></div></td>`;}return`<td>${canEdit?`<div class="te" onclick="qkPer('${day}','${time}')">＋</div>`:'<div style="color:#E2E8F0;font-size:11px">—</div>'}</td>`;}).join('')}</tr>`;}).join('');['ttbody','sptt'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});}
+function qkPer(d,t){document.getElementById('pdd').value=d;document.getElementById('pdt').value=t;openM('pdM');}
+function addPer(){const d=document.getElementById('pdd').value,t=document.getElementById('pdt').value;if(!TT[curCls])TT[curCls]={};TT[curCls][d+'|'+t]={s:document.getElementById('pds').value,te:document.getElementById('pdte').value,r:document.getElementById('pdr').value};DB.set('tt',[TT]);renderTT();closeM('pdM');document.getElementById('pdte').value='';document.getElementById('pdr').value='';toast('✅ Period added','ok');}
+function remPer(k){if(!confirm('Remove?'))return;if(TT[curCls])delete TT[curCls][k];DB.set('tt',[TT]);renderTT();toast('🗑 Removed','');}
+function handleEz(e){const f=e.target.files[0];if(f){ezfn=f.name;document.getElementById('ezfn').textContent='✅ '+f.name;}}
+function saveP(){const s=document.getElementById('ezs').value,y=document.getElementById('ezy2').value,l=document.getElementById('ezl').value;if(!s||!y||!l){toast('⚠️ Fill Subject, Year, Level','err');return;}if(!ezfn){toast('⚠️ Select a file','err');return;}PP.unshift({id:Date.now(),s,y,l,t:document.getElementById('eztt').value,fn:ezfn,up:new Date().toLocaleDateString('en-GB')});DB.set('pp',PP);renderP();updDash();closeM('ezM');ezfn='';document.getElementById('ezfn').textContent='Click or drag file here';['ezs','ezy2','ezl'].forEach(id=>document.getElementById(id).value='');toast('✅ Paper uploaded','ok');}
+function delP(id){if(curRole!=='admin'){toast('❌ Admins only','err');return;}PP=PP.filter(p=>p.id!==id);DB.set('pp',PP);renderP();updDash();toast('🗑 Removed','');}
+function renderP(){const q=document.querySelector('#pg-ecz .si2')?.value.toLowerCase()||'';const sf=document.getElementById('efs')?.value||'',lf=document.getElementById('efl')?.value||'',yf=document.getElementById('efy')?.value||'';const list=PP.filter(p=>(!q||p.s.toLowerCase().includes(q))&&(!sf||p.s===sf)&&(!lf||p.l===lf)&&(!yf||p.y===yf));document.getElementById('ezt').textContent=PP.length;document.getElementById('ezs').textContent=[...new Set(PP.map(p=>p.s))].length;document.getElementById('ezy').textContent=[...new Set(PP.map(p=>p.y))].length;const empty=document.getElementById('eempty'),tb=document.querySelector('#etbl tbody');if(!list.length){tb.innerHTML='';empty.style.display='block';return;}empty.style.display='none';const cd=curRole==='admin';tb.innerHTML=list.map(p=>`<tr><td><b>${p.s}</b></td><td><span class="badge bb">${p.y}</span></td><td><span class="badge bo">${p.l}</span></td><td>${p.t}</td><td style="font-size:10px;color:var(--muted)">${p.fn}</td><td>${p.up}</td><td><button class="btn bsm bo1" onclick="toast('📥 Downloading...','ok')">⬇</button>${cd?` <button class="btn bsm bd" onclick="delP(${p.id})">🗑</button>`:''}</td></tr>`).join('');}
+function saveFe(){const sid=document.getElementById('fms').value,am=parseFloat(document.getElementById('fma').value);if(!sid){toast('⚠️ Select student','err');return;}if(!am||am<=0){toast('⚠️ Enter amount','err');return;}const st=S.find(s=>s.id==sid);F.unshift({id:Date.now(),sid,sn:st?st.f+' '+st.l:'Unknown',am,t:document.getElementById('fmt').value,d:document.getElementById('fmd').value,m:document.getElementById('fmm').value,st:document.getElementById('fmst').value});DB.set('f',F);renderFe();updDash();closeM('fmM');document.getElementById('fma').value='';toast('✅ Payment recorded','ok');}
+function renderFe(){const pd=F.filter(x=>x.st==='Paid').reduce((a,x)=>a+x.am,0);const pe=F.filter(x=>x.st==='Pending').reduce((a,x)=>a+x.am,0);document.getElementById('fc').textContent='K'+pd.toLocaleString();document.getElementById('fpd').textContent='K'+pe.toLocaleString();document.getElementById('fnn').textContent=F.length;document.querySelector('#ftbl tbody').innerHTML=F.length?F.map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.sn}</b></td><td>K${x.am}</td><td>${x.t}</td><td>${x.d}</td><td><span class="badge ${x.st==='Paid'?'bg':x.st==='Partial'?'bo':'br'}">${x.st}</span></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No payments</td></tr>';}
+function savePr(){const item=document.getElementById('pmi').value.trim(),qty=parseInt(document.getElementById('pmq').value),price=parseFloat(document.getElementById('pmp').value);if(!item||!qty||!price){toast('⚠️ Fill fields','err');return;}PR.unshift({id:Date.now(),item,qty,price,tot:qty*price,v:document.getElementById('pmv').value,st:document.getElementById('pmst').value,d:new Date().toLocaleDateString('en-GB')});DB.set('pr',PR);renderPr();closeM('pmM');['pmi','pmq','pmp','pmv'].forEach(id=>document.getElementById(id).value='');toast('✅ Submitted','ok');}
+function renderPr(){document.querySelector('#ptbl tbody').innerHTML=PR.length?PR.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.item}</b></td><td>${p.qty}</td><td>K${p.price}</td><td>K${p.tot.toLocaleString()}</td><td>${p.v||'—'}</td><td><span class="badge ${p.st==='Approved'||p.st==='Received'?'bg':p.st==='Ordered'?'bb':'bx'}">${p.st}</span></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No requests</td></tr>';}
+function saveSt(){const name=document.getElementById('stn').value.trim();if(!name){toast('⚠️ Enter item name','err');return;}ST.unshift({id:Date.now(),n:name,cat:document.getElementById('stc').value,q:parseInt(document.getElementById('stq').value)||0,u:document.getElementById('stu').value,r:parseInt(document.getElementById('str').value)||5});DB.set('st',ST);renderSt();updDash();closeM('stM');['stn','stq'].forEach(id=>document.getElementById(id).value='');document.getElementById('str').value='5';toast('✅ Item added','ok');}
+function delSt(id){if(!confirm('Remove?'))return;ST=ST.filter(s=>s.id!==id);DB.set('st',ST);renderSt();toast('🗑 Removed','');}
+function renderSt(){const q=document.querySelector('#pg-stores .si2')?.value.toLowerCase()||'',cf=document.getElementById('stf')?.value||'';const list=ST.filter(s=>(!q||s.n.toLowerCase().includes(q))&&(!cf||s.cat===cf));document.querySelector('#sttbl tbody').innerHTML=list.length?list.map((s,i)=>`<tr><td>${i+1}</td><td><b>${s.n}</b></td><td>${s.cat}</td><td>${s.q}</td><td>${s.r}</td><td><span class="badge ${s.q<=s.r?'br':s.q<=s.r*2?'bo':'bg'}">${s.q<=s.r?'Low Stock':s.q<=s.r*2?'Moderate':'In Stock'}</span></td><td><button class="btn bsm bd" onclick="delSt(${s.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No items</td></tr>';}
+function saveFin(){const d=document.getElementById('find').value.trim(),am=parseFloat(document.getElementById('fina').value);if(!d||!am){toast('⚠️ Fill fields','err');return;}FN.unshift({id:Date.now(),d,t:document.getElementById('fint').value,am,cat:document.getElementById('finc').value,dt:document.getElementById('findt').value});DB.set('fn',FN);renderFin();closeM('finM');document.getElementById('find').value='';document.getElementById('fina').value='';toast('✅ Added','ok');}
+function renderFin(){const inc=FN.filter(x=>x.t==='Income').reduce((a,x)=>a+x.am,0);const exp=FN.filter(x=>x.t==='Expense').reduce((a,x)=>a+x.am,0);document.getElementById('fii').textContent='K'+inc.toLocaleString();document.getElementById('fie').textContent='K'+exp.toLocaleString();document.getElementById('fib').textContent='K'+(inc-exp).toLocaleString();document.querySelector('#fintbl tbody').innerHTML=FN.length?FN.map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.d}</b></td><td><span class="badge ${x.t==='Income'?'bg':'br'}">${x.t}</span></td><td>K${x.am.toLocaleString()}</td><td>${x.cat}</td><td>${x.dt}</td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No transactions</td></tr>';}
+function savePf(){const n=document.getElementById('pfn').value.trim(),sc=parseInt(document.getElementById('pfs').value);if(!n||isNaN(sc)){toast('⚠️ Fill fields','err');return;}const rating=sc>=90?'Excellent':sc>=75?'Good':sc>=60?'Satisfactory':'Needs Improvement';PF.unshift({id:Date.now(),n,r:document.getElementById('pfr').value,p:document.getElementById('pfp').value,sc,rating,rv:document.getElementById('pfrv').value});DB.set('pf',PF);renderPf();closeM('pfM');['pfn','pfp','pfs','pfrv'].forEach(id=>document.getElementById(id).value='');toast('✅ Saved','ok');}
+function renderPf(){const rc={'Excellent':'bg','Good':'bb','Satisfactory':'bo','Needs Improvement':'bp'};document.querySelector('#pftbl tbody').innerHTML=PF.length?PF.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.n}</b></td><td>${p.r}</td><td>${p.sc}%</td><td><span class="badge ${rc[p.rating]||'bx'}">${p.rating}</span></td><td>${p.rv||'—'}</td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No evaluations</td></tr>';}
+function saveProd(){const u=document.getElementById('pru').value.trim(),p=document.getElementById('prp').value.trim(),q=parseFloat(document.getElementById('prq').value);if(!u||!p||!q){toast('⚠️ Fill fields','err');return;}PD.unshift({id:Date.now(),u,p,q,um:document.getElementById('prum').value,d:document.getElementById('prd').value,st:document.getElementById('prst').value});DB.set('pd',PD);renderProd();closeM('prodM');['pru','prp','prq'].forEach(id=>document.getElementById(id).value='');toast('✅ Added','ok');}
+function renderProd(){const rc={'Produced':'bg','In Progress':'bo','Sold':'bb','Stored':'bp'};document.querySelector('#prodtbl tbody').innerHTML=PD.length?PD.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.u}</b></td><td>${p.p}</td><td>${p.q}</td><td>${p.d}</td><td><span class="badge ${rc[p.st]||'bx'}">${p.st}</span></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No records</td></tr>';}
+function saveU(){const n=document.getElementById('umn').value.trim(),u=document.getElementById('umu').value.trim(),p=document.getElementById('ump').value,r=document.getElementById('umr').value;if(!n||!u||!p){toast('⚠️ Fill fields','err');return;}if(ACC.find(a=>a.u===u)){toast('⚠️ Username taken','err');return;}ACC.push({id:Date.now(),u,p,n,r});DB.set('acc',ACC);renderU();closeM('umM');['umn','umu','ump'].forEach(id=>document.getElementById(id).value='');toast('✅ User created','ok');}
+function delU(id){if(id<=4){toast('⚠️ Cannot delete default accounts','err');return;}if(!confirm('Delete?'))return;ACC=ACC.filter(a=>a.id!==id);DB.set('acc',ACC);renderU();toast('🗑 Deleted','');}
+function renderU(){const rb={admin:'bb',teacher:'bg',student:'bp',parent:'bo'};document.querySelector('#utbl tbody').innerHTML=ACC.map((a,i)=>`<tr><td>${i+1}</td><td><b>${a.u}</b></td><td>${a.n}</td><td><span class="badge ${rb[a.r]}">${a.r}</span></td><td><span class="badge bg">Active</span></td><td>${a.id>4?`<button class="btn bsm bd" onclick="delU(${a.id})">🗑</button>`:''}</td></tr>`).join('');}
+function loadTP(){document.getElementById('tpw').textContent='Welcome, '+curUser.n;const mg=G.slice(0,10);document.querySelector('#tpgtbl tbody').innerHTML=mg.length?mg.map(g=>{const gd=gg(g.sc);return`<tr><td><b>${g.sn}</b></td><td>${g.sub}</td><td>${g.term}</td><td>${g.sc}%</td><td><span class="badge ${gd.c}">${gd.g}</span></td></tr>`}).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">No grades</td></tr>';const lr=A.slice(-1)[0];document.getElementById('tpas').innerHTML=lr?`Last: <b>${lr.date}</b> (${lr.cls})<br>Present: <b>${lr.p}</b> | Absent: <b>${lr.ab}</b>`:'No records yet.';document.getElementById('tpst').innerHTML=`Students: <b>${S.length}</b><br>Grades: <b>${G.length}</b><br>Papers: <b>${PP.length}</b><br>Sessions: <b>${A.length}</b>`;}
+function loadSP(){document.getElementById('spw').textContent='Welcome, '+curUser.n;const mg=G.slice(0,15);const avg=mg.length?Math.round(mg.reduce((a,g)=>a+g.sc,0)/mg.length):0;document.getElementById('spres').innerHTML=mg.length?`<div style="margin-bottom:10px;padding:9px;background:var(--light);border-radius:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--muted);">Overall Average</span><span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);">${avg}%</span></div>`+mg.map(g=>{const gd=gg(g.sc);return`<div class="rr"><div><div style="font-size:12px;font-weight:500;">${g.sub}</div><div style="font-size:10px;color:var(--muted);">${g.term}</div></div><div style="display:flex;align-items:center;gap:6px;"><b style="font-size:14px;color:var(--accent);">${g.sc}%</b><span class="badge ${gd.c}">${gd.g}</span></div></div>`}).join(''):'<div class="empty"><div class="empty-icon">📝</div><p>No grades yet.</p></div>';document.getElementById('sppapers').innerHTML=PP.slice(0,5).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:11px;"><div><b>${p.s}</b> <span class="badge bb" style="font-size:9px;">${p.y}</span></div><button class="btn bsm bo1" onclick="toast('📥 Downloading...','ok')">⬇</button></div>`).join('')||'<div style="color:var(--muted);font-size:11px;text-align:center;padding:10px;">No papers.</div>';document.getElementById('sppef').innerHTML=`Grades: <b>${mg.length}</b><br>Average: <b>${avg}%</b><br>Grade: <b>${gg(avg).g}</b>`;renderTT();}
+function loadPP(){popDDs();}
+function loadParent(){const sid=document.getElementById('ppc').value,term=document.getElementById('ppt').value;if(!sid){document.getElementById('ppout').innerHTML='<div class="empty"><div class="empty-icon">👨‍👧</div><p>Select child.</p></div>';return;}genR(sid,term,document.getElementById('ppout'));const lr=A.slice(-3);document.getElementById('ppatt').innerHTML=lr.length?lr.map(r=>`<div style="font-size:11px;padding:4px 0;"><b>${r.date}</b>: ${r.p} present / ${r.ab} absent</div>`).join(''):'No records.';document.getElementById('pppap').innerHTML=PP.slice(0,4).map(p=>`<div style="font-size:11px;padding:5px 0;border-bottom:1px solid #F1F5F9;"><b>${p.s}</b> <span class="badge bb" style="font-size:9px;">${p.y}</span></div>`).join('')||'No papers.';}
+function renderAll(){renderS();renderT();renderG();renderAR();renderP();renderFe();renderPr();renderSt();renderFin();renderPf();renderProd();renderTT();popDDs();renderU();loadAttS();updDash();document.getElementById('ac').addEventListener('change',loadAttS);}
+setDates();
+</script>
 </body>
 </html>
