@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumwana West Day Secondary School</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#003580;--red:#CC0000;--gold:#F0A500;--green:#007A33;--light:#F0F4FF;--text:#111827;--muted:#6B7A99;--border:#DBEAFE;--success:#16A34A;--danger:#DC2626;--warning:#D97706;--sw:220px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);}
+
+/* ===== WELCOME / ROLE SELECT SCREEN ===== */
+#welcomeScreen{position:fixed;inset:0;z-index:999;background:linear-gradient(135deg,#001F5B 0%,#003580 40%,#CC0000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+#welcomeScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(0,122,51,.25) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(240,165,0,.15) 0%,transparent 50%);}
+.ws-inner{position:relative;z-index:1;width:100%;max-width:1100px;}
+.ws-header{text-align:center;color:white;margin-bottom:32px;}
+.ws-logo{font-size:48px;margin-bottom:10px;}
+.ws-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(18px,3vw,28px);line-height:1.3;}
+.ws-title span{color:var(--gold);}
+.ws-sub{font-size:12px;opacity:.6;margin-top:4px;}
+.ws-flag{display:flex;height:5px;border-radius:3px;overflow:hidden;max-width:300px;margin:12px auto 0;}
+.ws-flag div{flex:1;}
+
+/* ORG CHART STYLE ROLE CARDS */
+.org-chart{display:flex;flex-direction:column;align-items:center;gap:0;}
+.org-level{display:flex;justify-content:center;gap:12px;position:relative;margin-bottom:0;}
+.org-connector-v{width:2px;height:20px;background:rgba(255,255,255,.3);margin:0 auto;}
+.org-connector-h{display:flex;align-items:flex-start;gap:0;position:relative;}
+.org-connector-h::before{content:'';position:absolute;top:0;left:50%;width:80%;height:2px;background:rgba(255,255,255,.25);transform:translateX(-50%);}
+
+.role-card{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 20px;cursor:pointer;transition:all .2s;text-align:center;min-width:130px;backdrop-filter:blur(8px);}
+.role-card:hover{background:rgba(255,255,255,.2);border-color:var(--gold);transform:translateY(-2px);}
+.role-card.sel{background:rgba(255,255,255,.95);border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.role-card.sel .rc-icon{filter:none;}
+.role-card.sel .rc-title{color:var(--navy);}
+.role-card.sel .rc-sub{color:var(--muted);}
+.rc-icon{font-size:28px;margin-bottom:6px;display:block;}
+.rc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:white;display:block;}
+.rc-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;display:block;}
+.role-card.sel .rc-title{color:var(--navy);}
+.role-card.sel .rc-sub{color:var(--muted);}
+
+/* LOGIN PANEL */
+.login-panel{background:white;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:20px auto 0;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.login-panel h3{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--navy);margin-bottom:4px;}
+.login-panel p{font-size:11px;color:var(--muted);margin-bottom:18px;}
+.tab-row{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+.ltab{flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);background:white;transition:.2s;}
+.ltab.active{background:var(--navy);color:white;}
+.lf{margin-bottom:10px;}
+.lf label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.lf input,.lf select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s;box-sizing:border-box;}
+.lf input:focus,.lf select:focus{border-color:var(--navy);}
+.lbtn{width:100%;padding:11px;background:var(--navy);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:.2s;}
+.lbtn:hover{background:var(--red);}
+.lbtn.gr{background:var(--green);}.lbtn.gr:hover{background:#005522;}
+.linfo{background:#EFF6FF;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--navy);line-height:1.8;}
+.lerr{background:#FEE2E2;color:var(--danger);font-size:11px;padding:8px 12px;border-radius:7px;margin-top:8px;display:none;text-align:center;}
+.lsuc{background:#DCFCE7;color:var(--success);font-size:11px;padding:8px 12px;border-radius:7px;margin-top:8px;display:none;text-align:center;}
+
+/* ===== APP SHELL ===== */
+#app{display:none;height:100vh;overflow:hidden;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--navy);color:white;z-index:100;overflow-y:auto;display:flex;flex-direction:column;}
+.sb-top{padding:14px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:11px;line-height:1.4;}
+.sb-logo span{color:var(--gold);}
+.sb-flag{display:flex;height:3px;border-radius:2px;overflow:hidden;margin-top:5px;}
+.sb-user{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.un{font-size:11px;font-weight:600;line-height:1.3;}
+.ur{font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+.ss{padding:7px 12px 2px;font-size:8px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:2px;font-weight:600;}
+.ni{display:flex;align-items:center;gap:7px;padding:7px 12px;margin:1px 6px;border-radius:7px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.6);transition:.2s;font-weight:500;}
+.ni:hover{background:rgba(255,255,255,.08);color:white;}
+.ni.active{background:var(--red);color:white;}
+.sf{margin-top:auto;padding:10px;border-top:1px solid rgba(255,255,255,.1);}
+.lo{width:100%;padding:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.6);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:.2s;}
+.lo:hover{background:var(--danger);color:white;border-color:var(--danger);}
+.mc{margin-left:var(--sw);height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.tb{background:white;border-bottom:2px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;}
+.tb-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--navy);}
+.rbadge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.ca{padding:18px;flex:1;}
+.pg{display:none;animation:fu .3s ease;}
+.pg.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* COMPONENTS */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px;}
+.sc{background:white;border-radius:10px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-top:4px solid var(--navy);}
+.sc:nth-child(2){border-top-color:var(--red);}
+.sc:nth-child(3){border-top-color:var(--gold);}
+.sc:nth-child(4){border-top-color:var(--green);}
+.sc:nth-child(5){border-top-color:#8B5CF6;}
+.sc:nth-child(6){border-top-color:#06B6D4;}
+.sn{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--navy);}
+.sl{font-size:11px;color:var(--muted);margin-top:2px;}
+.card{background:white;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden;}
+.ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.ct{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--navy);}
+.cb{padding:16px;}
+.tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.tbl th{background:#EFF6FF;padding:7px 11px;text-align:left;font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.tbl td{padding:9px 11px;border-bottom:1px solid #F0F6FF;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#F8FAFF;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.bg{background:rgba(22,163,74,.1);color:var(--success);}
+.br{background:rgba(204,0,0,.1);color:var(--red);}
+.bb{background:rgba(0,53,128,.1);color:var(--navy);}
+.bo{background:rgba(240,165,0,.12);color:#B07800;}
+.bp{background:rgba(139,92,246,.1);color:#7C3AED;}
+.bgr{background:rgba(0,122,51,.1);color:var(--green);}
+.bx{background:#F1F5F9;color:var(--muted);}
+.btn{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.2s;display:inline-flex;align-items:center;gap:4px;}
+.bprimary{background:var(--navy);color:white;}.bprimary:hover{filter:brightness(1.15);}
+.bdanger{background:var(--danger);color:white;}
+.bgold{background:var(--gold);color:var(--navy);font-weight:600;}
+.bgreen{background:var(--green);color:white;}
+.bred{background:var(--red);color:white;}
+.boutline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.boutline:hover{border-color:var(--navy);color:var(--navy);}
+.bsm{padding:4px 9px;font-size:10px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px;}
+.fgrid .full{grid-column:1/-1;}
+label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+input,select,textarea{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:white;outline:none;transition:.2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--navy);}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;}
+.modal{background:white;border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:mi .3s ease;}
+.modal-wide{max-width:680px;}
+@keyframes mi{from{opacity:0;transform:scale(.95) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.mt{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;color:var(--navy);}
+.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.fb{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.si2{flex:1;min-width:130px;padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif;}
+.si2:focus{border-color:var(--navy);}
+.fs{padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;color:var(--text);background:white;cursor:pointer;outline:none;}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{padding:5px 11px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;transition:.2s;background:white;color:var(--muted);}
+.pill:hover,.pill.active{background:var(--navy);color:white;border-color:var(--navy);}
+.ttw{overflow-x:auto;}
+.tt{width:100%;border-collapse:collapse;font-size:11px;min-width:540px;}
+.tt th{background:var(--navy);color:white;padding:8px 10px;text-align:center;font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.5px;}
+.tt th:first-child{text-align:left;}
+.tt td{padding:5px;border:1px solid var(--border);background:white;text-align:center;vertical-align:middle;}
+.tt td:first-child{font-size:10px;font-weight:600;color:var(--navy);background:#EFF6FF;text-align:left;padding:5px 9px;}
+.ts{border-radius:5px;padding:4px 5px;font-size:10px;cursor:pointer;border:1px solid transparent;}
+.ts.math{background:rgba(0,53,128,.1);border-color:rgba(0,53,128,.3);color:#001F5B;}
+.ts.sci{background:rgba(0,122,51,.1);border-color:rgba(0,122,51,.3);color:#003B18;}
+.ts.eng{background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.4);color:#92400E;}
+.ts.soc{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:#4C1D95;}
+.ts.pe{background:rgba(204,0,0,.1);border-color:rgba(204,0,0,.3);color:#7F0000;}
+.ts.brk{background:#F1F5F9;color:var(--muted);font-size:9px;font-style:italic;}
+.te{color:#CBD5E1;font-size:14px;cursor:pointer;}.te:hover{color:var(--navy);}
+.toast{position:fixed;bottom:16px;right:16px;background:var(--navy);color:white;padding:10px 15px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:.3s;z-index:9000;border-left:4px solid var(--gold);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left-color:var(--green);}
+.toast.err{border-left-color:var(--red);}
+.uz{border:2px dashed var(--border);border-radius:8px;padding:22px;text-align:center;cursor:pointer;transition:.2s;background:#F8FAFF;position:relative;}
+.uz:hover{border-color:var(--navy);}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
+.ph{margin-bottom:16px;}
+.ph h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--navy);}
+.ph p{color:var(--muted);font-size:11px;margin-top:2px;}
+.phr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0F6FF;font-size:12px;}
+.rr:last-child{border-bottom:none;}
+.enroll-badge{background:linear-gradient(135deg,var(--navy),var(--red));color:white;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Syne',sans-serif;}
+/* ROLE HERO BANNERS */
+.role-hero{border-radius:12px;padding:20px;margin-bottom:14px;color:white;}
+/* REPORT CARD */
+.rc-page{background:white;border:1px solid #ddd;border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.rc-header{background:linear-gradient(135deg,var(--navy),#001F5B);color:white;padding:16px 22px;}
+.rc-flag{display:flex;height:4px;margin-bottom:10px;border-radius:2px;overflow:hidden;}
+.rc-flag div{flex:1;}
+.rc-school{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;line-height:1.3;}
+.rc-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 22px;background:#EFF6FF;border-bottom:1px solid var(--border);}
+.rc-info-item label{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600;display:block;margin-bottom:2px;}
+.rc-info-item span{font-size:13px;font-weight:700;color:var(--navy);}
+.rc-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rc-table th{background:var(--navy);color:white;padding:8px 12px;text-align:center;font-size:10px;font-weight:600;}
+.rc-table th:first-child{text-align:left;}
+.rc-table td{padding:9px 12px;border-bottom:1px solid #EFF6FF;text-align:center;vertical-align:middle;}
+.rc-table td:first-child{text-align:left;}
+.rc-table tr:nth-child(even) td{background:#F8FBFF;}
+.rc-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 22px;background:#EFF6FF;border-top:2px solid var(--navy);}
+.rc-sum-item{text-align:center;}
+.rc-sum-item .val{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--navy);}
+.rc-sum-item .lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;}
+.rc-footer{padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted);}
+.bar-wrap{margin-bottom:10px;}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+.bar-bg{background:#E2E8F0;border-radius:99px;height:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;transition:width .6s ease;}
+.sba-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.sba-card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.sba-card:nth-child(1){border-left:4px solid var(--navy);}
+.sba-card:nth-child(2){border-left:4px solid var(--gold);}
+.sba-card:nth-child(3){border-left:4px solid var(--green);}
+.promote-card{background:linear-gradient(135deg,var(--navy),var(--red));color:white;border-radius:12px;padding:22px;margin-bottom:14px;}
+.promote-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:8px;}
+.scan-card{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;background:#F8FAFF;position:relative;}
+.scan-card input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
+.info-box{background:#EFF6FF;border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:var(--navy);margin-bottom:14px;}
+.change-pwd-card{background:linear-gradient(135deg,#EFF6FF,#F8FAFF);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+@media print{.sidebar,.tb,.sf,button,.btn,.ov,#welcomeScreen{display:none!important;}.mc{margin-left:0!important;}.rc-page{border:1px solid #000;}body{background:white;}}
+@media(max-width:700px){:root{--sw:0px;}.mc{margin-left:0;}.g2,.g21{grid-template-columns:1fr;}.sg{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- ===== WELCOME / LOGIN SCREEN ===== -->
+<div id="welcomeScreen">
+<div class="ws-inner">
+  <div class="ws-header">
+    <div class="ws-logo">🏫</div>
+    <div class="ws-title">Lumwana West Day Secondary School<br><span>Education System</span></div>
+    <div class="ws-sub">Republic of Zambia — Ministry of Education</div>
+    <div class="ws-flag"><div style="background:#198A00;"></div><div style="background:#E8000D;"></div><div style="background:black;"></div><div style="background:#F0A500;"></div></div>
+  </div>
+
+  <!-- ORG CHART ROLE SELECTOR -->
+  <div class="org-chart">
+    <!-- Level 1: Principal -->
+    <div class="org-level">
+      <div class="role-card sel" id="rc-admin" onclick="setRole('admin',this)">
+        <span class="rc-icon">👑</span>
+        <span class="rc-title">Principal / Admin</span>
+        <span class="rc-sub">Full system access</span>
+      </div>
+    </div>
+    <div class="org-connector-v"></div>
+    <!-- Level 2: Head Teacher -->
+    <div class="org-level">
+      <div class="role-card" id="rc-headteacher" onclick="setRole('headteacher',this)">
+        <span class="rc-icon">🎓</span>
+        <span class="rc-title">Head Teacher</span>
+        <span class="rc-sub">Full academic access</span>
+      </div>
+    </div>
+    <div class="org-connector-v"></div>
+    <!-- Level 3: Deputy -->
+    <div class="org-level">
+      <div class="role-card" id="rc-deputy" onclick="setRole('deputy',this)">
+        <span class="rc-icon">📚</span>
+        <span class="rc-title">Deputy Head Teacher</span>
+        <span class="rc-sub">Chief Academician</span>
+      </div>
+    </div>
+    <div class="org-connector-v"></div>
+    <!-- Level 4: HOD, Teachers, Students, Parents -->
+    <div class="org-level" style="gap:8px;flex-wrap:wrap;justify-content:center;">
+      <div class="role-card" id="rc-hod" onclick="setRole('hod',this)">
+        <span class="rc-icon">🗂️</span>
+        <span class="rc-title">H.O.D</span>
+        <span class="rc-sub">Head of Department</span>
+      </div>
+      <div class="role-card" id="rc-teacher" onclick="setRole('teacher',this)">
+        <span class="rc-icon">👨‍🏫</span>
+        <span class="rc-title">Teacher</span>
+        <span class="rc-sub">Class teacher</span>
+      </div>
+      <div class="role-card" id="rc-student" onclick="setRole('student',this)">
+        <span class="rc-icon">👨‍🎓</span>
+        <span class="rc-title">Student</span>
+        <span class="rc-sub">Use enrollment no.</span>
+      </div>
+      <div class="role-card" id="rc-parent" onclick="setRole('parent',this)">
+        <span class="rc-icon">👨‍👧</span>
+        <span class="rc-title">Parent</span>
+        <span class="rc-sub">View child's report</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN PANEL -->
+  <div class="login-panel" id="loginPanel">
+    <h3 id="lp-title">Principal / Admin Login</h3>
+    <p id="lp-sub">Enter your credentials to continue</p>
+
+    <!-- ADMIN / HT / DEPUTY / HOD / STUDENT panel -->
+    <div id="panel-standard">
+      <div class="tab-row" id="teacherTabs" style="display:none;">
+        <div class="ltab active" id="tt-signin" onclick="setTeacherTab('signin')">Sign In</div>
+        <div class="ltab" id="tt-signup" onclick="setTeacherTab('signup')">Sign Up</div>
+        <div class="ltab" id="tt-forgot" onclick="setTeacherTab('forgot')">Forgot Password</div>
+      </div>
+      <div id="form-signin">
+        <div class="lf"><label>Username</label><input id="ln-u" placeholder="Enter username"></div>
+        <div class="lf"><label>Password</label><input type="password" id="ln-p" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="lbtn" onclick="doLogin()">Sign In →</button>
+      </div>
+      <div id="form-signup" style="display:none;">
+        <div class="lf"><label>Full Name</label><input id="su-name"></div>
+        <div class="lf"><label>Choose Username</label><input id="su-u"></div>
+        <div class="lf"><label>Choose Password</label><input type="password" id="su-p"></div>
+        <div class="lf"><label>Subject / Department</label><select id="su-sub" class="subjectSelect"></select></div>
+        <div class="lf"><label>Assigned Class (optional)</label><select id="su-cls"><option value="">-- Select Class --</option></select></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px;">⚠️ Requires admin approval before login.</div>
+        <button class="lbtn gr" onclick="doSignup()">Create Account</button>
+      </div>
+      <div id="form-forgot" style="display:none;">
+        <div class="lf"><label>Your Username</label><input id="fo-u"></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Contact the school admin to reset your password.</div>
+        <button class="lbtn" onclick="doForgot()">Send Reset Request</button>
+      </div>
+      <div class="linfo" id="defaultInfo">Default: <b>admin</b> / <b>admin123</b></div>
+    </div>
+
+    <!-- PARENT PANEL -->
+    <div id="panel-parent" style="display:none;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Select your child and enter their access password (default = enrollment number).</div>
+      <div class="lf"><label>Search child</label><input id="parent-search" placeholder="Name or LW number..." oninput="filterChildren()"></div>
+      <div id="childList" style="max-height:160px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="parent-pwd-wrap" style="display:none;">
+        <div class="lf"><label>Access Password</label><input type="password" id="parent-pwd" placeholder="Default: enrollment number"></div>
+        <button class="lbtn" onclick="doParentLogin()">View Report →</button>
+      </div>
+    </div>
+
+    <div class="lerr" id="lerr"></div>
+    <div class="lsuc" id="lsuc"></div>
+  </div>
+</div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+<div class="sidebar">
+  <div class="sb-top">
+    <div class="sb-logo">Lumwana West Day<br>Secondary School <span>Edu System</span></div>
+    <div class="sb-flag"><div style="background:#198A00;"></div><div style="background:#E8000D;"></div><div style="background:black;"></div><div style="background:#F0A500;"></div></div>
+  </div>
+  <div class="sb-user"><div class="av" id="av">A</div><div><div class="un" id="uname">Admin</div><div class="ur" id="urole">Admin</div></div></div>
+  <div id="snav"></div>
+  <div class="sf"><button class="lo" onclick="doLogout()">🚪 Sign Out</button></div>
+</div>
+<div class="mc">
+  <div class="tb">
+    <div class="tb-title" id="tbt">Dashboard</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-size:10px;color:var(--muted);" id="tbd"></div>
+      <span class="rbadge" id="rbadge">Admin</span>
+    </div>
+  </div>
+  <div class="ca">
+
+    <!-- DASHBOARD -->
+    <div class="pg active" id="pg-dashboard">
+      <div class="sg">
+        <div class="sc"><div class="sn" id="ds">0</div><div class="sl">👨‍🎓 Students</div></div>
+        <div class="sc"><div class="sn" id="dt">0</div><div class="sl">👨‍🏫 Teachers</div></div>
+        <div class="sc"><div class="sn" id="df">K0</div><div class="sl">💰 Fees</div></div>
+        <div class="sc"><div class="sn" id="da">—</div><div class="sl">✅ Attendance</div></div>
+        <div class="sc"><div class="sn" id="dst">0</div><div class="sl">📦 Stores</div></div>
+        <div class="sc"><div class="sn" id="dp">0</div><div class="sl">📄 ECZ Papers</div></div>
+      </div>
+      <div class="g21">
+        <div class="card"><div class="ch"><div class="ct">👨‍🎓 Recently Enrolled</div><button class="btn boutline bsm" onclick="go('students')">All Students</button></div><table class="tbl" id="dash-stbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Class</th></tr></thead><tbody></tbody></table></div>
+        <div class="card"><div class="ch"><div class="ct">📰 Activity</div></div><div id="dash-actf" style="padding:8px 12px;"></div></div>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="pg" id="pg-students">
+      <div class="ph phr"><div class="ph"><h2>👨‍🎓 Students</h2><p>Enrolled learners</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn boutline bsm" onclick="go('class-enroll')">📋 By Class</button><button class="btn bprimary" id="addStuBtn" onclick="openM('smM')">＋ Enroll Student</button></div>
+      </div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
+        <input class="si2" placeholder="🔍 Name or LW number..." oninput="renderStudents()">
+        <select class="fs" onchange="renderStudents()" id="sf-cls"><option value="">All Classes</option></select>
+      </div></div>
+      <table class="tbl" id="stu-tbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Class</th><th>Gender</th><th>Guardian</th><th>Phone</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- CLASS ENROLL -->
+    <div class="pg" id="pg-class-enroll">
+      <div class="ph"><h2>📋 Class Enrollment</h2><p>Add learners to your class</p></div>
+      <div class="card"><div class="ch"><div class="ct">Select Class</div><button class="btn bprimary" onclick="openM('smM')">＋ Enroll Student</button></div><div class="cb">
+        <div class="fg" style="max-width:250px;margin-bottom:14px;"><label>Class</label><select id="enroll-cls" onchange="loadClassList()" class="classSelect"></select></div>
+        <div id="class-list"></div>
+      </div></div>
+    </div>
+
+    <!-- TEACHERS -->
+    <div class="pg" id="pg-teachers">
+      <div class="ph phr"><div class="ph"><h2>👨‍🏫 Teachers & Staff</h2></div><button class="btn bprimary" id="addTchBtn" onclick="openM('tmM')">＋ Add Teacher</button></div>
+      <div class="card" id="pendingCard" style="display:none;border:2px solid var(--gold);"><div class="ch"><div class="ct" style="color:var(--warning);">⏳ Pending Approvals</div></div><table class="tbl" id="pending-tbl"><thead><tr><th>Name</th><th>Username</th><th>Subject</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderTeachers()"></div></div>
+      <table class="tbl" id="tch-tbl"><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Subject/Dept</th><th>Class</th><th>Username</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="pg" id="pg-attendance">
+      <div class="ph phr"><div class="ph"><h2>✅ Attendance Register</h2></div><button class="btn bgold" onclick="expAtt()">⬇ Export</button></div>
+      <div class="card"><div class="ch"><div class="ct">Mark Register</div></div><div class="cb">
+        <div class="fgrid" style="max-width:450px;margin-bottom:14px;">
+          <div class="fg"><label>Date</label><input type="date" id="att-date"></div>
+          <div class="fg"><label>Class</label><select id="att-cls" onchange="loadAttStudents()" class="classSelect"></select></div>
+        </div>
+        <table class="tbl" id="att-tbl"><thead><tr><th>Enroll #</th><th>Student</th><th>Present ✅</th><th>Absent ❌</th><th>Late ⏰</th></tr></thead><tbody></tbody></table>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="btn boutline bsm" onclick="markAll('p')">✅ All Present</button>
+          <button class="btn bprimary" onclick="saveAtt()">💾 Save Register</button>
+        </div>
+      </div></div>
+      <div class="card"><div class="ch"><div class="ct">Records</div></div><table class="tbl" id="att-rec-tbl"><thead><tr><th>Date</th><th>Class</th><th>Present</th><th>Absent</th><th>Late</th><th>Rate</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- GRADES -->
+    <div class="pg" id="pg-grades">
+      <div class="ph phr"><div class="ph"><h2>📝 Grades & Results</h2></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn boutline bsm" onclick="openM('batchM')">📋 Batch Entry</button>
+          <button class="btn bprimary" onclick="openM('gmM')">＋ Add Grade</button>
+        </div>
+      </div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
+        <input class="si2" placeholder="🔍 Search student..." oninput="renderGrades()">
+        <select class="fs" onchange="renderGrades()" id="gf-term"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+        <select class="fs" onchange="renderGrades()" id="gf-sub"><option value="">All Subjects</option></select>
+        <select class="fs" onchange="renderGrades()" id="gf-cls"><option value="">All Classes</option></select>
+      </div></div>
+      <table class="tbl" id="grades-tbl"><thead><tr><th>Enroll #</th><th>Student</th><th>Class</th><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th><th>Comment</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- SBA -->
+    <div class="pg" id="pg-sba">
+      <div class="ph phr"><div class="ph"><h2>📊 School Based Assessments</h2><p>Week 5, Week 10 & End of Term</p></div><button class="btn bprimary" onclick="openM('sbaM')">＋ Record SBA</button></div>
+      <div class="sba-grid">
+        <div class="sba-card"><div style="font-weight:700;font-size:12px;color:var(--navy);">📅 Week 5</div><div style="font-size:11px;color:var(--muted);" id="sba5c">0 records</div></div>
+        <div class="sba-card"><div style="font-weight:700;font-size:12px;color:var(--navy);">📅 Week 10</div><div style="font-size:11px;color:var(--muted);" id="sba10c">0 records</div></div>
+        <div class="sba-card"><div style="font-weight:700;font-size:12px;color:var(--navy);">📝 End of Term</div><div style="font-size:11px;color:var(--muted);" id="sbaEOTc">0 records</div></div>
+      </div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
+        <input class="si2" placeholder="🔍 Search..." oninput="renderSBA()">
+        <select class="fs" onchange="renderSBA()" id="sba-ft"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+        <select class="fs" onchange="renderSBA()" id="sba-fw"><option value="">All Types</option><option>Week 5</option><option>Week 10</option><option>End of Term</option></select>
+      </div></div>
+      <table class="tbl" id="sba-tbl"><thead><tr><th>Enroll #</th><th>Student</th><th>Class</th><th>Subject</th><th>Type</th><th>Term</th><th>Score</th><th>Grade</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- REPORT CARDS -->
+    <div class="pg" id="pg-reports">
+      <div class="ph phr"><div class="ph"><h2>📋 Report Cards</h2></div>
+        <div style="display:flex;gap:6px;"><button class="btn bgold" onclick="window.print()">🖨 Print</button><button class="btn bprimary" onclick="genReport()">📋 Generate</button></div>
+      </div>
+      <div class="card"><div class="ch"><div class="ct">Select Student & Term</div></div><div class="cb">
+        <div class="fgrid" style="max-width:560px;margin-bottom:14px;">
+          <div class="fg"><label>Student</label><select id="rc-stu"><option value="">-- Select Student --</option></select></div>
+          <div class="fg"><label>Term</label><select id="rc-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+          <div class="fg"><label>Academic Year</label><input id="rc-yr" value="2025"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn bprimary" onclick="genReport()">📋 Generate</button>
+          <button class="btn boutline" id="uploadScanBtn" onclick="openM('scanM')">📸 Upload Scan</button>
+        </div>
+      </div></div>
+      <div id="rc-out"></div>
+      <div id="scans-out"></div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div class="pg" id="pg-timetable">
+      <div class="ph phr"><div class="ph"><h2>📅 Timetable</h2></div><div id="ttact"></div></div>
+      <div class="card"><div class="ch"><div class="ct">Class Schedule</div><button class="btn bsm bgold" onclick="window.print()">🖨</button></div><div class="cb">
+        <div class="pills" id="cls-pills"></div>
+        <div class="ttw"><table class="tt"><thead><tr><th>Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead><tbody id="tt-body"></tbody></table></div>
+      </div></div>
+    </div>
+
+    <!-- ANALYTICS / RESULTS ANALYSIS -->
+    <div class="pg" id="pg-analytics">
+      <div class="ph phr"><div class="ph"><h2>📈 Results Analysis</h2><p>School performance overview</p></div>
+        <div class="fg" style="min-width:180px;"><label>Filter by Class</label><select id="ana-cls" onchange="renderAnalytics()" class="fs"><option value="">All Classes</option></select></div>
+      </div>
+      <div id="analytics-cnt"></div>
+    </div>
+
+    <!-- HOD MONITORING PAGE -->
+    <div class="pg" id="pg-hod-monitor">
+      <div class="ph"><h2>🗂️ HOD Monitoring Dashboard</h2><p>Monitor teachers under your department</p></div>
+      <div id="hod-content"></div>
+    </div>
+
+    <!-- DEPUTY MONITORING PAGE -->
+    <div class="pg" id="pg-deputy-monitor">
+      <div class="ph"><h2>📚 Academic Monitoring</h2><p>Oversight of teachers, students and parents</p></div>
+      <div id="deputy-content"></div>
+    </div>
+
+    <!-- PROMOTION -->
+    <div class="pg" id="pg-promotion">
+      <div class="ph"><h2>🎓 Student Promotion</h2></div>
+      <div class="promote-card"><h3>🎓 Annual Promotion</h3><p style="font-size:12px;opacity:.8;margin-bottom:14px;">Form 1A/B → Form 2A/B/C → Grade 10A → Grade 11A → Grade 12A → Completed</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" style="background:var(--gold);color:var(--navy);font-weight:700;" onclick="previewPromo()">👁 Preview</button><button class="btn" style="background:white;color:var(--navy);font-weight:700;" onclick="confirmPromo()">✅ Confirm Promotion</button></div></div>
+      <div id="promo-preview"></div>
+      <div class="card"><div class="ch"><div class="ct">Student Distribution</div></div><div class="cb" id="stu-dist"></div></div>
+    </div>
+
+    <!-- ECZ -->
+    <div class="pg" id="pg-ecz">
+      <div class="ph phr"><div class="ph"><h2>📄 ECZ Past Papers</h2></div><div id="ecz-act"></div></div>
+      <div class="sg" style="grid-template-columns:repeat(4,1fr);"><div class="sc"><div class="sn" id="ez-t">0</div><div class="sl">Papers</div></div><div class="sc"><div class="sn" id="ez-s">0</div><div class="sl">Subjects</div></div><div class="sc"><div class="sn" id="ez-y">0</div><div class="sl">Years</div></div><div class="sc"><div class="sn">2</div><div class="sl">Levels</div></div></div>
+      <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderPapers()"><select class="fs" onchange="renderPapers()" id="ez-lf"><option value="">All Levels</option><option>JSC (Form 1-3)</option><option>GCE (Grade 10-12)</option></select></div></div>
+      <table class="tbl" id="ecz-tbl"><thead><tr><th>Subject</th><th>Year</th><th>Level</th><th>Type</th><th>File</th><th>Uploaded</th><th></th></tr></thead><tbody></tbody></table>
+      <div id="ecz-empty" style="display:none;text-align:center;padding:24px;color:var(--muted);">No papers yet.</div></div>
+    </div>
+
+    <!-- FEES -->
+    <div class="pg" id="pg-fees"><div class="ph phr"><div class="ph"><h2>💰 Fee Payments</h2></div><button class="btn bprimary" onclick="openM('feeM')">＋ Record</button></div><div class="sg" style="grid-template-columns:repeat(3,1fr);"><div class="sc"><div class="sn" id="fee-c">K0</div><div class="sl">Collected</div></div><div class="sc"><div class="sn" id="fee-p">K0</div><div class="sl">Pending</div></div><div class="sc"><div class="sn" id="fee-n">0</div><div class="sl">Records</div></div></div><div class="card"><table class="tbl" id="fee-tbl"><thead><tr><th>#</th><th>Student</th><th>Amount</th><th>Type</th><th>Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-procurement"><div class="ph phr"><div class="ph"><h2>🛒 Procurement</h2></div><button class="btn bprimary" onclick="openM('procM')">＋ New</button></div><div class="card"><table class="tbl" id="proc-tbl"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Vendor</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-stores"><div class="ph phr"><div class="ph"><h2>📦 Stores</h2></div><button class="btn bprimary" onclick="openM('storeM')">＋ Add</button></div><div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderStores()"></div></div><table class="tbl" id="store-tbl"><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Reorder</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-finance"><div class="ph phr"><div class="ph"><h2>💼 Finance</h2></div><button class="btn bprimary" onclick="openM('finM')">＋ Add</button></div><div class="sg" style="grid-template-columns:repeat(3,1fr);"><div class="sc"><div class="sn" id="fin-i">K0</div><div class="sl">Income</div></div><div class="sc"><div class="sn" id="fin-e">K0</div><div class="sl">Expenses</div></div><div class="sc"><div class="sn" id="fin-b">K0</div><div class="sl">Balance</div></div></div><div class="card"><table class="tbl" id="fin-tbl"><thead><tr><th>#</th><th>Description</th><th>Type</th><th>Amount</th><th>Category</th><th>Date</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-performance"><div class="ph phr"><div class="ph"><h2>⭐ Performance Evaluations</h2></div><button class="btn bprimary" onclick="openM('perfM')">＋ Evaluate</button></div><div class="card"><table class="tbl" id="perf-tbl"><thead><tr><th>#</th><th>Employee</th><th>Role</th><th>Score</th><th>Rating</th><th>Reviewer</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-production"><div class="ph phr"><div class="ph"><h2>🏭 Production</h2></div><button class="btn bprimary" onclick="openM('prodM')">＋ Add</button></div><div class="card"><table class="tbl" id="prod-tbl"><thead><tr><th>#</th><th>Unit</th><th>Product</th><th>Qty</th><th>Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+
+    <!-- CHANGE PASSWORD -->
+    <div class="pg" id="pg-changepassword">
+      <div class="ph"><h2>🔑 Change Password</h2><p>Update your login credentials</p></div>
+      <div class="change-pwd-card">
+        <div class="fgrid" style="max-width:400px;">
+          <div class="fg full"><label>Current Password</label><input type="password" id="cp-old" placeholder="Your current password"></div>
+          <div class="fg"><label>New Password</label><input type="password" id="cp-new" placeholder="New password (min 6 chars)"></div>
+          <div class="fg"><label>Confirm New Password</label><input type="password" id="cp-conf" placeholder="Confirm new password"></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn bprimary" onclick="changePassword()">🔑 Update Password</button>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+          <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;">Also update your username:</div>
+          <div class="fgrid" style="max-width:400px;">
+            <div class="fg"><label>New Username</label><input id="cp-newu" placeholder="New username"></div>
+            <div class="fg"><label>Current Password (confirm)</label><input type="password" id="cp-upwd"></div>
+          </div>
+          <button class="btn boutline bsm" style="margin-top:8px;" onclick="changeUsername()">Update Username</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHER PORTAL -->
+    <div class="pg" id="pg-teacher-portal">
+      <div class="role-hero" style="background:linear-gradient(135deg,var(--green),#005522);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">👨‍🏫 Teacher Portal</h2>
+        <p id="tp-welcome" style="opacity:.7;font-size:12px;margin-top:3px;">Welcome</p>
+      </div>
+      <div class="g2">
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📝 Enter Grades</div><div style="display:flex;gap:6px;"><button class="btn bsm boutline" onclick="openM('batchM')">📋 Batch</button><button class="btn bsm bprimary" onclick="openM('gmM')">＋ Add</button></div></div>
+            <table class="tbl" id="tp-grades"><thead><tr><th>Student</th><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="card"><div class="ch"><div class="ct">📊 SBA Records</div><button class="btn bsm bprimary" onclick="openM('sbaM')">＋ SBA</button></div>
+            <table class="tbl" id="tp-sba"><thead><tr><th>Student</th><th>Subject</th><th>Type</th><th>Score</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">✅ Attendance</div><button class="btn bsm bprimary" onclick="go('attendance')">Mark Register</button></div><div class="cb" id="tp-att" style="font-size:11px;color:var(--muted);line-height:1.8;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📋 My Class Students</div></div><div class="cb" id="tp-myclass" style="font-size:11px;padding:10px;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📊 Stats</div></div><div class="cb" id="tp-stats" style="font-size:12px;line-height:2;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT PORTAL -->
+    <div class="pg" id="pg-student-portal">
+      <div class="role-hero" style="background:linear-gradient(135deg,var(--navy),#001F5B);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">👨‍🎓 Student Portal</h2>
+        <p id="sp-welcome" style="opacity:.7;font-size:12px;margin-top:3px;">Welcome</p>
+      </div>
+      <div class="g2">
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📝 My Results</div></div><div id="sp-results" style="padding:12px 16px;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📊 My SBA</div></div><div id="sp-sba" style="padding:12px 16px;"></div></div>
+        </div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📄 ECZ Papers</div></div><div id="sp-papers" style="padding:10px 12px;"></div></div>
+          <div class="card"><div class="ch"><div class="ct">📊 Performance</div></div><div id="sp-perf" style="font-size:12px;line-height:2;padding:14px;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARENT PORTAL -->
+    <div class="pg" id="pg-parent-portal">
+      <div class="role-hero" style="background:linear-gradient(135deg,var(--gold),#B07800);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">👨‍👧 Parent Portal</h2>
+        <p id="pp-child" style="opacity:.8;font-size:12px;margin-top:3px;">Viewing your child's report</p>
+      </div>
+      <div id="pp-report"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="pg" id="pg-users"><div class="ph phr"><div class="ph"><h2>👥 User Management</h2></div><button class="btn bprimary" onclick="openM('userM')">＋ Add User</button></div><div class="card"><table class="tbl" id="user-tbl"><thead><tr><th>#</th><th>Username</th><th>Name</th><th>Role</th><th>Class/Dept</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
+
+  </div>
+</div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="ov" id="smM"><div class="modal"><div class="mt">👨‍🎓 Enroll Student</div>
+<div class="info-box">🏷️ Enrollment number auto-generated (LW001, LW002...)</div>
+<div class="fgrid">
+  <div class="fg"><label>First Name</label><input id="sm-fn"></div>
+  <div class="fg"><label>Last Name</label><input id="sm-ln"></div>
+  <div class="fg"><label>Class</label><select id="sm-cls" class="classSelect"></select></div>
+  <div class="fg"><label>Gender</label><select id="sm-gd"><option>Male</option><option>Female</option></select></div>
+  <div class="fg"><label>Date of Birth</label><input type="date" id="sm-dob"></div>
+  <div class="fg"><label>Guardian Name</label><input id="sm-gu"></div>
+  <div class="fg"><label>Guardian Phone</label><input id="sm-ph"></div>
+  <div class="fg"><label>Custom Password</label><input id="sm-pwd" placeholder="Default: enrollment #"></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('smM')">Cancel</button><button class="btn bprimary" onclick="saveStudent()">Enroll Student</button></div>
+</div></div>
+
+<div class="ov" id="tmM"><div class="modal"><div class="mt">👨‍🏫 Add Staff Member</div>
+<div class="fgrid">
+  <div class="fg"><label>First Name</label><input id="tm-fn"></div>
+  <div class="fg"><label>Last Name</label><input id="tm-ln"></div>
+  <div class="fg"><label>Role</label><select id="tm-role"><option value="teacher">Teacher</option><option value="hod">HOD (Head of Dept)</option><option value="deputy">Deputy Head Teacher</option><option value="headteacher">Head Teacher</option></select></div>
+  <div class="fg"><label>Username</label><input id="tm-u"></div>
+  <div class="fg"><label>Default Password</label><input type="password" id="tm-p" placeholder="e.g. pass123"></div>
+  <div class="fg"><label>Subject / Department</label><select id="tm-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Assigned Class</label><select id="tm-cls"><option value="">-- None --</option></select></div>
+  <div class="fg"><label>Qualification</label><input id="tm-q"></div>
+  <div class="fg"><label>Phone</label><input id="tm-ph"></div>
+</div>
+<div class="info-box" style="margin-top:8px;">💡 User can change their password anytime after login via Settings.</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('tmM')">Cancel</button><button class="btn bprimary" onclick="saveTeacher()">Add Staff</button></div>
+</div></div>
+
+<div class="ov" id="gmM"><div class="modal"><div class="mt">📝 Record Grade</div>
+<div class="fgrid">
+  <div class="fg full"><label>Student</label><select id="gm-stu"></select></div>
+  <div class="fg"><label>Subject</label><select id="gm-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Term</label><select id="gm-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+  <div class="fg"><label>Score (%)</label><input type="number" id="gm-score" min="0" max="100"></div>
+  <div class="fg full"><label>Comment</label><input id="gm-comment"></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('gmM')">Cancel</button><button class="btn bprimary" onclick="saveGrade()">Save Grade</button></div>
+</div></div>
+
+<div class="ov" id="batchM"><div class="modal modal-wide"><div class="mt">📋 Batch Grade Entry</div>
+<div class="fgrid" style="margin-bottom:12px;">
+  <div class="fg"><label>Class</label><select id="batch-cls" onchange="loadBatch()" class="classSelect"></select></div>
+  <div class="fg"><label>Subject</label><select id="batch-sub" class="subjectSelect" onchange="loadBatch()"></select></div>
+  <div class="fg"><label>Term</label><select id="batch-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+</div>
+<div id="batch-list" style="max-height:320px;overflow-y:auto;"></div>
+<div class="ma"><button class="btn boutline" onclick="closeM('batchM')">Cancel</button><button class="btn bprimary" onclick="saveBatch()">💾 Save All</button></div>
+</div></div>
+
+<div class="ov" id="sbaM"><div class="modal"><div class="mt">📊 Record SBA</div>
+<div class="fgrid">
+  <div class="fg full"><label>Student</label><select id="sba-stu"></select></div>
+  <div class="fg"><label>Subject</label><select id="sba-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Type</label><select id="sba-type"><option>Week 5</option><option>Week 10</option><option>End of Term</option></select></div>
+  <div class="fg"><label>Term</label><select id="sba-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+  <div class="fg"><label>Score (%)</label><input type="number" id="sba-score" min="0" max="100"></div>
+  <div class="fg"><label>Year</label><input id="sba-year"></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('sbaM')">Cancel</button><button class="btn bprimary" onclick="saveSBA()">Save SBA</button></div>
+</div></div>
+
+<div class="ov" id="scanM"><div class="modal"><div class="mt">📸 Upload Scanned Report</div>
+<div class="fgrid" style="margin-bottom:12px;">
+  <div class="fg full"><label>Student</label><select id="scan-stu"></select></div>
+  <div class="fg"><label>Term</label><select id="scan-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+  <div class="fg"><label>Year</label><input id="scan-yr" value="2025"></div>
+</div>
+<div class="scan-card"><input type="file" accept="image/*,.pdf" onchange="handleScan(event)"><div style="font-size:26px;margin-bottom:6px;">📸</div><div style="font-weight:600;font-size:13px;" id="scan-fn">Click to upload</div><div style="font-size:10px;color:var(--muted);">JPG, PNG, PDF</div></div>
+<div id="scan-prev"></div>
+<div class="ma"><button class="btn boutline" onclick="closeM('scanM')">Cancel</button><button class="btn bprimary" onclick="saveScan()">Save Scan</button></div>
+</div></div>
+
+<div class="ov" id="periodM"><div class="modal"><div class="mt">📅 Add Period</div>
+<div class="fgrid">
+  <div class="fg"><label>Day</label><select id="per-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></div>
+  <div class="fg"><label>Time</label><select id="per-time"><option>07:00-07:40</option><option>07:40-08:20</option><option>08:20-09:00</option><option>09:00-09:40</option><option>10:00-10:40</option><option>10:40-11:20</option><option>11:20-12:00</option><option>13:00-13:40</option><option>13:40-14:20</option><option>14:20-15:00</option></select></div>
+  <div class="fg full"><label>Subject</label><select id="per-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Teacher</label><input id="per-tch"></div>
+  <div class="fg"><label>Room</label><input id="per-room"></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('periodM')">Cancel</button><button class="btn bprimary" onclick="addPeriod()">Add</button></div>
+</div></div>
+
+<div class="ov" id="eczM"><div class="modal"><div class="mt">📤 Upload ECZ Paper</div>
+<div class="fgrid">
+  <div class="fg"><label>Subject</label><select id="ecz-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Year</label><select id="ecz-yr"><option value="">Select</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option></select></div>
+  <div class="fg"><label>Level</label><select id="ecz-lvl"><option value="">Select</option><option>JSC (Form 1-3)</option><option>GCE (Grade 10-12)</option></select></div>
+  <div class="fg"><label>Type</label><select id="ecz-type"><option>Paper 1 (MCQ)</option><option>Paper 2 (Theory)</option><option>Paper 3 (Practical)</option><option>Marking Scheme</option></select></div>
+</div>
+<div class="uz"><input type="file" accept=".pdf,.doc,.docx" onchange="handleECZ(event)"><div style="font-size:20px;margin-bottom:4px;">📎</div><div style="font-weight:600;font-size:12px;" id="ecz-fn">Click or drag file here</div></div>
+<div class="ma"><button class="btn boutline" onclick="closeM('eczM')">Cancel</button><button class="btn bprimary" onclick="saveECZ()">Upload</button></div>
+</div></div>
+
+<div class="ov" id="feeM"><div class="modal"><div class="mt">💰 Record Fee Payment</div>
+<div class="fgrid"><div class="fg full"><label>Student</label><select id="fee-stu"></select></div><div class="fg"><label>Amount (K)</label><input type="number" id="fee-amt"></div><div class="fg"><label>Type</label><select id="fee-type"><option>School Fees</option><option>Exam Fees</option><option>Sport Levy</option><option>Library Fees</option></select></div><div class="fg"><label>Date</label><input type="date" id="fee-date"></div><div class="fg"><label>Method</label><select id="fee-method"><option>Cash</option><option>Bank Transfer</option><option>Mobile Money</option></select></div><div class="fg"><label>Status</label><select id="fee-status"><option>Paid</option><option>Partial</option><option>Pending</option></select></div></div>
+<div class="ma"><button class="btn boutline" onclick="closeM('feeM')">Cancel</button><button class="btn bprimary" onclick="saveFee()">Record</button></div>
+</div></div>
+
+<div class="ov" id="procM"><div class="modal"><div class="mt">🛒 Procurement</div><div class="fgrid"><div class="fg full"><label>Item</label><input id="proc-item"></div><div class="fg"><label>Qty</label><input type="number" id="proc-qty"></div><div class="fg"><label>Unit Price (K)</label><input type="number" id="proc-price"></div><div class="fg"><label>Vendor</label><input id="proc-vendor"></div><div class="fg"><label>Status</label><select id="proc-status"><option>Pending</option><option>Approved</option><option>Ordered</option><option>Received</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('procM')">Cancel</button><button class="btn bprimary" onclick="saveProc()">Submit</button></div></div></div>
+<div class="ov" id="storeM"><div class="modal"><div class="mt">📦 Add Store Item</div><div class="fgrid"><div class="fg full"><label>Item Name</label><input id="st-name"></div><div class="fg"><label>Category</label><select id="st-cat"><option>Stationery</option><option>Lab Equipment</option><option>Furniture</option><option>Sports</option><option>Cleaning</option><option>IT Equipment</option></select></div><div class="fg"><label>Quantity</label><input type="number" id="st-qty" value="0"></div><div class="fg"><label>Unit</label><select id="st-unit"><option>Pieces</option><option>Boxes</option><option>Reams</option><option>Litres</option></select></div><div class="fg"><label>Reorder Level</label><input type="number" id="st-reorder" value="5"></div></div><div class="ma"><button class="btn boutline" onclick="closeM('storeM')">Cancel</button><button class="btn bprimary" onclick="saveStore()">Add</button></div></div></div>
+<div class="ov" id="finM"><div class="modal"><div class="mt">💼 Transaction</div><div class="fgrid"><div class="fg full"><label>Description</label><input id="fin-desc"></div><div class="fg"><label>Type</label><select id="fin-type"><option>Income</option><option>Expense</option></select></div><div class="fg"><label>Amount (K)</label><input type="number" id="fin-amt"></div><div class="fg"><label>Category</label><select id="fin-cat"><option>Fees</option><option>Salaries</option><option>Utilities</option><option>Supplies</option><option>Maintenance</option></select></div><div class="fg"><label>Date</label><input type="date" id="fin-date"></div></div><div class="ma"><button class="btn boutline" onclick="closeM('finM')">Cancel</button><button class="btn bprimary" onclick="saveFinance()">Add</button></div></div></div>
+<div class="ov" id="perfM"><div class="modal"><div class="mt">⭐ Performance Evaluation</div><div class="fgrid"><div class="fg"><label>Employee</label><input id="perf-name"></div><div class="fg"><label>Role</label><select id="perf-role"><option>Teacher</option><option>HOD</option><option>Admin Staff</option><option>Support Staff</option></select></div><div class="fg"><label>Period</label><input id="perf-period"></div><div class="fg"><label>Score (0-100)</label><input type="number" id="perf-score" min="0" max="100"></div><div class="fg"><label>Reviewer</label><input id="perf-rev"></div></div><div class="ma"><button class="btn boutline" onclick="closeM('perfM')">Cancel</button><button class="btn bprimary" onclick="savePerf()">Save</button></div></div></div>
+<div class="ov" id="prodM"><div class="modal"><div class="mt">🏭 Production Record</div><div class="fgrid"><div class="fg"><label>Unit</label><input id="prod-unit"></div><div class="fg"><label>Product</label><input id="prod-product"></div><div class="fg"><label>Qty</label><input type="number" id="prod-qty"></div><div class="fg"><label>Unit</label><select id="prod-unit2"><option>Kg</option><option>Bags</option><option>Litres</option><option>Units</option></select></div><div class="fg"><label>Date</label><input type="date" id="prod-date"></div><div class="fg"><label>Status</label><select id="prod-status"><option>Produced</option><option>In Progress</option><option>Sold</option><option>Stored</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('prodM')">Cancel</button><button class="btn bprimary" onclick="saveProd()">Add</button></div></div></div>
+<div class="ov" id="userM"><div class="modal"><div class="mt">👥 Add User</div><div class="fgrid"><div class="fg"><label>Full Name</label><input id="user-name"></div><div class="fg"><label>Username</label><input id="user-u"></div><div class="fg"><label>Default Password</label><input type="password" id="user-p"></div><div class="fg"><label>Role</label><select id="user-role"><option value="admin">Admin</option><option value="headteacher">Head Teacher</option><option value="deputy">Deputy HT</option><option value="hod">HOD</option><option value="teacher">Teacher</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('userM')">Cancel</button><button class="btn bprimary" onclick="saveUser()">Create</button></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONSTANTS =====
+const SUBJECTS=['Mathematics','English Language','Science','Social Studies','Computer Studies','Physics','Chemistry','Biology','Geography','History','Commerce','Accounts','Physical Education','Art and Design','Religious Education','Civic Education','Lunda','Literature in Lunda'];
+const CLASSES=['Form 1A','Form 1B','Form 2A','Form 2B','Form 2C','Grade 10A','Grade 11A','Grade 12A'];
+const PROMOTION_MAP={'Form 1A':'Form 2A','Form 1B':'Form 2B','Form 2A':'Grade 10A','Form 2B':'Grade 10A','Form 2C':'Grade 10A','Grade 10A':'Grade 11A','Grade 11A':'Grade 12A','Grade 12A':'Completed'};
+const TIMES=['07:00-07:40','07:40-08:20','08:20-09:00','09:00-09:40','BREAK','10:00-10:40','10:40-11:20','11:20-12:00','LUNCH','13:00-13:40','13:40-14:20','14:20-15:00'];
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const SC={Mathematics:'math','English Language':'eng','Literature in Lunda':'eng',Science:'sci',Physics:'sci',Chemistry:'sci',Biology:'sci','Social Studies':'soc','Civic Education':'soc',History:'soc',Geography:'soc','Religious Education':'soc','Physical Education':'pe','Art and Design':'pe','Lunda':'soc','Computer Studies':'math',Commerce:'soc',Accounts:'math'};
+const ROLE_LABELS={admin:'Principal/Admin',headteacher:'Head Teacher',deputy:'Deputy Head Teacher',hod:'HOD',teacher:'Teacher',student:'Student',parent:'Parent'};
+const ROLE_COLORS={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#D97706',teacher:'#8B5CF6',student:'#0891B2',parent:'#D97706'};
+
+// ===== DB =====
+const DB={get(k){try{return JSON.parse(localStorage.getItem('lw5_'+k)||'[]');}catch{return[];}},set(k,v){localStorage.setItem('lw5_'+k,JSON.stringify(v));}};
+let students=DB.get('students'),teachers=DB.get('teachers'),grades=DB.get('grades'),attendance=DB.get('att'),fees=DB.get('fees'),procurement=DB.get('proc'),stores=DB.get('stores'),finance=DB.get('finance'),performance=DB.get('perf'),production=DB.get('prod'),papers=DB.get('papers'),sba=DB.get('sba'),scans=DB.get('scans');
+let timetable=DB.get('tt')[0]||{},curClass='Form 1A',curRole='admin',curUser=null,eczFile='',scanData=null,scanFileName='';
+let accounts=DB.get('accounts');
+if(!accounts.length){accounts=[{id:1,u:'admin',p:'admin123',n:'Principal',r:'admin',approved:true,mustChange:false}];DB.set('accounts',accounts);}
+
+// ===== ENROLLMENT NUMBER =====
+function genEnroll(){const n=students.length+1;return'LW'+String(n).padStart(3,'0');}
+
+// ===== POPULATE SELECTS =====
+function populateAll(){
+  document.querySelectorAll('.subjectSelect').forEach(s=>{const c=s.value;s.innerHTML=SUBJECTS.map(x=>`<option>${x}</option>`).join('');if(c)s.value=c;});
+  document.querySelectorAll('.classSelect').forEach(s=>{const c=s.value;s.innerHTML=CLASSES.map(x=>`<option>${x}</option>`).join('');if(c)s.value=c;});
+  ['tm-cls','su-cls'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="">-- None --</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');});
+  const sfCls=document.getElementById('sf-cls');if(sfCls)sfCls.innerHTML='<option value="">All Classes</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
+  const gfCls=document.getElementById('gf-cls');if(gfCls)gfCls.innerHTML='<option value="">All Classes</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
+  const gfSub=document.getElementById('gf-sub');if(gfSub)gfSub.innerHTML='<option value="">All Subjects</option>'+SUBJECTS.map(s=>`<option>${s}</option>`).join('');
+  const anaCls=document.getElementById('ana-cls');if(anaCls)anaCls.innerHTML='<option value="">All Classes</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
+  const clsPills=document.getElementById('cls-pills');if(clsPills)clsPills.innerHTML=CLASSES.map(c=>`<div class="pill${c===curClass?' active':''}" onclick="selClass(this,'${c}')">${c}</div>`).join('');
+  const enrollCls=document.getElementById('enroll-cls');if(enrollCls)enrollCls.innerHTML=CLASSES.map(c=>`<option>${c}</option>`).join('');
+  renderStuDist();
+}
+function populateStudentDropdowns(){
+  const opts='<option value="">-- Select Student --</option>'+students.map(s=>`<option value="${s.id}">[${s.enroll}] ${s.fn} ${s.ln} (${s.cls})</option>`).join('');
+  ['gm-stu','fee-stu','scan-stu','sba-stu','rc-stu'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  filterChildren();
+}
+
+// ===== LOGIN SCREEN =====
+let selRole='admin',selParentChild=null;
+
+function setRole(r,el){
+  selRole=r;
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  const titles={admin:'Principal / Admin Login',headteacher:'Head Teacher Login',deputy:'Deputy Head Teacher Login',hod:'Head of Department Login',teacher:'Teacher Login',student:'Student Login',parent:'Parent / Guardian'};
+  const subs={admin:'Full system access',headteacher:'Access all academic modules',deputy:'Chief academician access',hod:'Monitor your department',teacher:'Sign in, sign up, or reset password',student:'Use your enrollment number (LW001)',parent:'Select your child to view their report card'};
+  document.getElementById('lp-title').textContent=titles[r];
+  document.getElementById('lp-sub').textContent=subs[r];
+  document.getElementById('lerr').style.display='none';
+  document.getElementById('lsuc').style.display='none';
+  document.getElementById('panel-standard').style.display=r==='parent'?'none':'block';
+  document.getElementById('panel-parent').style.display=r==='parent'?'block':'none';
+  document.getElementById('teacherTabs').style.display=r==='teacher'?'flex':'none';
+  if(r==='teacher')setTeacherTab('signin');
+  // Show default credentials hint
+  const hints={admin:'Default: <b>admin</b> / <b>admin123</b>',headteacher:'Default set by admin — username & password given by principal',deputy:'Default set by admin — username & password given by principal',hod:'Default set by admin — change after first login',teacher:'Sign in with your credentials, or Sign Up for new account',student:'Username = Enrollment # (e.g. LW001), Password = enrollment #'};
+  document.getElementById('defaultInfo').innerHTML=hints[r]||'Enter your credentials';
+  if(r==='parent')filterChildren();
+}
+
+function setTeacherTab(t){
+  ['signin','signup','forgot'].forEach(x=>{document.getElementById('tt-'+x)?.classList.toggle('active',x===t);document.getElementById('form-'+x).style.display=x===t?'':'none';});
+}
+
+function filterChildren(){
+  const q=(document.getElementById('parent-search')?.value||'').toLowerCase();
+  const el=document.getElementById('childList');if(!el)return;
+  const list=students.filter(s=>!q||(s.fn+' '+s.ln+' '+s.enroll).toLowerCase().includes(q));
+  el.innerHTML=list.length?list.map(s=>`<div onclick="selectChild(${s.id})" style="padding:10px 12px;border:1.5px solid ${selParentChild==s.id?'var(--navy)':'var(--border)'};border-radius:8px;cursor:pointer;background:${selParentChild==s.id?'#EFF6FF':'white'};transition:.2s;"><div style="font-weight:600;font-size:12px;">${s.fn} ${s.ln}</div><div style="font-size:10px;color:var(--muted);">${s.cls} &nbsp;|&nbsp; <b>${s.enroll}</b></div></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:14px;font-size:11px;">No students in database yet.</div>';
+}
+function selectChild(id){selParentChild=id;filterChildren();document.getElementById('parent-pwd-wrap').style.display='';const st=students.find(s=>s.id==id);if(st)document.getElementById('parent-pwd').placeholder=`Default: ${st.enroll}`;}
+
+function doLogin(){
+  const u=document.getElementById('ln-u').value.trim(),p=document.getElementById('ln-p').value;
+  if(!u||!p){showErr('Enter username and password.');return;}
+  // Admin master login — works from any role tab
+  const adminAcc=accounts.find(a=>a.r==='admin'&&a.u===u&&a.p===p);
+  if(adminAcc){curUser=adminAcc;curRole='admin';launchApp();return;}
+  // Normal login — must match selected role
+  if(selRole==='student'){
+    const st=students.find(s=>s.enroll===u);
+    if(st&&(p===st.pwd||p===st.enroll)){curUser={id:st.id,u:st.enroll,n:st.fn+' '+st.ln,r:'student',sid:st.id};curRole='student';launchApp();return;}
+    showErr('❌ Invalid enrollment number or password.');return;
+  }
+  const acc=accounts.find(a=>a.u===u&&a.p===p&&a.r===selRole);
+  if(!acc){showErr('❌ Invalid credentials. Contact the school admin.');return;}
+  if(!acc.approved){showErr('⏳ Account pending admin approval.');return;}
+  curUser=acc;curRole=acc.r;launchApp();
+}
+
+function doParentLogin(){
+  if(!selParentChild){showErr('Select a child first.');return;}
+  const st=students.find(s=>s.id==selParentChild);if(!st){showErr('Student not found.');return;}
+  const p=document.getElementById('parent-pwd').value;
+  if(p!==(st.pwd||st.enroll)){showErr('❌ Incorrect password. Default is enrollment number.');return;}
+  curUser={id:st.id,u:'parent_'+st.id,n:'Parent of '+st.fn+' '+st.ln,r:'parent',childId:st.id};curRole='parent';launchApp();
+}
+
+function doSignup(){
+  const name=document.getElementById('su-name').value.trim(),u=document.getElementById('su-u').value.trim(),p=document.getElementById('su-p').value;
+  if(!name||!u||!p){showErr('Fill all required fields.');return;}
+  if(p.length<6){showErr('Password must be at least 6 characters.');return;}
+  if(accounts.find(a=>a.u===u)){showErr('Username already taken.');return;}
+  accounts.push({id:Date.now(),u,p,n:name,r:'teacher',sub:document.getElementById('su-sub').value,cls:document.getElementById('su-cls').value,approved:false,mustChange:false});
+  DB.set('accounts',accounts);
+  showSuccess('✅ Account created! Awaiting admin approval.');
+}
+
+function doForgot(){
+  const u=document.getElementById('fo-u').value.trim();
+  if(!u){showErr('Enter your username.');return;}
+  showSuccess('✅ Contact the school admin with username: '+u+' to reset your password.');
+}
+
+function showErr(m){const e=document.getElementById('lerr');e.innerHTML=m;e.style.display='block';document.getElementById('lsuc').style.display='none';}
+function showSuccess(m){const e=document.getElementById('lsuc');e.textContent=m;e.style.display='block';document.getElementById('lerr').style.display='none';}
+
+function launchApp(){
+  document.getElementById('welcomeScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  setupRole();renderAll();setDates();
+}
+function doLogout(){
+  document.getElementById('welcomeScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  curUser=null;selParentChild=null;
+  document.getElementById('ln-u').value='';document.getElementById('ln-p').value='';
+}
+
+// ===== ROLE NAVIGATION CONFIG =====
+const NAVS={
+  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Analytics'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Analytics'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Analytics'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  student:[{s:'My Portal'},{id:'student-portal',i:'🏠',l:'My Dashboard'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  parent:[{s:'My Portal'},{id:'parent-portal',i:'🏠',l:"Child's Report"}]
+};
+const RDEF={admin:'dashboard',headteacher:'dashboard',deputy:'dashboard',hod:'hod-monitor',teacher:'teacher-portal',student:'student-portal',parent:'parent-portal'};
+
+function setupRole(){
+  const c=ROLE_COLORS[curRole]||'#003580';
+  const av=document.getElementById('av');av.textContent=curUser.n[0];av.style.background=c+'22';av.style.color=c;
+  document.getElementById('uname').textContent=curUser.n;
+  document.getElementById('urole').textContent=ROLE_LABELS[curRole]||curRole;
+  document.getElementById('urole').style.color=curRole==='admin'?'#F0A500':c;
+  const rb=document.getElementById('rbadge');rb.textContent=ROLE_LABELS[curRole]||curRole;rb.style.background=c+'22';rb.style.color=c;
+  document.getElementById('snav').innerHTML=(NAVS[curRole]||[]).map(n=>n.s?`<div class="ss">${n.s}</div>`:`<div class="ni" onclick="go('${n.id}')"><span>${n.i}</span>${n.l}</div>`).join('');
+  // Role-specific setup
+  document.getElementById('ecz-act').innerHTML=curRole!=='student'&&curRole!=='parent'?'<button class="btn bprimary" onclick="openM(\'eczM\')">📤 Upload</button>':'';
+  document.getElementById('ttact').innerHTML=curRole==='admin'||curRole==='headteacher'?'<button class="btn bprimary" onclick="openM(\'periodM\')">＋ Add Period</button>':'';
+  const usb=document.getElementById('uploadScanBtn');if(usb)usb.style.display=curRole!=='student'&&curRole!=='parent'?'':'none';
+  const asb=document.getElementById('addStuBtn');if(asb)asb.style.display=curRole==='student'||curRole==='parent'?'none':'';
+  const atb=document.getElementById('addTchBtn');if(atb)atb.style.display=curRole==='admin'||curRole==='headteacher'?'':'none';
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  const def=RDEF[curRole];document.getElementById('pg-'+def)?.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')===`go('${def}')`)n.classList.add('active');});
+  document.getElementById('tbt').textContent=def.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  populateAll();populateStudentDropdowns();
+  if(curRole==='parent')loadParentPortal();
+  if(curRole==='student')loadStudentPortal();
+  if(curRole==='teacher')loadTeacherPortal();
+  if(curRole==='hod')loadHODMonitor();
+  if(curRole==='deputy')loadDeputyMonitor();
+  renderPendingApprovals();
+}
+
+function go(page){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+page)?.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')===`go('${page}')`)n.classList.add('active');});
+  const titles={dashboard:'Dashboard','students':'Students','class-enroll':'Class Enrollment',teachers:'Staff Management',attendance:'Attendance Register',grades:'Grades & Results',sba:'School Based Assessments',reports:'Report Cards',timetable:'Timetable',analytics:'Results Analysis',promotion:'Student Promotion','hod-monitor':'HOD Monitor','deputy-monitor':'Deputy Oversight',ecz:'ECZ Past Papers',fees:'Fee Payments',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance Evaluations',production:'Production',users:'User Management',changepassword:'Change Password','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal'};
+  document.getElementById('tbt').textContent=titles[page]||page;
+  if(page==='timetable')renderTimetable();
+  if(page==='dashboard')updateDash();
+  if(page==='attendance')loadAttStudents();
+  if(page==='ecz')renderPapers();
+  if(page==='grades'){populateStudentDropdowns();renderGrades();}
+  if(page==='sba'){populateStudentDropdowns();renderSBA();}
+  if(page==='reports'){populateStudentDropdowns();renderScans();}
+  if(page==='analytics')renderAnalytics();
+  if(page==='promotion')renderStuDist();
+  if(page==='class-enroll'){loadClassList();}
+  if(page==='teacher-portal')loadTeacherPortal();
+  if(page==='student-portal')loadStudentPortal();
+  if(page==='parent-portal')loadParentPortal();
+  if(page==='users')renderUsers();
+  if(page==='teachers')renderPendingApprovals();
+  if(page==='hod-monitor')loadHODMonitor();
+  if(page==='deputy-monitor')loadDeputyMonitor();
+}
+
+function setDates(){
+  const d=new Date();
+  document.getElementById('tbd').textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  ['att-date','fee-date','fin-date','prod-date'].forEach(id=>{const el=document.getElementById(id);if(el&&el.type==='date')el.value=d.toISOString().split('T')[0];});
+  ['sba-year','rc-yr','scan-yr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=d.getFullYear();});
+}
+
+function openM(id){document.getElementById(id).classList.add('show');if(['gmM','feeM','batchM','sbaM','scanM'].includes(id))populateStudentDropdowns();if(id==='batchM')loadBatch();}
+function closeM(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
+function toast(msg,t=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(t==='ok'?'ok':t==='err'?'err':'');setTimeout(()=>el.classList.remove('show'),3500);}
+function gg(s){if(s>=80)return{g:'A',c:'bgr',l:'Distinction'};if(s>=70)return{g:'B',c:'bb',l:'Merit'};if(s>=60)return{g:'C',c:'bo',l:'Credit'};if(s>=50)return{g:'D',c:'bp',l:'Pass'};return{g:'F',c:'br',l:'Fail'};}
+function gc(s){if(s>=80)return'var(--green)';if(s>=70)return'var(--navy)';if(s>=60)return'var(--warning)';if(s>=50)return'#8B5CF6';return'var(--red)';}
+
+// ===== CHANGE PASSWORD =====
+function changePassword(){
+  const old=document.getElementById('cp-old').value,np=document.getElementById('cp-new').value,cp=document.getElementById('cp-conf').value;
+  if(!old||!np||!cp){toast('⚠️ Fill all password fields','err');return;}
+  if(curRole==='student'){
+    const st=students.find(s=>s.id==curUser.sid);
+    if(!st||(old!==st.pwd&&old!==st.enroll)){toast('❌ Current password incorrect','err');return;}
+    if(np.length<6){toast('⚠️ New password must be at least 6 characters','err');return;}
+    if(np!==cp){toast('❌ Passwords do not match','err');return;}
+    st.pwd=np;DB.set('students',students);toast('✅ Password updated successfully','ok');
+  } else {
+    const acc=accounts.find(a=>a.id===curUser.id);
+    if(!acc||old!==acc.p){toast('❌ Current password incorrect','err');return;}
+    if(np.length<6){toast('⚠️ New password must be at least 6 characters','err');return;}
+    if(np!==cp){toast('❌ Passwords do not match','err');return;}
+    acc.p=np;DB.set('accounts',accounts);toast('✅ Password updated successfully','ok');
+  }
+  ['cp-old','cp-new','cp-conf'].forEach(id=>document.getElementById(id).value='');
+}
+function changeUsername(){
+  const nu=document.getElementById('cp-newu').value.trim(),pwd=document.getElementById('cp-upwd').value;
+  if(!nu||!pwd){toast('⚠️ Fill username and confirm password','err');return;}
+  const acc=accounts.find(a=>a.id===curUser.id);
+  if(!acc||pwd!==acc.p){toast('❌ Password incorrect','err');return;}
+  if(accounts.find(a=>a.u===nu&&a.id!==curUser.id)){toast('⚠️ Username already taken','err');return;}
+  acc.u=nu;curUser.u=nu;DB.set('accounts',accounts);
+  document.getElementById('uname').textContent=curUser.n;
+  toast('✅ Username updated to: '+nu,'ok');
+  document.getElementById('cp-newu').value='';document.getElementById('cp-upwd').value='';
+}
+
+// ===== DASHBOARD =====
+function updateDash(){
+  document.getElementById('ds').textContent=students.length;
+  document.getElementById('dt').textContent=teachers.length;
+  document.getElementById('dst').textContent=stores.length;
+  document.getElementById('dp').textContent=papers.length;
+  const fc=fees.filter(f=>f.status==='Paid').reduce((a,f)=>a+parseFloat(f.amount||0),0);
+  document.getElementById('df').textContent='K'+fc.toLocaleString();
+  const lr=attendance.slice(-1)[0];document.getElementById('da').textContent=lr?Math.round(lr.present/(lr.present+lr.absent||1)*100)+'%':'—';
+  document.querySelector('#dash-stbl tbody').innerHTML=students.slice(-5).reverse().map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td>${s.fn} ${s.ln}</td><td>${s.cls}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:14px">No students yet</td></tr>';
+  const acts=[...students.slice(-2).map(s=>({i:'👨‍🎓',t:`${s.fn} ${s.ln} enrolled [${s.enroll}]`})),...grades.slice(-2).map(g=>({i:'📝',t:`Grade: ${g.sn} — ${g.sub} ${g.sc}%`})),...sba.slice(-2).map(b=>({i:'📊',t:`SBA: ${b.sn} ${b.type}`}))].slice(0,5);
+  document.getElementById('dash-actf').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;gap:7px;padding:7px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><span>${a.i}</span><span>${a.t}</span></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:14px;font-size:11px;">No activity yet</div>';
+}
+
+// ===== STUDENTS =====
+function saveStudent(){
+  const fn=document.getElementById('sm-fn').value.trim(),ln=document.getElementById('sm-ln').value.trim();
+  if(!fn||!ln){toast('⚠️ Enter first and last name','err');return;}
+  const enroll=genEnroll(),pwd=document.getElementById('sm-pwd').value||enroll;
+  const cls=document.getElementById('sm-cls').value||CLASSES[0];
+  students.push({id:Date.now(),enroll,fn,ln,cls,gender:document.getElementById('sm-gd').value,dob:document.getElementById('sm-dob').value,guardian:document.getElementById('sm-gu').value,phone:document.getElementById('sm-ph').value,pwd,enrolledAt:new Date().toLocaleDateString('en-GB')});
+  DB.set('students',students);populateStudentDropdowns();renderStudents();loadClassList();updateDash();closeM('smM');
+  ['sm-fn','sm-ln','sm-gu','sm-ph','sm-pwd'].forEach(id=>document.getElementById(id).value='');
+  toast(`✅ ${fn} ${ln} enrolled as ${enroll}`,'ok');
+}
+function delStudent(id){if(!confirm('Remove student?'))return;students=students.filter(s=>s.id!==id);DB.set('students',students);renderStudents();populateStudentDropdowns();updateDash();toast('🗑 Removed','');}
+function renderStudents(){
+  const q=document.querySelector('#pg-students .si2')?.value.toLowerCase()||'',cf=document.getElementById('sf-cls')?.value||'';
+  const list=students.filter(s=>(!q||(s.fn+' '+s.ln+' '+s.enroll).toLowerCase().includes(q))&&(!cf||s.cls===cf));
+  document.querySelector('#stu-tbl tbody').innerHTML=list.length?list.map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td><b>${s.fn} ${s.ln}</b></td><td><span class="badge bb">${s.cls}</span></td><td>${s.gender}</td><td>${s.guardian||'—'}</td><td>${s.phone||'—'}</td><td><button class="btn bsm bdanger" onclick="delStudent(${s.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No students yet</td></tr>';
+}
+
+// CLASS ENROLLMENT
+function loadClassList(){
+  const cls=document.getElementById('enroll-cls')?.value||CLASSES[0];
+  document.getElementById('sm-cls').value=cls;
+  const list=students.filter(s=>s.cls===cls);
+  const el=document.getElementById('class-list');if(!el)return;
+  el.innerHTML=list.length?`<table class="tbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Gender</th><th>Guardian</th><th>Enrolled</th><th></th></tr></thead><tbody>${list.map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td><b>${s.fn} ${s.ln}</b></td><td>${s.gender}</td><td>${s.guardian||'—'}</td><td>${s.enrolledAt||'—'}</td><td><button class="btn bsm bdanger" onclick="delStudent(${s.id})">🗑</button></td></tr>`).join('')}</tbody></table>`:`<div style="text-align:center;padding:24px;color:var(--muted);"><div style="font-size:32px;margin-bottom:8px;">📋</div><p>No students in ${cls} yet.</p><button class="btn bprimary" style="margin-top:10px;" onclick="openM('smM')">＋ Enroll First Student</button></div>`;
+}
+
+// ===== TEACHERS =====
+function renderPendingApprovals(){
+  const pending=accounts.filter(a=>a.r==='teacher'&&!a.approved);
+  const card=document.getElementById('pendingCard');if(card)card.style.display=pending.length?'block':'none';
+  const tb=document.querySelector('#pending-tbl tbody');
+  if(tb)tb.innerHTML=pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher(${a.id})">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher(${a.id})">❌ Reject</button></td></tr>`).join('');
+}
+function approveTeacher(id){
+  const acc=accounts.find(a=>a.id===id);if(!acc)return;
+  acc.approved=true;
+  const parts=acc.n.split(' ');
+  teachers.push({id:Date.now(),fn:parts[0],ln:parts.slice(1).join(' ')||'',u:acc.u,sub:acc.sub||'',cls:acc.cls||'',role:'teacher',status:'Active'});
+  DB.set('teachers',teachers);DB.set('accounts',accounts);renderTeachers();renderPendingApprovals();toast('✅ Teacher approved','ok');
+}
+function rejectTeacher(id){if(!confirm('Reject account?'))return;accounts=accounts.filter(a=>a.id!==id);DB.set('accounts',accounts);renderPendingApprovals();toast('❌ Rejected','');}
+function saveTeacher(){
+  const fn=document.getElementById('tm-fn').value.trim(),ln=document.getElementById('tm-ln').value.trim();
+  const u=document.getElementById('tm-u').value.trim(),p=document.getElementById('tm-p').value;
+  const role=document.getElementById('tm-role').value;
+  if(!fn||!ln||!u||!p){toast('⚠️ Fill name, username and password','err');return;}
+  if(accounts.find(a=>a.u===u)){toast('⚠️ Username taken','err');return;}
+  const newT={id:Date.now(),fn,ln,u,sub:document.getElementById('tm-sub').value,cls:document.getElementById('tm-cls').value,role,q:document.getElementById('tm-q').value,phone:document.getElementById('tm-ph').value,status:'Active'};
+  teachers.push(newT);DB.set('teachers',teachers);
+  accounts.push({id:Date.now()+1,u,p,n:fn+' '+ln,r:role,approved:true,mustChange:true});DB.set('accounts',accounts);
+  renderTeachers();closeM('tmM');['tm-fn','tm-ln','tm-u','tm-p','tm-q','tm-ph'].forEach(id=>document.getElementById(id).value='');
+  toast(`✅ ${ROLE_LABELS[role]} ${fn} ${ln} added. Login: ${u} / ${p}`,'ok');
+}
+function delTeacher(id){if(!confirm('Remove?'))return;const t=teachers.find(x=>x.id===id);teachers=teachers.filter(x=>x.id!==id);DB.set('teachers',teachers);if(t){accounts=accounts.filter(a=>a.u!==t.u);DB.set('accounts',accounts);}renderTeachers();toast('🗑 Removed','');}
+function renderTeachers(){
+  const q=document.querySelector('#pg-teachers .si2')?.value.toLowerCase()||'';
+  const list=teachers.filter(t=>!q||(t.fn+' '+t.ln).toLowerCase().includes(q));
+  const rb={admin:'bb',headteacher:'bgr',deputy:'br',hod:'bo',teacher:'bp'};
+  document.querySelector('#tch-tbl tbody').innerHTML=list.length?list.map((t,i)=>`<tr><td>${i+1}</td><td><b>${t.fn} ${t.ln}</b></td><td><span class="badge ${rb[t.role||'teacher']}">${ROLE_LABELS[t.role||'teacher']}</span></td><td>${t.sub||'—'}</td><td>${t.cls?`<span class="badge bb">${t.cls}</span>`:'—'}</td><td><span class="badge bgr">${t.u||'—'}</span></td><td><span class="badge bgr">Active</span></td><td><button class="btn bsm bdanger" onclick="delTeacher(${t.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:16px">No staff added yet</td></tr>';
+}
+
+// ===== ATTENDANCE =====
+function loadAttStudents(){
+  const cls=document.getElementById('att-cls')?.value||CLASSES[0];
+  const list=students.filter(s=>s.cls===cls);
+  document.querySelector('#att-tbl tbody').innerHTML=list.length?list.map((s,i)=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td>${s.fn} ${s.ln}</td><td><input type="radio" name="a${s.id}" value="p" checked></td><td><input type="radio" name="a${s.id}" value="ab"></td><td><input type="radio" name="a${s.id}" value="l"></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">No students in this class</td></tr>';
+  renderAttRec();
+}
+function markAll(v){document.querySelectorAll('#att-tbl tbody tr').forEach(r=>{r.querySelectorAll('input[type=radio]').forEach(rd=>{if(rd.value===v)rd.checked=true;});});}
+function saveAtt(){
+  const cls=document.getElementById('att-cls').value,date=document.getElementById('att-date').value;
+  if(!date){toast('⚠️ Select a date','err');return;}
+  let p=0,ab=0,l=0;document.querySelectorAll('#att-tbl tbody tr').forEach(r=>{r.querySelectorAll('input[type=radio]').forEach(rd=>{if(rd.checked){if(rd.value==='p')p++;else if(rd.value==='ab')ab++;else l++;}});});
+  attendance.unshift({id:Date.now(),date,cls,present:p,absent:ab,late:l,total:p+ab+l,by:curUser.n,byRole:curRole});
+  DB.set('att',attendance);renderAttRec();updateDash();toast(`✅ Register saved — ${p} present`,'ok');
+}
+function renderAttRec(){document.querySelector('#att-rec-tbl tbody').innerHTML=attendance.slice(0,15).map(r=>`<tr><td>${r.date}</td><td>${r.cls}</td><td><span class="badge bgr">${r.present}</span></td><td><span class="badge br">${r.absent}</span></td><td><span class="badge bo">${r.late||0}</span></td><td>${r.total?Math.round(r.present/r.total*100):0}%</td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No records yet</td></tr>';}
+function expAtt(){const rows=['Date,Class,Present,Absent,Late'];attendance.forEach(r=>rows.push(`${r.date},${r.cls},${r.present},${r.absent},${r.late||0}`));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='Attendance.csv';a.click();toast('📊 Exported','ok');}
+
+// ===== GRADES =====
+function saveGrade(){
+  const sid=document.getElementById('gm-stu').value,sc=parseInt(document.getElementById('gm-score').value);
+  if(!sid){toast('⚠️ Select a student','err');return;}if(isNaN(sc)||sc<0||sc>100){toast('⚠️ Valid score required','err');return;}
+  const st=students.find(s=>s.id==sid);
+  grades.unshift({id:Date.now(),sid,sn:st?st.fn+' '+st.ln:'Unknown',scls:st?.cls||'',enroll:st?.enroll||'',sub:document.getElementById('gm-sub').value,term:document.getElementById('gm-term').value,sc,comment:document.getElementById('gm-comment').value,by:curUser.n,byRole:curRole});
+  DB.set('grades',grades);renderGrades();closeM('gmM');document.getElementById('gm-score').value='';document.getElementById('gm-comment').value='';toast('✅ Grade saved','ok');
+}
+function delGrade(id){if(curRole==='student'||curRole==='parent'){toast('❌ Not allowed','err');return;}grades=grades.filter(g=>g.id!==id);DB.set('grades',grades);renderGrades();toast('🗑 Removed','');}
+function renderGrades(){
+  const q=document.querySelector('#pg-grades .si2')?.value.toLowerCase()||'';
+  const tf=document.getElementById('gf-term')?.value||'',sf=document.getElementById('gf-sub')?.value||'',cf=document.getElementById('gf-cls')?.value||'';
+  // For HOD: filter by their department subject
+  let list=grades.filter(g=>(!q||(g.sn+' '+g.enroll).toLowerCase().includes(q))&&(!tf||g.term===tf)&&(!sf||g.sub===sf)&&(!cf||g.scls===cf));
+  if(curRole==='hod'){const acc=accounts.find(a=>a.id===curUser.id);const myDept=acc?.sub||teachers.find(t=>t.u===curUser.u)?.sub||'';if(myDept)list=list.filter(g=>g.sub===myDept);}
+  const cd=curRole!=='student'&&curRole!=='parent';
+  document.querySelector('#grades-tbl tbody').innerHTML=list.length?list.map(g=>{const gd=gg(g.sc);return`<tr><td><span class="enroll-badge">${g.enroll||'—'}</span></td><td><b>${g.sn}</b></td><td>${g.scls}</td><td>${g.sub}</td><td>${g.term}</td><td><b style="color:${gc(g.sc)}">${g.sc}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td><td style="font-size:10px;color:var(--muted);max-width:100px;">${g.comment||'—'}</td><td>${cd?`<button class="btn bsm bdanger" onclick="delGrade(${g.id})">🗑</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:16px">No grades yet</td></tr>';
+}
+
+// BATCH
+function loadBatch(){
+  const cls=document.getElementById('batch-cls')?.value||CLASSES[0];
+  const list=students.filter(s=>s.cls===cls);
+  document.getElementById('batch-list').innerHTML=list.length?`<table class="tbl"><thead><tr><th>Enroll #</th><th>Student</th><th>Score (%)</th><th>Comment</th></tr></thead><tbody>${list.map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td><b>${s.fn} ${s.ln}</b></td><td><input type="number" min="0" max="100" id="bs_${s.id}" style="width:65px;padding:5px;text-align:center;"></td><td><input id="bc_${s.id}" placeholder="Comment..." style="font-size:11px;"></td></tr>`).join('')}</tbody></table>`:'<div style="text-align:center;color:var(--muted);padding:16px;">No students.</div>';
+}
+function saveBatch(){
+  const cls=document.getElementById('batch-cls').value,sub=document.getElementById('batch-sub').value,term=document.getElementById('batch-term').value;
+  const list=students.filter(s=>s.cls===cls);let count=0;
+  list.forEach(s=>{const sc=parseInt(document.getElementById('bs_'+s.id)?.value);if(!isNaN(sc)&&sc>=0&&sc<=100){grades.unshift({id:Date.now()+Math.random(),sid:s.id,sn:`${s.fn} ${s.ln}`,scls:s.cls,enroll:s.enroll,sub,term,sc,comment:document.getElementById('bc_'+s.id)?.value||'',by:curUser.n,byRole:curRole});count++;}});
+  if(!count){toast('⚠️ Enter at least one score','err');return;}
+  DB.set('grades',grades);renderGrades();closeM('batchM');toast(`✅ ${count} grades saved`,'ok');
+}
+
+// ===== SBA =====
+function saveSBA(){
+  const sid=document.getElementById('sba-stu').value,sc=parseInt(document.getElementById('sba-score').value);
+  if(!sid){toast('⚠️ Select student','err');return;}if(isNaN(sc)||sc<0||sc>100){toast('⚠️ Valid score required','err');return;}
+  const st=students.find(s=>s.id==sid);
+  sba.unshift({id:Date.now(),sid,sn:st?st.fn+' '+st.ln:'Unknown',scls:st?.cls||'',enroll:st?.enroll||'',sub:document.getElementById('sba-sub').value,type:document.getElementById('sba-type').value,term:document.getElementById('sba-term').value,sc,year:document.getElementById('sba-year').value,by:curUser.n});
+  DB.set('sba',sba);renderSBA();closeM('sbaM');document.getElementById('sba-score').value='';toast('✅ SBA recorded','ok');
+}
+function delSBA(id){sba=sba.filter(s=>s.id!==id);DB.set('sba',sba);renderSBA();toast('🗑 Removed','');}
+function renderSBA(){
+  const q=document.querySelector('#pg-sba .si2')?.value.toLowerCase()||'';
+  const tf=document.getElementById('sba-ft')?.value||'',wf=document.getElementById('sba-fw')?.value||'';
+  let list=sba.filter(b=>(!q||(b.sn+' '+b.enroll).toLowerCase().includes(q))&&(!tf||b.term===tf)&&(!wf||b.type===wf));
+  if(curRole==='hod'){const acc=accounts.find(a=>a.id===curUser.id);const myDept=acc?.sub||'';if(myDept)list=list.filter(b=>b.sub===myDept);}
+  document.getElementById('sba5c').textContent=sba.filter(b=>b.type==='Week 5').length+' records';
+  document.getElementById('sba10c').textContent=sba.filter(b=>b.type==='Week 10').length+' records';
+  document.getElementById('sbaEOTc').textContent=sba.filter(b=>b.type==='End of Term').length+' records';
+  const cd=curRole!=='student'&&curRole!=='parent';
+  document.querySelector('#sba-tbl tbody').innerHTML=list.length?list.map(b=>{const gd=gg(b.sc);return`<tr><td><span class="enroll-badge">${b.enroll||'—'}</span></td><td><b>${b.sn}</b></td><td>${b.scls}</td><td>${b.sub}</td><td><span class="badge ${b.type==='Week 5'?'bgr':b.type==='Week 10'?'bb':'bo'}">${b.type}</span></td><td>${b.term}</td><td><b style="color:${gc(b.sc)}">${b.sc}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td><td>${cd?`<button class="btn bsm bdanger" onclick="delSBA(${b.id})">🗑</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:16px">No SBA records yet</td></tr>';
+  const tp=document.querySelector('#tp-sba tbody');if(tp)tp.innerHTML=sba.slice(0,8).map(b=>`<tr><td>${b.sn}</td><td>${b.sub}</td><td>${b.type}</td><td><b style="color:${gc(b.sc)}">${b.sc}%</b></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">No SBA records</td></tr>';
+}
+
+// ===== REPORT CARD =====
+function buildRC(st,sg,sbag,term,yr){
+  const avg=sg.length?Math.round(sg.reduce((a,g)=>a+g.sc,0)/sg.length):0;
+  const gd=gg(avg);const grCnt={A:0,B:0,C:0,D:0,F:0};sg.forEach(g=>grCnt[gg(g.sc).g]++);
+  return `<div class="rc-page">
+    <div class="rc-header">
+      <div class="rc-flag"><div style="background:#198A00;"></div><div style="background:#E8000D;"></div><div style="background:black;"></div><div style="background:#F0A500;"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div class="rc-school">LUMWANA WEST DAY SECONDARY SCHOOL</div><div style="font-size:11px;opacity:.6;margin-top:2px;">Ministry of Education — Republic of Zambia</div><div style="font-size:10px;opacity:.5;">Official Academic Report Card — ${yr}</div></div>
+        <div style="text-align:right;font-size:11px;opacity:.7;">${term}<br>Year ${yr}</div>
+      </div>
+    </div>
+    <div class="rc-info">
+      <div class="rc-info-item"><label>Student Name</label><span>${st.fn} ${st.ln}</span></div>
+      <div class="rc-info-item"><label>Enrollment No.</label><span style="font-family:'Syne',sans-serif;">${st.enroll}</span></div>
+      <div class="rc-info-item"><label>Class</label><span>${st.cls}</span></div>
+      <div class="rc-info-item"><label>Gender</label><span>${st.gender||'—'}</span></div>
+      <div class="rc-info-item"><label>Term</label><span>${term}</span></div>
+      <div class="rc-info-item"><label>Academic Year</label><span>${yr}</span></div>
+    </div>
+    <div style="overflow-x:auto;"><table class="rc-table">
+      <thead><tr><th style="text-align:left;width:20px;">#</th><th style="text-align:left;">SUBJECT</th><th>MARK (%)</th><th>GRADE</th><th>REMARKS</th><th style="text-align:left;">TEACHER COMMENT</th></tr></thead>
+      <tbody>${sg.length?sg.map((g,i)=>{const gx=gg(g.sc);return`<tr><td>${i+1}</td><td><b>${g.sub}</b></td><td><b style="font-size:14px;color:${gc(g.sc)}">${g.sc}%</b></td><td><span class="badge ${gx.c}">${gx.g}</span></td><td>${gx.l}</td><td style="text-align:left;font-size:11px;color:var(--muted);">${g.comment||'—'}</td></tr>`}).join(''):`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:18px">No grades for ${term}</td></tr>`}</tbody>
+    </table></div>
+    ${sbag.length?`<div style="padding:10px 22px;border-top:1px solid var(--border);"><div style="font-weight:700;font-size:12px;color:var(--navy);margin-bottom:8px;">📊 SBA — ${term}</div>
+    <table class="rc-table" style="font-size:11px;"><thead><tr><th style="text-align:left;">Subject</th><th>Week 5</th><th>Week 10</th><th>End of Term</th></tr></thead><tbody>
+    ${SUBJECTS.map(sub=>{const w5=sbag.find(b=>b.sub===sub&&b.type==='Week 5'),w10=sbag.find(b=>b.sub===sub&&b.type==='Week 10'),eot=sbag.find(b=>b.sub===sub&&b.type==='End of Term');if(!w5&&!w10&&!eot)return'';return`<tr><td style="text-align:left;"><b>${sub}</b></td><td>${w5?`<b style="color:${gc(w5.sc)}">${w5.sc}%</b>`:'—'}</td><td>${w10?`<b style="color:${gc(w10.sc)}">${w10.sc}%</b>`:'—'}</td><td>${eot?`<b style="color:${gc(eot.sc)}">${eot.sc}%</b>`:'—'}</td></tr>`;}).filter(Boolean).join('')}
+    </tbody></table></div>`:''}
+    <div class="rc-summary">
+      <div class="rc-sum-item"><div class="val">${sg.length}</div><div class="lbl">Subjects</div></div>
+      <div class="rc-sum-item"><div class="val" style="color:${gc(avg)}">${avg}%</div><div class="lbl">Average</div></div>
+      <div class="rc-sum-item"><div class="val"><span class="badge ${gd.c}">${gd.g}</span></div><div class="lbl">Overall</div></div>
+      <div class="rc-sum-item"><div class="val">${grCnt.A+grCnt.B}</div><div class="lbl">A &amp; B</div></div>
+    </div>
+    <div style="padding:12px 22px;background:white;border-top:1px solid var(--border);">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${Object.entries(grCnt).map(([g,n])=>`<div style="text-align:center;padding:6px 12px;border-radius:8px;background:var(--light);min-width:42px;"><div style="font-weight:800;font-size:15px;">${n}</div><div style="font-size:9px;color:var(--muted);">Grd ${g}</div></div>`).join('')}</div>
+      <div style="font-size:11px;color:var(--muted);"><b>Class Teacher Remark:</b> ${avg>=80?'Outstanding performance. A model learner — keep it up!':avg>=70?'Very good performance. Continue working hard.':avg>=60?'Good performance. More effort needed.':avg>=50?'Satisfactory. Greater dedication required.':'Needs urgent improvement. Extra lessons recommended.'}</div>
+    </div>
+    <div class="rc-footer">
+      <div>Generated: ${new Date().toLocaleDateString('en-GB')} | Lumwana West Day Edu System</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;font-size:10px;margin-top:10px;width:100%;"><div><div style="border-top:1px solid #999;margin-top:20px;padding-top:4px;">Class Teacher</div></div><div><div style="border-top:1px solid #999;margin-top:20px;padding-top:4px;">Head Teacher</div></div><div><div style="border-top:1px solid #999;margin-top:20px;padding-top:4px;">Parent/Guardian</div></div></div>
+      <button class="btn bgold" onclick="window.print()" style="margin-top:8px;">🖨 Print</button>
+    </div>
+  </div>`;
+}
+function genReport(){
+  const sid=document.getElementById('rc-stu').value,term=document.getElementById('rc-term').value,yr=document.getElementById('rc-yr').value||new Date().getFullYear();
+  if(!sid){toast('⚠️ Select a student','err');return;}
+  const st=students.find(s=>s.id==sid);if(!st)return;
+  document.getElementById('rc-out').innerHTML=buildRC(st,grades.filter(g=>g.sid==sid&&g.term===term),sba.filter(b=>b.sid==sid&&b.term===term),term,yr);
+  toast('✅ Report card generated','ok');
+}
+
+// SCAN UPLOAD
+function handleScan(e){const f=e.target.files[0];if(!f)return;scanFileName=f.name;document.getElementById('scan-fn').textContent='✅ '+f.name;const r=new FileReader();r.onload=ev=>{scanData=ev.target.result;const p=document.getElementById('scan-prev');p.innerHTML=f.type.startsWith('image')?`<img src="${scanData}" style="max-width:100%;border-radius:8px;margin-top:10px;max-height:180px;">`:`<div style="padding:8px;background:var(--light);border-radius:6px;font-size:11px;margin-top:8px;">📄 ${f.name}</div>`;};r.readAsDataURL(f);}
+function saveScan(){
+  const sid=document.getElementById('scan-stu').value;if(!sid){toast('⚠️ Select student','err');return;}if(!scanData){toast('⚠️ Select file','err');return;}
+  const st=students.find(s=>s.id==sid);
+  scans.unshift({id:Date.now(),sid,sn:st?st.fn+' '+st.ln:'Unknown',enroll:st?.enroll||'',cls:st?.cls||'',term:document.getElementById('scan-term').value,year:document.getElementById('scan-yr').value,data:scanData,fileName:scanFileName,uploaded:new Date().toLocaleDateString('en-GB')});
+  DB.set('scans',scans);renderScans();closeM('scanM');scanData=null;scanFileName='';document.getElementById('scan-fn').textContent='Click to upload';document.getElementById('scan-prev').innerHTML='';toast('✅ Scan saved','ok');
+}
+function viewScan(id){const sc=scans.find(s=>s.id===id);if(!sc)return;if(sc.data.startsWith('data:image')){const w=window.open('');w.document.write(`<img src="${sc.data}" style="max-width:100%;"><title>${sc.sn}</title>`);}else{const a=document.createElement('a');a.href=sc.data;a.download=sc.fileName;a.click();}}
+function delScan(id){if(!confirm('Remove?'))return;scans=scans.filter(s=>s.id!==id);DB.set('scans',scans);renderScans();toast('🗑 Removed','');}
+function renderScans(){const el=document.getElementById('scans-out');if(!el||!scans.length){if(el)el.innerHTML='';return;}el.innerHTML=`<div class="card"><div class="ch"><div class="ct">📸 Uploaded Scans (${scans.length})</div></div><table class="tbl"><thead><tr><th>Enroll #</th><th>Student</th><th>Class</th><th>Term</th><th>Year</th><th>File</th><th>Actions</th></tr></thead><tbody>${scans.map(sc=>`<tr><td><span class="enroll-badge">${sc.enroll||'—'}</span></td><td><b>${sc.sn}</b></td><td>${sc.cls}</td><td>${sc.term}</td><td>${sc.year}</td><td style="font-size:10px;color:var(--muted)">${sc.fileName}</td><td><button class="btn bsm bgold" onclick="viewScan(${sc.id})">👁</button> <button class="btn bsm bdanger" onclick="delScan(${sc.id})">🗑</button></td></tr>`).join('')}</tbody></table></div>`;}
+
+// ===== TIMETABLE =====
+function selClass(el,cls){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');curClass=cls;renderTimetable();}
+function renderTimetable(){
+  const data=timetable[curClass]||{};const canEdit=curRole==='admin'||curRole==='headteacher';
+  document.getElementById('tt-body').innerHTML=TIMES.map(time=>{
+    if(time==='BREAK'||time==='LUNCH')return`<tr><td style="font-size:9px;color:var(--muted);font-style:italic;">${time}</td>${DAYS.map(()=>`<td><div class="ts brk">—</div></td>`).join('')}</tr>`;
+    return`<tr><td>${time}</td>${DAYS.map(day=>{const k=day+'|'+time,slot=data[k];if(slot){const c=SC[slot.s]||'soc';return`<td><div class="ts ${c}" ${canEdit?`onclick="remPeriod('${k}')"`:''}><div style="font-weight:600">${slot.s.split(' ').slice(0,2).join(' ')}</div><div style="font-size:9px;opacity:.65">${slot.te||''}</div></div></td>`;}return`<td>${canEdit?`<div class="te" onclick="quickPer('${day}','${time}')">＋</div>`:'<div style="color:#E2E8F0;font-size:11px">—</div>'}</td>`;}).join('')}</tr>`;
+  }).join('');
+}
+function quickPer(d,t){document.getElementById('per-day').value=d;document.getElementById('per-time').value=t;openM('periodM');}
+function addPeriod(){const d=document.getElementById('per-day').value,t=document.getElementById('per-time').value;if(!timetable[curClass])timetable[curClass]={};timetable[curClass][d+'|'+t]={s:document.getElementById('per-sub').value,te:document.getElementById('per-tch').value,r:document.getElementById('per-room').value};DB.set('tt',[timetable]);renderTimetable();closeM('periodM');document.getElementById('per-tch').value='';document.getElementById('per-room').value='';toast('✅ Period added','ok');}
+function remPeriod(k){if(!confirm('Remove?'))return;if(timetable[curClass])delete timetable[curClass][k];DB.set('tt',[timetable]);renderTimetable();toast('🗑 Removed','');}
+
+// ===== ANALYTICS =====
+function renderAnalytics(){
+  const el=document.getElementById('analytics-cnt');
+  const clsFilter=document.getElementById('ana-cls')?.value||'';
+  // HOD: only their department
+  let myDept='';
+  if(curRole==='hod'){const acc=accounts.find(a=>a.id===curUser.id);myDept=acc?.sub||teachers.find(t=>t.u===curUser.u)?.sub||'';}
+  let filtGrades=grades;
+  if(clsFilter)filtGrades=filtGrades.filter(g=>g.scls===clsFilter);
+  if(myDept)filtGrades=filtGrades.filter(g=>g.sub===myDept);
+  const avg=filtGrades.length?Math.round(filtGrades.reduce((a,g)=>a+g.sc,0)/filtGrades.length):0;
+  const dist={A:0,B:0,C:0,D:0,F:0};filtGrades.forEach(g=>dist[gg(g.sc).g]++);
+  const clsPerf=CLASSES.filter(c=>!clsFilter||c===clsFilter).map(c=>{const sts=students.filter(s=>s.cls===c);let gs=grades.filter(g=>sts.find(s=>s.id==g.sid));if(myDept)gs=gs.filter(g=>g.sub===myDept);const a=gs.length?Math.round(gs.reduce((x,g)=>x+g.sc,0)/gs.length):0;return{c,n:sts.length,g:gs.length,avg:a};});
+  const subPerf=SUBJECTS.filter(s=>!myDept||s===myDept).map(sub=>{let sg=grades.filter(g=>g.sub===sub);if(clsFilter)sg=sg.filter(g=>g.scls===clsFilter);const a=sg.length?Math.round(sg.reduce((x,g)=>x+g.sc,0)/sg.length):0;return{sub,n:sg.length,avg:a};}).filter(s=>s.n>0).sort((a,b)=>b.avg-a.avg);
+  let topStu=students.map(s=>{let sg=grades.filter(g=>g.sid==s.id);if(clsFilter)sg=sg.filter(g=>g.scls===clsFilter);if(myDept)sg=sg.filter(g=>g.sub===myDept);const a=sg.length?Math.round(sg.reduce((x,g)=>x+g.sc,0)/sg.length):0;return{...s,avg:a,n:sg.length};}).filter(s=>s.n>0).sort((a,b)=>b.avg-a.avg).slice(0,10);
+  // Weekly contact analysis for HOD
+  const weeklyAtt=DAYS.map(day=>{const records=attendance.filter(r=>new Date(r.date).toLocaleDateString('en-US',{weekday:'long'})===day);const avgRate=records.length?Math.round(records.reduce((a,r)=>a+(r.total?r.present/r.total:0),0)/records.length*100):0;return{day,avgRate,sessions:records.length};});
+  el.innerHTML=`<div class="sg" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+    <div class="sc"><div class="sn" style="color:${gc(avg)}">${avg}%</div><div class="sl">Average${myDept?' ('+myDept.split(' ')[0]+')':''}</div></div>
+    <div class="sc"><div class="sn">${students.filter(s=>!clsFilter||s.cls===clsFilter).length}</div><div class="sl">Students</div></div>
+    <div class="sc"><div class="sn">${filtGrades.length}</div><div class="sl">Grades</div></div>
+    <div class="sc"><div class="sn">${sba.length}</div><div class="sl">SBA Records</div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">📊 Grade Distribution</div></div><div class="cb"><div style="display:flex;gap:10px;flex-wrap:wrap;">${Object.entries(dist).map(([g,n])=>`<div style="text-align:center;padding:10px 16px;border-radius:8px;background:var(--light);min-width:58px;"><div style="font-weight:800;font-size:20px;color:${gc(g==='A'?85:g==='B'?75:g==='C'?65:g==='D'?55:40)}">${n}</div><div style="font-size:10px;color:var(--muted);">Grade ${g}</div></div>`).join('')}</div></div></div>
+  <div class="card"><div class="ch"><div class="ct">🏫 Performance by Class</div></div><div class="cb" style="padding-bottom:8px;">${clsPerf.map(cp=>`<div class="bar-wrap"><div class="bar-label"><span><b>${cp.c}</b> (${cp.n} students)</span><span style="font-weight:700;color:${gc(cp.avg)}">${cp.avg}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${cp.avg}%;background:${gc(cp.avg)};"></div></div></div>`).join('')}${!filtGrades.length?'<div style="text-align:center;color:var(--muted);padding:14px;">No grades yet.</div>':''}</div></div>
+  ${myDept?'':`<div class="card"><div class="ch"><div class="ct">📚 Performance by Subject</div></div><table class="tbl"><thead><tr><th>#</th><th>Subject</th><th>Entries</th><th>Average</th><th>Grade</th><th>Bar</th></tr></thead><tbody>${subPerf.length?subPerf.map((s,i)=>{const gd=gg(s.avg);return`<tr><td>${i+1}</td><td><b>${s.sub}</b></td><td>${s.n}</td><td><b style="color:${gc(s.avg)}">${s.avg}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td><td><div class="bar-bg" style="min-width:80px;"><div class="bar-fill" style="width:${s.avg}%;background:${gc(s.avg)};"></div></div></td></tr>`}).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No data yet</td></tr>'}</tbody></table></div>`}
+  <div class="card"><div class="ch"><div class="ct">📅 Weekly Attendance Contact (HOD View)</div></div><div class="cb" style="padding-bottom:8px;">${weeklyAtt.map(d=>`<div class="bar-wrap"><div class="bar-label"><span><b>${d.day}</b> (${d.sessions} sessions)</span><span style="font-weight:700;color:${gc(d.avgRate)}">${d.avgRate}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${d.avgRate}%;background:${gc(d.avgRate)};"></div></div></div>`).join('')}</div></div>
+  <div class="card"><div class="ch"><div class="ct">🏆 Top Performing Students</div></div><table class="tbl"><thead><tr><th>Rank</th><th>Enroll #</th><th>Student</th><th>Class</th><th>Avg</th><th>Grade</th></tr></thead><tbody>${topStu.length?topStu.map((s,i)=>{const gd=gg(s.avg);return`<tr><td><b>${i+1}</b>${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td><span class="enroll-badge">${s.enroll}</span></td><td><b>${s.fn} ${s.ln}</b></td><td>${s.cls}</td><td><b style="color:${gc(s.avg)}">${s.avg}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td></tr>`}).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No data yet</td></tr>'}</tbody></table></div>`;
+}
+
+// ===== HOD MONITOR =====
+function loadHODMonitor(){
+  const acc=accounts.find(a=>a.id===curUser.id);
+  const myDept=acc?.sub||teachers.find(t=>t.u===curUser.u)?.sub||'';
+  const myTeachers=teachers.filter(t=>t.sub===myDept&&t.role==='teacher');
+  const deptGrades=grades.filter(g=>g.sub===myDept);
+  const deptSBA=sba.filter(b=>b.sub===myDept);
+  const avg=deptGrades.length?Math.round(deptGrades.reduce((a,g)=>a+g.sc,0)/deptGrades.length):0;
+  const el=document.getElementById('hod-content');
+  el.innerHTML=`
+  <div class="info-box">🗂️ Department: <b>${myDept||'Not assigned'}</b> | ${myTeachers.length} teacher(s) | ${deptGrades.length} grades recorded</div>
+  <div class="sg" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+    <div class="sc"><div class="sn" style="color:${gc(avg)}">${avg}%</div><div class="sl">Dept. Average</div></div>
+    <div class="sc"><div class="sn">${myTeachers.length}</div><div class="sl">Teachers</div></div>
+    <div class="sc"><div class="sn">${deptGrades.length}</div><div class="sl">Grades in Dept</div></div>
+    <div class="sc"><div class="sn">${deptSBA.length}</div><div class="sl">SBA Records</div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct">👨‍🏫 Teachers in ${myDept||'Department'}</div></div>
+    <table class="tbl"><thead><tr><th>Teacher</th><th>Class</th><th>Grades Entered</th><th>Attendance Sessions</th><th>Avg Score Given</th></tr></thead>
+    <tbody>${myTeachers.length?myTeachers.map(t=>{
+      const tg=grades.filter(g=>g.by===t.fn+' '+t.ln);
+      const ta=attendance.filter(a=>a.cls===t.cls);
+      const tavg=tg.length?Math.round(tg.reduce((a,g)=>a+g.sc,0)/tg.length):0;
+      return`<tr><td><b>${t.fn} ${t.ln}</b></td><td>${t.cls?`<span class="badge bb">${t.cls}</span>`:'—'}</td><td>${tg.length}</td><td>${ta.length}</td><td><b style="color:${gc(tavg)}">${tavg}%</b></td></tr>`;
+    }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">No teachers in your department yet</td></tr>'}</tbody>
+  </table></div>
+  <div class="card"><div class="ch"><div class="ct">📅 Class Attendance per Contact (Weekly)</div></div><div class="cb">
+    ${DAYS.map(day=>{
+      const records=attendance.filter(r=>{try{return new Date(r.date).toLocaleDateString('en-US',{weekday:'long'})===day;}catch{return false;}});
+      const deptRecords=records.filter(r=>myTeachers.find(t=>t.cls===r.cls));
+      const avgRate=deptRecords.length?Math.round(deptRecords.reduce((a,r)=>a+(r.total?r.present/r.total:0),0)/deptRecords.length*100):0;
+      return`<div class="bar-wrap"><div class="bar-label"><span><b>${day}</b> (${deptRecords.length} sessions recorded)</span><span style="font-weight:700;color:${gc(avgRate)}">${avgRate}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${avgRate}%;background:${gc(avgRate)};"></div></div></div>`;
+    }).join('')}
+  </div></div>
+  <div class="card"><div class="ch"><div class="ct">📋 Recent Report Cards (${myDept})</div><button class="btn bsm bprimary" onclick="go('reports')">View All</button></div>
+    <table class="tbl"><thead><tr><th>Student</th><th>Class</th><th>Term</th><th>Score</th><th>Grade</th><th>By</th></tr></thead>
+    <tbody>${deptGrades.slice(0,10).map(g=>{const gd=gg(g.sc);return`<tr><td><b>${g.sn}</b></td><td>${g.scls}</td><td>${g.term}</td><td><b style="color:${gc(g.sc)}">${g.sc}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td><td style="font-size:10px;color:var(--muted)">${g.by||'—'}</td></tr>`}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No grades recorded</td></tr>'}
+    </tbody>
+  </table></div>`;
+}
+
+// ===== DEPUTY MONITOR =====
+function loadDeputyMonitor(){
+  const el=document.getElementById('deputy-content');
+  const allTeachers=teachers;
+  const schoolAvg=grades.length?Math.round(grades.reduce((a,g)=>a+g.sc,0)/grades.length):0;
+  el.innerHTML=`
+  <div class="sg" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+    <div class="sc"><div class="sn" style="color:${gc(schoolAvg)}">${schoolAvg}%</div><div class="sl">School Average</div></div>
+    <div class="sc"><div class="sn">${students.length}</div><div class="sl">Students</div></div>
+    <div class="sc"><div class="sn">${allTeachers.length}</div><div class="sl">Teachers</div></div>
+    <div class="sc"><div class="sn">${grades.length}</div><div class="sl">Grades Recorded</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">👨‍🏫 Teachers Overview</div></div>
+      <table class="tbl"><thead><tr><th>Teacher</th><th>Subject</th><th>Class</th><th>Grades</th><th>Avg Given</th></tr></thead>
+      <tbody>${allTeachers.length?allTeachers.map(t=>{
+        const tg=grades.filter(g=>g.by===t.fn+' '+t.ln);
+        const tavg=tg.length?Math.round(tg.reduce((a,g)=>a+g.sc,0)/tg.length):0;
+        return`<tr><td><b>${t.fn} ${t.ln}</b></td><td style="font-size:10px;">${t.sub||'—'}</td><td>${t.cls?`<span class="badge bb" style="font-size:9px;">${t.cls}</span>`:'—'}</td><td>${tg.length}</td><td><b style="color:${gc(tavg)}">${tavg}%</b></td></tr>`;
+      }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">No teachers yet</td></tr>'}
+      </tbody>
+    </table></div>
+    <div>
+      <div class="card"><div class="ch"><div class="ct">📊 Class Performance</div></div><div class="cb" style="padding-bottom:8px;">
+        ${CLASSES.map(c=>{const sts=students.filter(s=>s.cls===c);const gs=grades.filter(g=>sts.find(s=>s.id==g.sid));const a=gs.length?Math.round(gs.reduce((x,g)=>x+g.sc,0)/gs.length):0;return`<div class="bar-wrap"><div class="bar-label"><span style="font-size:11px;"><b>${c}</b> (${sts.length})</span><span style="font-weight:700;color:${gc(a)};font-size:11px;">${a}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${a}%;background:${gc(a)};"></div></div></div>`;}).join('')}
+      </div></div>
+      <div class="card"><div class="ch"><div class="ct">👨‍👧 Parent Activity</div></div><div class="cb" style="font-size:12px;line-height:2;">
+        Total students: <b>${students.length}</b><br>
+        Students with grades: <b>${[...new Set(grades.map(g=>g.sid))].length}</b><br>
+        Scanned reports: <b>${scans.length}</b><br>
+        Last attendance: <b>${attendance[0]?.date||'—'}</b> (${attendance[0]?.cls||''})
+      </div></div>
+    </div>
+  </div>`;
+}
+
+// ===== PROMOTION =====
+function renderStuDist(){
+  const el=document.getElementById('stu-dist');if(!el)return;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;">${CLASSES.map(c=>{const n=students.filter(s=>s.cls===c).length;return`<div style="background:var(--light);border-radius:8px;padding:12px;text-align:center;border-left:4px solid var(--navy);"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--navy);">${n}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${c}</div></div>`;}).join('')}${students.filter(s=>s.cls==='Completed').length?`<div style="background:#FEF9C3;border-radius:8px;padding:12px;text-align:center;border-left:4px solid var(--gold);"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--warning);">${students.filter(s=>s.cls==='Completed').length}</div><div style="font-size:11px;color:var(--muted);">Completed</div></div>`:''}</div>`;
+}
+function previewPromo(){
+  const rows=CLASSES.map(c=>{const n=students.filter(s=>s.cls===c).length;return n?`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="font-weight:600;min-width:90px;">${c}</span><span style="color:var(--muted);">→</span><span style="font-weight:700;color:var(--navy);">${PROMOTION_MAP[c]||c}</span><span style="color:var(--muted);font-size:11px;">(${n} students)</span></div>`:''}).join('');
+  document.getElementById('promo-preview').innerHTML=`<div class="card"><div class="ch"><div class="ct">👁 Preview</div></div><div class="cb">${rows||'No students.'}</div></div>`;
+  toast('Preview ready','ok');
+}
+function confirmPromo(){
+  if(!confirm('Promote ALL students to next class? Cannot be undone.'))return;
+  let count=0;students.forEach(s=>{if(PROMOTION_MAP[s.cls]){s.prevCls=s.cls;s.cls=PROMOTION_MAP[s.cls];count++;}});
+  DB.set('students',students);renderStudents();renderStuDist();loadClassList();
+  toast(`✅ ${count} students promoted!`,'ok');
+  document.getElementById('promo-preview').innerHTML=`<div class="card" style="border:2px solid var(--green);"><div class="cb" style="text-align:center;padding:20px;"><div style="font-size:32px;">🎉</div><div style="font-weight:700;color:var(--green);font-size:15px;margin-top:6px;">${count} students promoted!</div></div></div>`;
+}
+
+// ===== ECZ =====
+function handleECZ(e){const f=e.target.files[0];if(f){eczFile=f.name;document.getElementById('ecz-fn').textContent='✅ '+f.name;}}
+function saveECZ(){const s=document.getElementById('ecz-sub').value,y=document.getElementById('ecz-yr').value,l=document.getElementById('ecz-lvl').value;if(!s||!y||!l){toast('⚠️ Fill Subject, Year, Level','err');return;}if(!eczFile){toast('⚠️ Select file','err');return;}papers.unshift({id:Date.now(),s,y,l,t:document.getElementById('ecz-type').value,fn:eczFile,up:new Date().toLocaleDateString('en-GB')});DB.set('papers',papers);renderPapers();updateDash();closeM('eczM');eczFile='';document.getElementById('ecz-fn').textContent='Click or drag file here';['ecz-yr','ecz-lvl'].forEach(id=>document.getElementById(id).value='');toast('✅ Paper uploaded','ok');}
+function delECZ(id){if(curRole!=='admin'&&curRole!=='headteacher'){toast('❌ Not allowed','err');return;}papers=papers.filter(p=>p.id!==id);DB.set('papers',papers);renderPapers();updateDash();toast('🗑 Removed','');}
+function renderPapers(){
+  const q=document.querySelector('#pg-ecz .si2')?.value.toLowerCase()||'',lf=document.getElementById('ez-lf')?.value||'';
+  const list=papers.filter(p=>(!q||p.s.toLowerCase().includes(q))&&(!lf||p.l===lf));
+  document.getElementById('ez-t').textContent=papers.length;document.getElementById('ez-s').textContent=[...new Set(papers.map(p=>p.s))].length;document.getElementById('ez-y').textContent=[...new Set(papers.map(p=>p.y))].length;
+  const empty=document.getElementById('ecz-empty'),tb=document.querySelector('#ecz-tbl tbody');
+  if(!list.length){tb.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  const cd=curRole==='admin'||curRole==='headteacher';
+  tb.innerHTML=list.map(p=>`<tr><td><b>${p.s}</b></td><td><span class="badge bb">${p.y}</span></td><td><span class="badge bo">${p.l}</span></td><td>${p.t}</td><td style="font-size:10px;color:var(--muted)">${p.fn}</td><td>${p.up}</td><td><button class="btn bsm boutline" onclick="toast('📥 Downloading...','ok')">⬇</button>${cd?` <button class="btn bsm bdanger" onclick="delECZ(${p.id})">🗑</button>`:''}</td></tr>`).join('');
+}
+
+// ===== FEES / STORES / FINANCE / PERF / PROD =====
+function saveFee(){const sid=document.getElementById('fee-stu').value,am=parseFloat(document.getElementById('fee-amt').value);if(!sid||!am||am<=0){toast('⚠️ Fill fields','err');return;}const st=students.find(s=>s.id==sid);fees.unshift({id:Date.now(),sid,sn:st?st.fn+' '+st.ln:'Unknown',amount:am,type:document.getElementById('fee-type').value,date:document.getElementById('fee-date').value,method:document.getElementById('fee-method').value,status:document.getElementById('fee-status').value});DB.set('fees',fees);renderFees();updateDash();closeM('feeM');document.getElementById('fee-amt').value='';toast('✅ Recorded','ok');}
+function renderFees(){const pd=fees.filter(f=>f.status==='Paid').reduce((a,f)=>a+f.amount,0);const pe=fees.filter(f=>f.status==='Pending').reduce((a,f)=>a+f.amount,0);document.getElementById('fee-c').textContent='K'+pd.toLocaleString();document.getElementById('fee-p').textContent='K'+pe.toLocaleString();document.getElementById('fee-n').textContent=fees.length;document.querySelector('#fee-tbl tbody').innerHTML=fees.length?fees.map((f,i)=>`<tr><td>${i+1}</td><td><b>${f.sn}</b></td><td>K${f.amount}</td><td>${f.type}</td><td>${f.date}</td><td><span class="badge ${f.status==='Paid'?'bgr':f.status==='Partial'?'bo':'br'}">${f.status}</span></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No payments</td></tr>';}
+function saveProc(){const item=document.getElementById('proc-item').value.trim(),qty=parseInt(document.getElementById('proc-qty').value),price=parseFloat(document.getElementById('proc-price').value);if(!item||!qty||!price){toast('⚠️ Fill fields','err');return;}procurement.unshift({id:Date.now(),item,qty,price,total:qty*price,vendor:document.getElementById('proc-vendor').value,status:document.getElementById('proc-status').value,date:new Date().toLocaleDateString('en-GB')});DB.set('proc',procurement);renderProc();closeM('procM');['proc-item','proc-qty','proc-price','proc-vendor'].forEach(id=>document.getElementById(id).value='');toast('✅ Submitted','ok');}
+function renderProc(){document.querySelector('#proc-tbl tbody').innerHTML=procurement.length?procurement.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.item}</b></td><td>${p.qty}</td><td>K${p.price}</td><td>K${p.total.toLocaleString()}</td><td>${p.vendor||'—'}</td><td><span class="badge ${p.status==='Approved'||p.status==='Received'?'bgr':p.status==='Ordered'?'bb':'bx'}">${p.status}</span></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px">No requests</td></tr>';}
+function saveStore(){const name=document.getElementById('st-name').value.trim();if(!name){toast('⚠️ Enter item name','err');return;}stores.unshift({id:Date.now(),name,category:document.getElementById('st-cat').value,qty:parseInt(document.getElementById('st-qty').value)||0,unit:document.getElementById('st-unit').value,reorder:parseInt(document.getElementById('st-reorder').value)||5});DB.set('stores',stores);renderStores();updateDash();closeM('storeM');['st-name','st-qty'].forEach(id=>document.getElementById(id).value='');document.getElementById('st-reorder').value='5';toast('✅ Added','ok');}
+function delStore(id){if(!confirm('Remove?'))return;stores=stores.filter(s=>s.id!==id);DB.set('stores',stores);renderStores();updateDash();toast('🗑 Removed','');}
+function renderStores(){const q=document.querySelector('#pg-stores .si2')?.value.toLowerCase()||'';const list=stores.filter(s=>!q||s.name.toLowerCase().includes(q));document.querySelector('#store-tbl tbody').innerHTML=list.length?list.map((s,i)=>`<tr><td>${i+1}</td><td><b>${s.name}</b></td><td>${s.category}</td><td>${s.qty}</td><td>${s.reorder}</td><td><span class="badge ${s.qty<=s.reorder?'br':s.qty<=s.reorder*2?'bo':'bgr'}">${s.qty<=s.reorder?'Low Stock':s.qty<=s.reorder*2?'Moderate':'In Stock'}</span></td><td><button class="btn bsm bdanger" onclick="delStore(${s.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px">No items</td></tr>';}
+function saveFinance(){const d=document.getElementById('fin-desc').value.trim(),am=parseFloat(document.getElementById('fin-amt').value);if(!d||!am){toast('⚠️ Fill fields','err');return;}finance.unshift({id:Date.now(),desc:d,type:document.getElementById('fin-type').value,amount:am,category:document.getElementById('fin-cat').value,date:document.getElementById('fin-date').value});DB.set('finance',finance);renderFinance();closeM('finM');document.getElementById('fin-desc').value='';document.getElementById('fin-amt').value='';toast('✅ Added','ok');}
+function renderFinance(){const inc=finance.filter(f=>f.type==='Income').reduce((a,f)=>a+f.amount,0);const exp=finance.filter(f=>f.type==='Expense').reduce((a,f)=>a+f.amount,0);document.getElementById('fin-i').textContent='K'+inc.toLocaleString();document.getElementById('fin-e').textContent='K'+exp.toLocaleString();document.getElementById('fin-b').textContent='K'+(inc-exp).toLocaleString();document.querySelector('#fin-tbl tbody').innerHTML=finance.length?finance.map((f,i)=>`<tr><td>${i+1}</td><td><b>${f.desc}</b></td><td><span class="badge ${f.type==='Income'?'bgr':'br'}">${f.type}</span></td><td>K${f.amount.toLocaleString()}</td><td>${f.category}</td><td>${f.date}</td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No transactions</td></tr>';}
+function savePerf(){const n=document.getElementById('perf-name').value.trim(),sc=parseInt(document.getElementById('perf-score').value);if(!n||isNaN(sc)){toast('⚠️ Fill fields','err');return;}const rating=sc>=90?'Excellent':sc>=75?'Good':sc>=60?'Satisfactory':'Needs Improvement';performance.unshift({id:Date.now(),name:n,role:document.getElementById('perf-role').value,period:document.getElementById('perf-period').value,score:sc,rating,reviewer:document.getElementById('perf-rev').value,by:curUser.n});DB.set('perf',performance);renderPerf();closeM('perfM');['perf-name','perf-period','perf-score','perf-rev'].forEach(id=>document.getElementById(id).value='');toast('✅ Saved','ok');}
+function renderPerf(){const rc={'Excellent':'bgr','Good':'bb','Satisfactory':'bo','Needs Improvement':'bp'};document.querySelector('#perf-tbl tbody').innerHTML=performance.length?performance.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.name}</b></td><td>${p.role}</td><td>${p.score}%</td><td><span class="badge ${rc[p.rating]||'bx'}">${p.rating}</span></td><td>${p.reviewer||'—'}</td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No evaluations</td></tr>';}
+function saveProd(){const u=document.getElementById('prod-unit').value.trim(),p=document.getElementById('prod-product').value.trim(),q=parseFloat(document.getElementById('prod-qty').value);if(!u||!p||!q){toast('⚠️ Fill fields','err');return;}production.unshift({id:Date.now(),unit:u,product:p,qty:q,unitM:document.getElementById('prod-unit2').value,date:document.getElementById('prod-date').value,status:document.getElementById('prod-status').value});DB.set('prod',production);renderProd();closeM('prodM');['prod-unit','prod-product','prod-qty'].forEach(id=>document.getElementById(id).value='');toast('✅ Added','ok');}
+function renderProd(){const rc={'Produced':'bgr','In Progress':'bo','Sold':'bb','Stored':'bp'};document.querySelector('#prod-tbl tbody').innerHTML=production.length?production.map((p,i)=>`<tr><td>${i+1}</td><td><b>${p.unit}</b></td><td>${p.product}</td><td>${p.qty}</td><td>${p.date}</td><td><span class="badge ${rc[p.status]||'bx'}">${p.status}</span></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">No records</td></tr>';}
+
+// ===== USERS =====
+function saveUser(){const n=document.getElementById('user-name').value.trim(),u=document.getElementById('user-u').value.trim(),p=document.getElementById('user-p').value,r=document.getElementById('user-role').value;if(!n||!u||!p){toast('⚠️ Fill fields','err');return;}if(accounts.find(a=>a.u===u)){toast('⚠️ Username taken','err');return;}accounts.push({id:Date.now(),u,p,n,r,approved:true,mustChange:true});DB.set('accounts',accounts);renderUsers();closeM('userM');['user-name','user-u','user-p'].forEach(id=>document.getElementById(id).value='');toast(`✅ ${ROLE_LABELS[r]} created. Login: ${u} / ${p}`,'ok');}
+function delUser(id){if(id===1){toast('⚠️ Cannot delete default admin','err');return;}if(!confirm('Delete?'))return;accounts=accounts.filter(a=>a.id!==id);DB.set('accounts',accounts);renderUsers();toast('🗑 Deleted','');}
+function renderUsers(){const rb={admin:'bb',headteacher:'bgr',deputy:'bred',hod:'bo',teacher:'bp',student:'bx'};document.querySelector('#user-tbl tbody').innerHTML=accounts.map((a,i)=>`<tr><td>${i+1}</td><td><b>${a.u}</b></td><td>${a.n}</td><td><span class="badge ${rb[a.r]||'bx'}">${ROLE_LABELS[a.r]||a.r}</span></td><td style="font-size:10px;">${a.cls||a.sub||'—'}</td><td><span class="badge ${a.approved?'bgr':'bo'}">${a.approved?'Active':'Pending'}</span></td><td>${a.id>1?`<button class="btn bsm bdanger" onclick="delUser(${a.id})">🗑</button>`:''}</td></tr>`).join('');}
+
+// ===== TEACHER PORTAL =====
+function loadTeacherPortal(){
+  document.getElementById('tp-welcome').textContent='Welcome, '+curUser.n;
+  const myG=grades.slice(0,12);
+  document.querySelector('#tp-grades tbody').innerHTML=myG.length?myG.map(g=>{const gd=gg(g.sc);return`<tr><td><b>${g.sn}</b></td><td>${g.sub}</td><td>${g.term}</td><td><b style="color:${gc(g.sc)}">${g.sc}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td></tr>`}).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:12px">No grades yet</td></tr>';
+  const lr=attendance.slice(-1)[0];
+  document.getElementById('tp-att').innerHTML=lr?`Last: <b>${lr.date}</b> (${lr.cls})<br>Present: <b style="color:var(--green)">${lr.present}</b> | Absent: <b style="color:var(--red)">${lr.absent}</b>`:'No registers yet. <a href="#" onclick="go(\'attendance\')" style="color:var(--navy)">Mark first →</a>';
+  const acc=accounts.find(a=>a.id===curUser.id);
+  const myCls=acc?.cls||teachers.find(t=>t.u===curUser.u)?.cls||'';
+  const myStuList=myCls?students.filter(s=>s.cls===myCls):[];
+  document.getElementById('tp-myclass').innerHTML=myCls?`<b style="color:var(--navy);">${myCls}</b> — ${myStuList.length} students<br><br>`+myStuList.slice(0,5).map(s=>`<div style="padding:4px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><span class="enroll-badge">${s.enroll}</span> ${s.fn} ${s.ln}</div>`).join('')+(myStuList.length>5?`<div style="font-size:10px;color:var(--muted);margin-top:4px;">+${myStuList.length-5} more</div>`:''):'<div style="color:var(--muted);font-size:11px;">No class assigned.</div>';
+  document.getElementById('tp-stats').innerHTML=`Students: <b>${students.length}</b><br>Grades entered: <b>${grades.length}</b><br>SBA records: <b>${sba.length}</b>`;
+  renderSBA();
+}
+
+// ===== STUDENT PORTAL =====
+function loadStudentPortal(){
+  const sid=curUser.sid;
+  document.getElementById('sp-welcome').textContent='Welcome, '+curUser.n;
+  const st=students.find(s=>s.id==sid);
+  const myG=sid?grades.filter(g=>g.sid==sid):[];
+  const avg=myG.length?Math.round(myG.reduce((a,g)=>a+g.sc,0)/myG.length):0;
+  document.getElementById('sp-results').innerHTML=myG.length?`<div style="margin-bottom:10px;padding:10px;background:var(--light);border-radius:8px;display:flex;justify-content:space-between;align-items:center;"><div>${st?`<span class="enroll-badge">${st.enroll}</span>`:''} <span style="font-size:11px;color:var(--muted);">${st?.cls||''}</span></div><div><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:${gc(avg)};">${avg}%</span> <span class="badge ${gg(avg).c}">${gg(avg).g}</span></div></div>`+myG.slice(0,10).map(g=>{const gd=gg(g.sc);return`<div class="rr"><div><div style="font-size:12px;font-weight:500;">${g.sub}</div><div style="font-size:10px;color:var(--muted);">${g.term}</div></div><div style="display:flex;align-items:center;gap:8px;"><b style="font-size:14px;color:${gc(g.sc)}">${g.sc}%</b><span class="badge ${gd.c}">${gd.g}</span></div></div>`}).join(''):'<div style="text-align:center;color:var(--muted);padding:20px;">No grades recorded yet.</div>';
+  const mySBA=sid?sba.filter(b=>b.sid==sid):[];
+  document.getElementById('sp-sba').innerHTML=mySBA.length?mySBA.map(b=>`<div class="rr"><div><div style="font-size:12px;font-weight:500;">${b.sub}</div><div style="font-size:10px;color:var(--muted);">${b.type} • ${b.term}</div></div><b style="color:${gc(b.sc)}">${b.sc}%</b></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:16px;">No SBA records yet.</div>';
+  document.getElementById('sp-papers').innerHTML=papers.slice(0,5).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><div><b>${p.s}</b> <span class="badge bb" style="font-size:9px;">${p.y}</span></div><button class="btn bsm boutline">⬇</button></div>`).join('')||'<div style="color:var(--muted);font-size:11px;text-align:center;padding:10px;">No papers available.</div>';
+  document.getElementById('sp-perf').innerHTML=`Grades recorded: <b>${myG.length}</b><br>Average: <b style="color:${gc(avg)}">${avg}%</b><br>Grade: <b>${gg(avg).g}</b> (${gg(avg).l})`;
+}
+
+// ===== PARENT PORTAL =====
+function loadParentPortal(){
+  const cid=curUser.childId;const st=students.find(s=>s.id==cid);
+  if(!st){document.getElementById('pp-report').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">Child not found.</div>';return;}
+  document.getElementById('pp-child').textContent=`${st.fn} ${st.ln} — ${st.cls} (${st.enroll})`;
+  document.getElementById('pp-report').innerHTML=`<div class="card"><div class="ch"><div class="ct">Select Term</div></div><div class="cb">
+    <div class="fgrid" style="max-width:380px;margin-bottom:12px;">
+      <div class="fg"><label>Term</label><select id="pp-term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+      <div class="fg"><label>Year</label><input id="pp-yr" value="${new Date().getFullYear()}"></div>
+    </div>
+    <button class="btn bprimary" onclick="showParentRC()">📋 View Report Card</button>
+  </div></div>
+  <div id="pp-rc"></div>
+  <div id="pp-scans"></div>`;
+}
+function showParentRC(){
+  const cid=curUser.childId;const term=document.getElementById('pp-term').value;const yr=document.getElementById('pp-yr').value;
+  const st=students.find(s=>s.id==cid);if(!st)return;
+  document.getElementById('pp-rc').innerHTML=buildRC(st,grades.filter(g=>g.sid==cid&&g.term===term),sba.filter(b=>b.sid==cid&&b.term===term),term,yr);
+  const myScans=scans.filter(sc=>sc.sid==cid&&sc.term===term);
+  document.getElementById('pp-scans').innerHTML=myScans.length?`<div class="card" style="margin-top:12px;"><div class="ch"><div class="ct">📸 Uploaded Reports</div></div><div class="cb">${myScans.map(sc=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span><b>${sc.term} ${sc.year}</b> — ${sc.fileName}</span><button class="btn bsm bgold" onclick="viewScan(${sc.id})">👁 View</button></div>`).join('')}</div></div>`:'';
+}
+
+// ===== INIT =====
+function renderAll(){renderStudents();renderTeachers();renderGrades();renderAttRec();renderPapers();renderFees();renderProc();renderStores();renderFinance();renderPerf();renderProd();renderTimetable();renderSBA();renderScans();populateStudentDropdowns();renderUsers();loadAttStudents();updateDash();renderPendingApprovals();document.getElementById('att-cls').addEventListener('change',loadAttStudents);}
+
+// Init subject selects on welcome screen
+document.querySelectorAll('.subjectSelect').forEach(s=>{s.innerHTML=SUBJECTS.map(x=>`<option>${x}</option>`).join('');});
+document.querySelectorAll('.classSelect').forEach(s=>{s.innerHTML=CLASSES.map(x=>`<option>${x}</option>`).join('');});
+document.getElementById('su-cls').innerHTML='<option value="">-- Select Class --</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
+setDates();
+</script>
+</body>
+</html>
