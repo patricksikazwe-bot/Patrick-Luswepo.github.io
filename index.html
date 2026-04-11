@@ -14,35 +14,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 #welcomeScreen{position:fixed;inset:0;z-index:999;background:linear-gradient(135deg,#001F5B 0%,#003580 40%,#CC0000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
 #welcomeScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(0,122,51,.25) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(240,165,0,.15) 0%,transparent 50%);}
 .ws-inner{position:relative;z-index:1;width:100%;max-width:1100px;}
-.ws-header{text-align:center;color:white;margin-bottom:32px;}
-.ws-logo{font-size:48px;margin-bottom:10px;}
+.ws-header{text-align:center;color:white;margin-bottom:12px;}
+.ws-logo{font-size:28px;margin-bottom:4px;}
 .ws-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(18px,3vw,28px);line-height:1.3;}
 .ws-title span{color:var(--gold);}
 .ws-sub{font-size:12px;opacity:.6;margin-top:4px;}
 .ws-flag{display:flex;height:5px;border-radius:3px;overflow:hidden;max-width:300px;margin:12px auto 0;}
 .ws-flag div{flex:1;}
 
-/* ORG CHART STYLE ROLE CARDS */
+/* ORG CHART STYLE ROLE CARDS — compact 1:3:4 */
 .org-chart{display:flex;flex-direction:column;align-items:center;gap:0;}
-.org-level{display:flex;justify-content:center;gap:12px;position:relative;margin-bottom:0;}
-.org-connector-v{width:2px;height:20px;background:rgba(255,255,255,.3);margin:0 auto;}
-.org-connector-h{display:flex;align-items:flex-start;gap:0;position:relative;}
-.org-connector-h::before{content:'';position:absolute;top:0;left:50%;width:80%;height:2px;background:rgba(255,255,255,.25);transform:translateX(-50%);}
+.org-level{display:flex;justify-content:center;gap:6px;position:relative;margin-bottom:0;}
+.org-connector-v{width:2px;height:10px;background:rgba(255,255,255,.3);margin:0 auto;}
 
-.role-card{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 20px;cursor:pointer;transition:all .2s;text-align:center;min-width:130px;backdrop-filter:blur(8px);}
-.role-card:hover{background:rgba(255,255,255,.2);border-color:var(--gold);transform:translateY(-2px);}
-.role-card.sel{background:rgba(255,255,255,.95);border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
-.role-card.sel .rc-icon{filter:none;}
-.role-card.sel .rc-title{color:var(--navy);}
-.role-card.sel .rc-sub{color:var(--muted);}
-.rc-icon{font-size:28px;margin-bottom:6px;display:block;}
-.rc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:white;display:block;}
-.rc-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;display:block;}
+.role-card{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 10px;cursor:pointer;transition:all .2s;text-align:center;min-width:90px;backdrop-filter:blur(8px);}
+.role-card:hover{background:rgba(255,255,255,.2);border-color:var(--gold);transform:translateY(-1px);}
+.role-card.sel{background:rgba(255,255,255,.95);border-color:var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.rc-icon{font-size:16px;margin-bottom:3px;display:block;}
+.rc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;color:white;display:block;}
+.rc-sub{font-size:9px;color:rgba(255,255,255,.55);margin-top:1px;display:block;}
 .role-card.sel .rc-title{color:var(--navy);}
 .role-card.sel .rc-sub{color:var(--muted);}
 
 /* LOGIN PANEL */
-.login-panel{background:white;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:20px auto 0;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.login-panel{background:white;border-radius:16px;padding:20px 24px;width:100%;max-width:360px;margin:10px auto 0;box-shadow:0 20px 60px rgba(0,0,0,.4);}
 .login-panel h3{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--navy);margin-bottom:4px;}
 .login-panel p{font-size:11px;color:var(--muted);margin-bottom:18px;}
 .tab-row{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px;}
@@ -225,9 +220,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     <div class="ws-flag"><div style="background:#198A00;"></div><div style="background:#E8000D;"></div><div style="background:black;"></div><div style="background:#F0A500;"></div></div>
   </div>
 
-  <!-- ORG CHART ROLE SELECTOR -->
+  <!-- ORG CHART ROLE SELECTOR — 1 : 3 : 4 -->
   <div class="org-chart">
-    <!-- Level 1: Principal -->
+    <!-- Row 1 — 1 card -->
     <div class="org-level">
       <div class="role-card sel" id="rc-admin" onclick="setRole('admin',this)">
         <span class="rc-icon">👑</span>
@@ -236,31 +231,27 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
       </div>
     </div>
     <div class="org-connector-v"></div>
-    <!-- Level 2: Head Teacher -->
+    <!-- Row 2 — 3 cards -->
     <div class="org-level">
       <div class="role-card" id="rc-headteacher" onclick="setRole('headteacher',this)">
         <span class="rc-icon">🎓</span>
         <span class="rc-title">Head Teacher</span>
         <span class="rc-sub">Full academic access</span>
       </div>
-    </div>
-    <div class="org-connector-v"></div>
-    <!-- Level 3: Deputy -->
-    <div class="org-level">
       <div class="role-card" id="rc-deputy" onclick="setRole('deputy',this)">
         <span class="rc-icon">📚</span>
         <span class="rc-title">Deputy Head Teacher</span>
         <span class="rc-sub">Chief Academician</span>
       </div>
-    </div>
-    <div class="org-connector-v"></div>
-    <!-- Level 4: HOD, Teachers, Students, Parents -->
-    <div class="org-level" style="gap:8px;flex-wrap:wrap;justify-content:center;">
       <div class="role-card" id="rc-hod" onclick="setRole('hod',this)">
         <span class="rc-icon">🗂️</span>
         <span class="rc-title">H.O.D</span>
         <span class="rc-sub">Head of Department</span>
       </div>
+    </div>
+    <div class="org-connector-v"></div>
+    <!-- Row 3 — 4 cards -->
+    <div class="org-level">
       <div class="role-card" id="rc-teacher" onclick="setRole('teacher',this)">
         <span class="rc-icon">👨‍🏫</span>
         <span class="rc-title">Teacher</span>
@@ -275,6 +266,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <span class="rc-icon">👨‍👧</span>
         <span class="rc-title">Parent</span>
         <span class="rc-sub">View child's report</span>
+      </div>
+      <div class="role-card" id="rc-extra" style="visibility:hidden;pointer-events:none;">
+        <span class="rc-icon">　</span>
+        <span class="rc-title">　</span>
       </div>
     </div>
   </div>
