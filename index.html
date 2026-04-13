@@ -1581,7 +1581,6 @@ function populateHWFilters(){
   if(cf)cf.innerHTML='<option value="">All Classes</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
   if(sf)sf.innerHTML='<option value="">All Subjects</option>'+SUBJECTS.map(s=>`<option>${s}</option>`).join('');
 }
-let hwImageData=null;
 function handleHWImage(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{hwImageData=ev.target.result;document.getElementById('hw-img-name').textContent='✅ '+f.name;document.getElementById('hw-img-prev').innerHTML=`<img src="${hwImageData}" style="max-width:100%;border-radius:8px;margin-top:8px;max-height:160px;">`};r.readAsDataURL(f);}
 function saveHomework(){
   const cls=document.getElementById('hw-cls').value,sub=document.getElementById('hw-sub').value;
