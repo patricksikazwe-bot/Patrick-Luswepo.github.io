@@ -204,7 +204,76 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 .scan-card input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
 .info-box{background:#EFF6FF;border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:var(--navy);margin-bottom:14px;}
 .change-pwd-card{background:linear-gradient(135deg,#EFF6FF,#F8FAFF);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
-/* ID CARD */
+/* ANNOUNCEMENTS */
+.ann-card{background:white;border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-left:5px solid var(--navy);}
+.ann-card.urgent{border-left-color:var(--red);}
+.ann-card.info{border-left-color:var(--gold);}
+.ann-card.event{border-left-color:var(--green);}
+.ann-card.unread{background:#F0F6FF;}
+.ann-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--navy);margin-bottom:4px;}
+.ann-body{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:6px;}
+.ann-meta{font-size:10px;color:var(--muted);}
+.ann-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;margin-right:6px;}
+.ann-urgent{background:rgba(204,0,0,.1);color:var(--red);}
+.ann-info{background:rgba(240,165,0,.1);color:#B07800;}
+.ann-event{background:rgba(0,122,51,.1);color:var(--green);}
+.ann-general{background:rgba(0,53,128,.1);color:var(--navy);}
+/* CHAT */
+.chat-layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 120px);background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.chat-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.chat-sidebar-header{padding:12px 14px;border-bottom:1px solid var(--border);background:#F8FAFF;}
+.chat-sidebar-header h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--navy);}
+.chat-user-list{overflow-y:auto;flex:1;}
+.chat-user{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #F5F8FF;transition:.15s;}
+.chat-user:hover{background:#F0F6FF;}
+.chat-user.active{background:#EFF6FF;border-left:3px solid var(--navy);}
+.chat-user .cu-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.chat-user .cu-name{font-size:12px;font-weight:600;color:var(--text);}
+.chat-user .cu-last{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+.chat-user .cu-badge{background:var(--red);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0;}
+.chat-main{display:flex;flex-direction:column;overflow:hidden;}
+.chat-header{padding:12px 16px;border-bottom:1px solid var(--border);background:#F8FAFF;display:flex;align-items:center;gap:10px;}
+.chat-header .ch-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--navy);}
+.chat-header .ch-role{font-size:10px;color:var(--muted);}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#FAFBFF;}
+.msg{display:flex;flex-direction:column;max-width:72%;}
+.msg.mine{align-self:flex-end;align-items:flex-end;}
+.msg.theirs{align-self:flex-start;align-items:flex-start;}
+.msg-bubble{padding:9px 13px;border-radius:14px;font-size:12px;line-height:1.5;word-break:break-word;}
+.msg.mine .msg-bubble{background:var(--navy);color:white;border-bottom-right-radius:4px;}
+.msg.theirs .msg-bubble{background:white;color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.msg-time{font-size:9px;color:var(--muted);margin-top:3px;}
+.chat-input-area{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:white;}
+.chat-input-area textarea{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-family:'DM Sans',sans-serif;resize:none;outline:none;max-height:80px;transition:.2s;}
+.chat-input-area textarea:focus{border-color:var(--navy);}
+.chat-send{background:var(--navy);color:white;border:none;border-radius:10px;padding:9px 14px;cursor:pointer;font-size:14px;transition:.2s;flex-shrink:0;}
+.chat-send:hover{background:var(--red);}
+.chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--muted);}
+/* ONLINE LESSONS */
+.lesson-card{background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);overflow:hidden;margin-bottom:12px;}
+.lesson-card-header{background:linear-gradient(135deg,var(--navy),var(--red));color:white;padding:14px 16px;}
+.lesson-card-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.lesson-card-body{padding:14px 16px;}
+.lesson-live{display:inline-flex;align-items:center;gap:5px;background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.lesson-live::before{content:'';width:7px;height:7px;background:white;border-radius:50%;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.lesson-scheduled{display:inline-flex;align-items:center;gap:5px;background:rgba(0,53,128,.1);color:var(--navy);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.lesson-room{background:#F8FAFF;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;}
+.lesson-room h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.video-area{background:#1a1a2e;border-radius:10px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:10px;}
+.video-placeholder{text-align:center;color:white;}
+.video-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.vc-btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:.2s;}
+.vc-btn.red{background:var(--red);color:white;}
+.vc-btn.blue{background:var(--navy);color:white;}
+.vc-btn.green{background:var(--green);color:white;}
+.vc-btn.gray{background:#4B5563;color:white;}
+.vc-btn:hover{filter:brightness(1.15);}
+@media(max-width:700px){
+  .chat-layout{grid-template-columns:1fr;height:auto;}
+  .chat-sidebar{height:200px;}
+  .chat-messages{height:300px;}
+}
 .id-card{width:280px;background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.18);display:inline-block;margin:8px;}
 .id-card-header{background:linear-gradient(135deg,var(--navy),var(--red));color:white;padding:10px 14px;text-align:center;}
 .id-card-header .school{font-family:'Syne',sans-serif;font-weight:800;font-size:10px;line-height:1.4;}
@@ -382,6 +451,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="font-size:10px;color:var(--muted);" id="tbd"></div>
+      <!-- Notification Bell -->
+      <div style="position:relative;cursor:pointer;" onclick="go('announcements')">
+        <span style="font-size:20px;">🔔</span>
+        <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;" id="notif-count">0</span>
+      </div>
+      <!-- Chat icon -->
+      <div style="position:relative;cursor:pointer;" onclick="go('messages')">
+        <span style="font-size:20px;">💬</span>
+        <span id="msg-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--green);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">0</span>
+      </div>
       <span class="rbadge" id="rbadge">Admin</span>
     </div>
   </div>
@@ -582,6 +661,102 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
       <div id="hw-list" style="padding:12px;min-height:60px;"></div></div>
     </div>
 
+    <!-- ANNOUNCEMENTS -->
+    <div class="pg" id="pg-announcements">
+      <div class="ph phr">
+        <div class="ph"><h2>🔔 Announcements</h2><p>School notices and notifications</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="ann-act">
+          <button class="btn bprimary" onclick="openM('annM')">＋ Post Announcement</button>
+        </div>
+      </div>
+      <!-- Filter pills -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn boutline bsm" id="ann-f-all" onclick="filterAnn('all',this)" style="border-color:var(--navy);color:var(--navy);">All</button>
+        <button class="btn boutline bsm" id="ann-f-urgent" onclick="filterAnn('urgent',this)">🔴 Urgent</button>
+        <button class="btn boutline bsm" id="ann-f-info" onclick="filterAnn('info',this)">🟡 Notice</button>
+        <button class="btn boutline bsm" id="ann-f-event" onclick="filterAnn('event',this)">🟢 Event</button>
+        <button class="btn boutline bsm" id="ann-f-general" onclick="filterAnn('general',this)">🔵 General</button>
+      </div>
+      <div id="ann-list"></div>
+    </div>
+
+    <!-- MESSAGES / CHATBOX -->
+    <div class="pg" id="pg-messages">
+      <div class="ph"><h2>💬 Messages</h2><p>Send and receive messages with staff, teachers and students</p></div>
+      <div class="chat-layout">
+        <!-- Sidebar: user list -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">
+            <h3>Conversations</h3>
+            <input class="si2" placeholder="🔍 Search..." oninput="filterChatUsers()" id="chat-search" style="margin-top:8px;font-size:11px;padding:5px 8px;">
+          </div>
+          <div class="chat-user-list" id="chat-user-list"></div>
+        </div>
+        <!-- Main chat area -->
+        <div class="chat-main" id="chat-main">
+          <div class="chat-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);padding:30px;">
+            <div style="font-size:40px;margin-bottom:10px;">💬</div>
+            <div style="font-weight:600;font-size:14px;">Select a conversation</div>
+            <div style="font-size:12px;margin-top:4px;">Choose someone from the list to start messaging</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE LESSONS -->
+    <div class="pg" id="pg-lessons">
+      <div class="ph phr">
+        <div class="ph"><h2>🎥 Online Lessons</h2><p>Live and scheduled virtual classes</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="lesson-act">
+          <button class="btn bgreen" onclick="openM('lessonM')">📅 Schedule Lesson</button>
+          <button class="btn bred" onclick="startLiveLesson()">🔴 Start Live Now</button>
+        </div>
+      </div>
+      <!-- Active lesson room (shown when in a lesson) -->
+      <div id="lesson-room" style="display:none;">
+        <div class="lesson-room">
+          <div class="lesson-live" id="lesson-live-badge">🔴 LIVE</div>
+          <h3 id="lesson-room-title">Mathematics — Form 1A</h3>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;" id="lesson-room-sub">Teacher: — &nbsp;|&nbsp; Started: —</div>
+          <div class="video-area" id="lesson-video">
+            <div class="video-placeholder">
+              <div style="font-size:48px;margin-bottom:10px;">📹</div>
+              <div style="font-size:14px;font-weight:600;">Camera / Screen Share</div>
+              <div style="font-size:11px;opacity:.6;margin-top:4px;">Enable camera to begin broadcasting</div>
+            </div>
+          </div>
+          <div class="video-controls">
+            <button class="vc-btn gray" id="btn-mic" onclick="toggleMic()">🎤 Mic On</button>
+            <button class="vc-btn gray" id="btn-cam" onclick="toggleCam()">📷 Camera On</button>
+            <button class="vc-btn blue" id="btn-share" onclick="toggleShare()">🖥️ Share Screen</button>
+            <button class="vc-btn green" onclick="openM('lessonMsgM')">💬 Chat</button>
+            <button class="vc-btn red" onclick="endLesson()">📵 End Lesson</button>
+          </div>
+          <!-- Participants -->
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:8px;">👥 Participants (<span id="participant-count">1</span>)</div>
+            <div id="participants-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Scheduled / Past lessons list -->
+      <div class="g2">
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📅 Scheduled Lessons</div></div>
+            <div id="scheduled-lessons" style="padding:10px 14px;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">📚 Past Lessons</div></div>
+            <div id="past-lessons" style="padding:10px 14px;"></div>
+          </div>
+          <div class="card"><div class="ch"><div class="ct">📊 Lesson Stats</div></div>
+            <div id="lesson-stats" style="padding:14px;font-size:12px;line-height:2;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- CHANGE PASSWORD -->
     <div class="pg" id="pg-changepassword">
       <div class="ph"><h2>🔑 Change Password</h2><p>Update your login credentials</p></div>
@@ -778,7 +953,56 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 <div class="ov" id="prodM"><div class="modal"><div class="mt">🏭 Production Record</div><div class="fgrid"><div class="fg"><label>Unit</label><input id="prod-unit"></div><div class="fg"><label>Product</label><input id="prod-product"></div><div class="fg"><label>Qty</label><input type="number" id="prod-qty"></div><div class="fg"><label>Unit</label><select id="prod-unit2"><option>Kg</option><option>Bags</option><option>Litres</option><option>Units</option></select></div><div class="fg"><label>Date</label><input type="date" id="prod-date"></div><div class="fg"><label>Status</label><select id="prod-status"><option>Produced</option><option>In Progress</option><option>Sold</option><option>Stored</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('prodM')">Cancel</button><button class="btn bprimary" onclick="saveProd()">Add</button></div></div></div>
 <div class="ov" id="userM"><div class="modal"><div class="mt">👥 Add User</div><div class="fgrid"><div class="fg"><label>Full Name</label><input id="user-name"></div><div class="fg"><label>Username</label><input id="user-u"></div><div class="fg"><label>Default Password</label><input type="password" id="user-p"></div><div class="fg"><label>Role</label><select id="user-role"><option value="admin">Admin</option><option value="headteacher">Head Teacher</option><option value="deputy">Deputy HT</option><option value="hod">HOD</option><option value="teacher">Teacher</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('userM')">Cancel</button><button class="btn bprimary" onclick="saveUser()">Create</button></div></div></div>
 
-<div class="ov" id="hwM"><div class="modal"><div class="mt">📚 Post Homework / Assignment</div>
+<!-- ANNOUNCEMENT MODAL -->
+<div class="ov" id="annM"><div class="modal"><div class="mt">🔔 Post Announcement</div>
+<div class="fgrid">
+  <div class="fg full"><label>Title</label><input id="ann-title" placeholder="Announcement title..."></div>
+  <div class="fg"><label>Category</label><select id="ann-cat">
+    <option value="general">🔵 General</option>
+    <option value="urgent">🔴 Urgent</option>
+    <option value="info">🟡 Notice</option>
+    <option value="event">🟢 Event</option>
+  </select></div>
+  <div class="fg"><label>Target Audience</label><select id="ann-target">
+    <option value="all">Everyone</option>
+    <option value="teachers">Teachers Only</option>
+    <option value="students">Students Only</option>
+    <option value="parents">Parents Only</option>
+    <option value="staff">Staff Only</option>
+  </select></div>
+  <div class="fg full"><label>Message</label><textarea id="ann-body" rows="4" placeholder="Type your announcement here..."></textarea></div>
+  <div class="fg"><label>Expiry Date (optional)</label><input type="date" id="ann-exp"></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('annM')">Cancel</button><button class="btn bprimary" onclick="saveAnnouncement()">📢 Post</button></div>
+</div></div>
+
+<!-- SCHEDULE LESSON MODAL -->
+<div class="ov" id="lessonM"><div class="modal"><div class="mt">📅 Schedule Online Lesson</div>
+<div class="fgrid">
+  <div class="fg full"><label>Lesson Title</label><input id="ls-title" placeholder="e.g. Introduction to Algebra"></div>
+  <div class="fg"><label>Subject</label><select id="ls-sub" class="subjectSelect"></select></div>
+  <div class="fg"><label>Class</label><select id="ls-cls" class="classSelect"></select></div>
+  <div class="fg"><label>Date</label><input type="date" id="ls-date"></div>
+  <div class="fg"><label>Start Time</label><input type="time" id="ls-time" value="08:00"></div>
+  <div class="fg"><label>Duration</label><select id="ls-dur">
+    <option>30 minutes</option><option>45 minutes</option><option selected>1 hour</option><option>1.5 hours</option><option>2 hours</option>
+  </select></div>
+  <div class="fg full"><label>Description / Agenda</label><textarea id="ls-desc" rows="2" placeholder="What will be covered in this lesson..."></textarea></div>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('lessonM')">Cancel</button><button class="btn bprimary" onclick="scheduleLesson()">📅 Schedule</button></div>
+</div></div>
+
+<!-- LESSON CHAT MODAL -->
+<div class="ov" id="lessonMsgM"><div class="modal" style="max-width:400px;"><div class="mt">💬 Lesson Chat</div>
+<div style="height:250px;overflow-y:auto;padding:10px;background:#F8FAFF;border-radius:8px;margin-bottom:10px;" id="lesson-chat-msgs"></div>
+<div style="display:flex;gap:8px;">
+  <input id="lesson-chat-input" placeholder="Type a message..." style="flex:1;" onkeydown="if(event.key==='Enter')sendLessonChat()">
+  <button class="btn bprimary" onclick="sendLessonChat()">Send</button>
+</div>
+<div class="ma"><button class="btn boutline" onclick="closeM('lessonMsgM')">Close</button></div>
+</div></div>
+
+<div class="modal"><div class="mt">📚 Post Homework / Assignment</div>
 <div class="fgrid">
   <div class="fg"><label>Class</label><select id="hw-cls" class="classSelect"></select></div>
   <div class="fg"><label>Subject</label><select id="hw-sub" class="subjectSelect"></select></div>
@@ -809,7 +1033,7 @@ const ROLE_COLORS={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#
 
 // ===== DB =====
 const DB={get(k){try{return JSON.parse(localStorage.getItem('lw5_'+k)||'[]');}catch{return[];}},set(k,v){localStorage.setItem('lw5_'+k,JSON.stringify(v));}};
-let students=DB.get('students'),teachers=DB.get('teachers'),grades=DB.get('grades'),attendance=DB.get('att'),fees=DB.get('fees'),procurement=DB.get('proc'),stores=DB.get('stores'),finance=DB.get('finance'),performance=DB.get('perf'),production=DB.get('prod'),papers=DB.get('papers'),sba=DB.get('sba'),scans=DB.get('scans'),homework=DB.get('homework');
+let students=DB.get('students'),teachers=DB.get('teachers'),grades=DB.get('grades'),attendance=DB.get('att'),fees=DB.get('fees'),procurement=DB.get('proc'),stores=DB.get('stores'),finance=DB.get('finance'),performance=DB.get('perf'),production=DB.get('prod'),papers=DB.get('papers'),sba=DB.get('sba'),scans=DB.get('scans'),homework=DB.get('homework'),announcements=DB.get('ann'),messages=DB.get('msgs'),lessons=DB.get('lessons');
 let timetable=DB.get('tt')[0]||{},curClass='Form 1A',curRole='admin',curUser=null,eczFile='',scanData=null,scanFileName='';
 let accounts=DB.get('accounts');
 if(!accounts.length){accounts=[{id:1,u:'admin',p:'admin123',n:'Principal',r:'admin',approved:true,mustChange:false}];DB.set('accounts',accounts);}
@@ -933,13 +1157,13 @@ function doLogout(){
 
 // ===== ROLE NAVIGATION CONFIG =====
 const NAVS={
-  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'homework',i:'📚',l:'Homework'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  student:[{s:'My Portal'},{id:'student-portal',i:'🏠',l:'My Dashboard'},{id:'homework',i:'📚',l:'Homework'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  parent:[{s:'My Portal'},{id:'parent-portal',i:'🏠',l:"Child's Report"}]
+  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'homework',i:'📚',l:'Homework'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  student:[{s:'My Portal'},{id:'student-portal',i:'🏠',l:'My Dashboard'},{id:'homework',i:'📚',l:'Homework'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  parent:[{s:'My Portal'},{id:'parent-portal',i:'🏠',l:"Child's Report"},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'}]
 };
 const RDEF={admin:'dashboard',headteacher:'dashboard',deputy:'dashboard',hod:'hod-monitor',teacher:'teacher-portal',student:'student-portal',parent:'parent-portal'};
 
@@ -978,7 +1202,7 @@ function go(page){
   // close sidebar on mobile
   document.querySelector('.sidebar')?.classList.remove('open');
   document.getElementById('mobOverlay')?.classList.remove('show');
-  const titles={dashboard:'Dashboard','students':'Students','class-enroll':'Class Enrollment',teachers:'Staff Management',attendance:'Attendance Register',grades:'Grades & Results',sba:'School Based Assessments',reports:'Report Cards',idcards:'Student ID Cards',timetable:'Timetable',homework:'Homework & Assignments',analytics:'Results Analysis',promotion:'Student Promotion','hod-monitor':'HOD Monitor','deputy-monitor':'Deputy Oversight',ecz:'ECZ Past Papers',fees:'Fee Payments',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance Evaluations',production:'Production',users:'User Management',changepassword:'Change Password','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal'};
+  const titles={dashboard:'Dashboard','students':'Students','class-enroll':'Class Enrollment',teachers:'Staff Management',attendance:'Attendance Register',grades:'Grades & Results',sba:'School Based Assessments',reports:'Report Cards',idcards:'Student ID Cards',timetable:'Timetable',homework:'Homework & Assignments',analytics:'Results Analysis',promotion:'Student Promotion','hod-monitor':'HOD Monitor','deputy-monitor':'Deputy Oversight',ecz:'ECZ Past Papers',fees:'Fee Payments',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance Evaluations',production:'Production',users:'User Management',changepassword:'Change Password','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal',announcements:'Announcements',messages:'Messages',lessons:'Online Lessons'};
   document.getElementById('tbt').textContent=titles[page]||page;
   if(page==='timetable')renderTimetable();
   if(page==='dashboard')updateDash();
@@ -999,6 +1223,9 @@ function go(page){
   if(page==='deputy-monitor')loadDeputyMonitor();
   if(page==='idcards'){populateIDFilters();renderIDCards();}
   if(page==='homework'){populateHWFilters();renderHomework();}
+  if(page==='announcements'){renderAnnouncements();updateAnnBtn();}
+  if(page==='messages'){buildChatUserList();}
+  if(page==='lessons'){renderLessons();}
 }
 
 function toggleSidebar(){
@@ -1620,8 +1847,73 @@ function renderHomework(){
   </div>`).join(''):'<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No homework posted yet.</div>';
 }
 
+// ===== ANNOUNCEMENTS =====
+let annFilter='all';
+function updateAnnBtn(){const canPost=curRole==='admin'||curRole==='headteacher'||curRole==='deputy'||curRole==='hod'||curRole==='teacher';const el=document.getElementById('ann-act');if(el)el.style.display=canPost?'':'none';}
+function saveAnnouncement(){const title=document.getElementById('ann-title').value.trim(),body=document.getElementById('ann-body').value.trim();if(!title||!body){toast('⚠️ Fill title and message','err');return;}const ann={id:Date.now(),title,body,cat:document.getElementById('ann-cat').value,target:document.getElementById('ann-target').value,exp:document.getElementById('ann-exp').value,by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]};announcements.unshift(ann);DB.set('ann',announcements);renderAnnouncements();updateNotifBadge();closeM('annM');['ann-title','ann-body','ann-exp'].forEach(id=>document.getElementById(id).value='');toast('📢 Announcement posted!','ok');}
+function delAnn(id){if(curRole==='student'||curRole==='parent'){toast('❌ Not allowed','err');return;}announcements=announcements.filter(a=>a.id!==id);DB.set('ann',announcements);renderAnnouncements();updateNotifBadge();toast('🗑 Removed','');}
+function markAnnRead(id){const ann=announcements.find(a=>a.id===id);if(ann&&!ann.readBy.includes(curUser.u)){ann.readBy.push(curUser.u);DB.set('ann',announcements);updateNotifBadge();}}
+function filterAnn(f,el){annFilter=f;document.querySelectorAll('[id^="ann-f-"]').forEach(b=>{b.style.borderColor='';b.style.color='';});if(el){el.style.borderColor='var(--navy)';el.style.color='var(--navy)';}renderAnnouncements();}
+function renderAnnouncements(){
+  const catMap={urgent:'ann-urgent',info:'ann-info',event:'ann-event',general:'ann-general'};
+  const catLabel={urgent:'🔴 Urgent',info:'🟡 Notice',event:'🟢 Event',general:'🔵 General'};
+  const list=announcements.filter(a=>{
+    if(annFilter!=='all'&&a.cat!==annFilter)return false;
+    if(a.target==='all')return true;
+    if(a.target==='teachers'&&(curRole==='teacher'||curRole==='admin'||curRole==='headteacher'||curRole==='deputy'||curRole==='hod'))return true;
+    if(a.target==='students'&&(curRole==='student'||curRole==='admin'))return true;
+    if(a.target==='parents'&&(curRole==='parent'||curRole==='admin'))return true;
+    if(a.target==='staff'&&curRole!=='student'&&curRole!=='parent')return true;
+    return curRole==='admin'||curRole==='headteacher';
+  });
+  const el=document.getElementById('ann-list');if(!el)return;
+  const canDel=curRole==='admin'||curRole==='headteacher'||curRole==='deputy';
+  el.innerHTML=list.length?list.map(a=>{const unread=!a.readBy?.includes(curUser.u);return`<div class="ann-card ${a.cat} ${unread?'unread':''}" onclick="markAnnRead(${a.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px;"><div><span class="ann-badge ${catMap[a.cat]||'ann-general'}">${catLabel[a.cat]||'General'}</span>${unread?'<span class="ann-badge" style="background:var(--navy);color:white;">NEW</span>':''}<span style="font-size:10px;color:var(--muted);"> To: ${a.target}</span></div>${canDel?`<button class="btn bsm bdanger" onclick="event.stopPropagation();delAnn(${a.id})">🗑</button>`:''}</div><div class="ann-title" style="margin-top:6px;">${a.title}</div><div class="ann-body">${a.body}</div><div class="ann-meta">📅 ${a.date} ${a.time} | By: <b>${a.by}</b> | ${a.readBy?.length||0} read${a.exp?` | Expires: ${a.exp}`:''}</div></div>`;}).join(''):'<div style="text-align:center;padding:30px;color:var(--muted);"><div style="font-size:40px;margin-bottom:10px;">🔔</div><p>No announcements yet.</p></div>';
+}
+function updateNotifBadge(){const unread=announcements.filter(a=>!a.readBy?.includes(curUser?.u||'')).length;const badge=document.getElementById('notif-badge');if(badge){badge.style.display=unread>0?'flex':'none';badge.textContent=unread>9?'9+':unread;}}
+
+// ===== MESSAGES =====
+let activeChatUser=null;
+function getChatKey(u1,u2){return[u1,u2].sort().join('__');}
+function getChatUsers(){const all=[];const rc2={admin:'Principal',headteacher:'Head Teacher',deputy:'Deputy HT',hod:'HOD',teacher:'Teacher',student:'Student',parent:'Parent'};if(curRole==='admin'||curRole==='headteacher'||curRole==='deputy'){accounts.filter(a=>a.id!==curUser.id).forEach(a=>all.push({id:a.u,name:a.n,role:a.r}));}else if(curRole==='hod'||curRole==='teacher'){accounts.filter(a=>a.id!==curUser.id&&a.r!=='parent').forEach(a=>all.push({id:a.u,name:a.n,role:a.r}));const myCls=accounts.find(a=>a.id===curUser.id)?.cls||'';if(myCls)students.filter(s=>s.cls===myCls).forEach(s=>all.push({id:s.enroll,name:s.fn+' '+s.ln,role:'student'}));}else if(curRole==='student'){accounts.filter(a=>['admin','headteacher','teacher','deputy','hod'].includes(a.r)).forEach(a=>all.push({id:a.u,name:a.n,role:a.r}));}else if(curRole==='parent'){accounts.filter(a=>['admin','headteacher','teacher'].includes(a.r)).forEach(a=>all.push({id:a.u,name:a.n,role:a.r}));}return all;}
+function getConvMsgs(otherId){const key=getChatKey(curUser.u,otherId);return messages.filter(m=>m.key===key);}
+function getMsgCount(){if(!curUser)return 0;return messages.filter(m=>m.to===curUser.u&&!m.read).length;}
+function buildChatUserList(){
+  const users=getChatUsers();const el=document.getElementById('chat-user-list');if(!el)return;
+  const q=(document.getElementById('chat-search')?.value||'').toLowerCase();
+  const filtered=users.filter(u=>!q||(u.name+u.role).toLowerCase().includes(q));
+  const rc={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#D97706',teacher:'#8B5CF6',student:'#0891B2',parent:'#D97706'};
+  el.innerHTML=filtered.length?filtered.map(u=>{const conv=getConvMsgs(u.id);const last=conv.slice(-1)[0];const unread=conv.filter(m=>m.to===curUser.u&&!m.read).length;return`<div class="chat-user${activeChatUser===u.id?' active':''}" onclick="openChat('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.role}')"><div class="cu-av" style="background:${rc[u.role]||'#6B728022'};color:${rc[u.role]||'#6B7280'};">${u.name[0]}</div><div style="flex:1;min-width:0;"><div class="cu-name">${u.name}</div><div class="cu-last">${last?last.text:'Start a conversation'}</div></div>${unread>0?`<div class="cu-badge">${unread}</div>`:''}</div>`;}).join(''):'<div style="text-align:center;padding:16px;color:var(--muted);font-size:11px;">No contacts found</div>';
+  updateMsgBadge();
+}
+function filterChatUsers(){buildChatUserList();}
+function openChat(userId,userName,userRole){
+  activeChatUser=userId;messages.filter(m=>m.key===getChatKey(curUser.u,userId)&&m.to===curUser.u&&!m.read).forEach(m=>m.read=true);DB.set('msgs',messages);updateMsgBadge();buildChatUserList();
+  const conv=getConvMsgs(userId);const rc={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#D97706',teacher:'#8B5CF6',student:'#0891B2',parent:'#D97706'};
+  document.getElementById('chat-main').innerHTML=`<div class="chat-header"><div class="cu-av" style="background:${rc[userRole]||'#6B728022'};color:${rc[userRole]||'#6B7280'};width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">${userName[0]}</div><div><div class="ch-name">${userName}</div><div class="ch-role">${ROLE_LABELS[userRole]||userRole}</div></div></div><div class="chat-messages" id="chat-msgs">${conv.length?conv.map(m=>`<div class="msg ${m.from===curUser.u?'mine':'theirs'}"><div class="msg-bubble">${m.text}</div><div class="msg-time">${m.time}</div></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px;">No messages yet. Say hello! 👋</div>'}</div><div class="chat-input-area"><textarea id="chat-inp" placeholder="Type a message..." rows="1" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea><button class="chat-send" onclick="sendMsg()">➤</button></div>`;
+  const msgsEl=document.getElementById('chat-msgs');if(msgsEl)msgsEl.scrollTop=msgsEl.scrollHeight;
+}
+function sendMsg(){const inp=document.getElementById('chat-inp');if(!inp||!activeChatUser)return;const text=inp.value.trim();if(!text)return;messages.push({id:Date.now(),key:getChatKey(curUser.u,activeChatUser),from:curUser.u,to:activeChatUser,text,time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:new Date().toLocaleDateString('en-GB'),read:false});DB.set('msgs',messages);inp.value='';const cname=document.querySelector('.ch-name')?.textContent||'';const crole=document.querySelector('.ch-role')?.textContent||'';openChat(activeChatUser,cname,Object.keys(ROLE_LABELS).find(k=>ROLE_LABELS[k]===crole)||crole);updateMsgBadge();buildChatUserList();}
+function updateMsgBadge(){const count=getMsgCount();const badge=document.getElementById('msg-badge');if(badge){badge.style.display=count>0?'flex':'none';badge.textContent=count>9?'9+':count;}}
+
+// ===== ONLINE LESSONS =====
+let liveLesson=null,micOn=true,camOn=false,shareOn=false,lessonChatMsgs=[];
+function scheduleLesson(){const title=document.getElementById('ls-title').value.trim(),cls=document.getElementById('ls-cls').value,sub=document.getElementById('ls-sub').value,date=document.getElementById('ls-date').value,time=document.getElementById('ls-time').value;if(!title||!cls||!sub||!date||!time){toast('⚠️ Fill all required fields','err');return;}const lesson={id:Date.now(),title,sub,cls,date,time,duration:document.getElementById('ls-dur').value,desc:document.getElementById('ls-desc').value,by:curUser.n,byRole:curRole,status:'scheduled',created:new Date().toLocaleDateString('en-GB')};lessons.unshift(lesson);DB.set('lessons',lessons);renderLessons();closeM('lessonM');['ls-title','ls-desc'].forEach(id=>document.getElementById(id).value='');announcements.unshift({id:Date.now()+1,title:'📅 Lesson Scheduled: '+title,body:`${sub} for ${cls} on ${date} at ${time} (${document.getElementById('ls-dur').value}). Teacher: ${curUser.n}`,cat:'info',target:'students',by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]});DB.set('ann',announcements);updateNotifBadge();toast('📅 Scheduled & students notified!','ok');}
+function startLiveLesson(){if(curRole==='student'||curRole==='parent'){toast('❌ Only teachers can start lessons','err');return;}const sub=prompt('Subject?','Mathematics');if(!sub)return;const cls=prompt('Class?','Form 1A');if(!cls)return;liveLesson={id:Date.now(),title:sub+' — '+cls,sub,cls,by:curUser.n,startTime:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:new Date().toLocaleDateString('en-GB'),status:'live',participants:[curUser.n]};lessons.unshift(liveLesson);DB.set('lessons',lessons);announcements.unshift({id:Date.now()+2,title:'🔴 LIVE NOW: '+sub,body:`${sub} live lesson for ${cls} is starting NOW!`,cat:'urgent',target:'students',by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]});DB.set('ann',announcements);updateNotifBadge();showLessonRoom();renderLessons();toast('🔴 LIVE! Students notified.','ok');}
+function showLessonRoom(){if(!liveLesson)return;document.getElementById('lesson-room').style.display='block';document.getElementById('lesson-room-title').textContent=liveLesson.title;document.getElementById('lesson-room-sub').textContent=`Teacher: ${liveLesson.by}  |  Started: ${liveLesson.startTime||'—'}`;document.getElementById('participant-count').textContent=liveLesson.participants?.length||1;document.getElementById('participants-list').innerHTML=(liveLesson.participants||[curUser.n]).map(p=>`<span class="badge bgr" style="font-size:10px;">${p}</span>`).join('');lessonChatMsgs=[{from:'System',text:'Lesson started. Welcome!',time:liveLesson.startTime||''}];renderLessonChat();}
+function joinLesson(id){const l=lessons.find(x=>x.id===id);if(!l||l.status!=='live'){toast('Lesson is not live','err');return;}liveLesson=l;if(!liveLesson.participants)liveLesson.participants=[];if(!liveLesson.participants.includes(curUser.n)){liveLesson.participants.push(curUser.n);DB.set('lessons',lessons);}showLessonRoom();lessonChatMsgs.push({from:curUser.n,text:'joined the lesson',time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})});renderLessonChat();toast('✅ Joined!','ok');}
+function endLesson(){if(!confirm('End this lesson?'))return;if(liveLesson){liveLesson.status='completed';liveLesson.endTime=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});DB.set('lessons',lessons);}document.getElementById('lesson-room').style.display='none';liveLesson=null;micOn=true;camOn=false;shareOn=false;renderLessons();toast('Lesson ended','ok');}
+function toggleMic(){micOn=!micOn;const b=document.getElementById('btn-mic');b.textContent=micOn?'🎤 Mic On':'🎙️ Mic Off';b.style.background=micOn?'#4B5563':'var(--red)';}
+function toggleCam(){camOn=!camOn;const b=document.getElementById('btn-cam');b.textContent=camOn?'📷 Camera On':'📵 Camera Off';b.style.background=camOn?'var(--green)':'#4B5563';document.getElementById('lesson-video').innerHTML=camOn?'<div style="text-align:center;color:white;padding:20px;"><div style="font-size:48px;">📹</div><div style="font-size:13px;font-weight:600;margin-top:8px;">Camera Active — Broadcasting</div></div>':'<div style="text-align:center;color:white;padding:20px;"><div style="font-size:48px;">📹</div><div style="font-size:13px;margin-top:8px;">Camera Off</div></div>';}
+function toggleShare(){shareOn=!shareOn;const b=document.getElementById('btn-share');b.textContent=shareOn?'🖥️ Sharing':'🖥️ Share Screen';b.style.background=shareOn?'var(--gold)':'var(--navy)';if(shareOn)toast('📺 Screen sharing active','ok');}
+function sendLessonChat(){const inp=document.getElementById('lesson-chat-input');if(!inp)return;const text=inp.value.trim();if(!text)return;lessonChatMsgs.push({from:curUser.n,text,time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})});inp.value='';renderLessonChat();}
+function renderLessonChat(){const el=document.getElementById('lesson-chat-msgs');if(!el)return;el.innerHTML=lessonChatMsgs.map(m=>`<div style="margin-bottom:6px;"><b style="font-size:10px;color:var(--navy);">${m.from}</b> <span style="font-size:9px;color:var(--muted);">${m.time}</span><br><span style="font-size:12px;">${m.text}</span></div>`).join('');el.scrollTop=el.scrollHeight;}
+function renderLessons(){const liveLessons=lessons.filter(l=>l.status==='live');const scheduled=lessons.filter(l=>l.status==='scheduled');const past=lessons.filter(l=>l.status==='completed');if(liveLesson)showLessonRoom();const schEl=document.getElementById('scheduled-lessons');if(schEl)schEl.innerHTML=[...liveLessons.map(l=>`<div class="lesson-card"><div class="lesson-card-header"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>${l.title}</h3><span class="lesson-live">LIVE</span></div><div style="font-size:11px;opacity:.7;margin-top:3px;">${l.sub} | ${l.cls} | 👥 ${l.participants?.length||1}</div></div><div class="lesson-card-body"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;">👨‍🏫 ${l.by} | 📅 ${l.date} ${l.startTime||''}</div><button class="btn bgreen bsm" onclick="joinLesson(${l.id})">▶ Join Now</button></div></div>`),...scheduled.map(l=>`<div class="lesson-card"><div class="lesson-card-header"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>${l.title}</h3><span class="lesson-scheduled">SCHEDULED</span></div><div style="font-size:11px;opacity:.7;margin-top:3px;">${l.sub} | ${l.cls}</div></div><div class="lesson-card-body"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;">📅 ${l.date} ${l.time} | ⏱ ${l.duration} | 👨‍🏫 ${l.by}</div>${l.desc?`<div style="font-size:11px;margin-bottom:8px;color:var(--muted);">${l.desc}</div>`:''}<div style="display:flex;gap:6px;">${curRole!=='student'&&curRole!=='parent'?`<button class="btn bgreen bsm" onclick="startFromSchedule(${l.id})">🔴 Start</button><button class="btn bdanger bsm" onclick="deleteLesson(${l.id})">🗑</button>`:''}</div></div></div>`)].join('')||'<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">No upcoming lessons</div>';const pastEl=document.getElementById('past-lessons');if(pastEl)pastEl.innerHTML=past.slice(0,5).map(l=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><div style="font-weight:600;">${l.title}</div><div style="font-size:10px;color:var(--muted);">${l.date} | ${l.sub} | ${l.cls} | ${l.by}</div></div>`).join('')||'<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">No past lessons</div>';const se=document.getElementById('lesson-stats');if(se)se.innerHTML=`Total: <b>${lessons.length}</b><br>Live now: <b style="color:var(--red)">${liveLessons.length}</b><br>Scheduled: <b style="color:var(--navy)">${scheduled.length}</b><br>Completed: <b style="color:var(--green)">${past.length}</b>`;const la=document.getElementById('lesson-act');if(la)la.style.display=curRole==='student'||curRole==='parent'?'none':'';}
+function startFromSchedule(id){const l=lessons.find(x=>x.id===id);if(!l)return;l.status='live';l.startTime=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});l.participants=[curUser.n];liveLesson=l;DB.set('lessons',lessons);announcements.unshift({id:Date.now(),title:'🔴 LIVE: '+l.title,body:`${l.sub} for ${l.cls} is LIVE now!`,cat:'urgent',target:'students',by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]});DB.set('ann',announcements);updateNotifBadge();showLessonRoom();renderLessons();toast('🔴 Lesson is LIVE!','ok');}
+function deleteLesson(id){if(!confirm('Delete?'))return;lessons=lessons.filter(l=>l.id!==id);DB.set('lessons',lessons);renderLessons();toast('🗑 Deleted','');}
+
 // ===== INIT =====
-function renderAll(){renderStudents();renderTeachers();renderGrades();renderAttRec();renderPapers();renderFees();renderProc();renderStores();renderFinance();renderPerf();renderProd();renderTimetable();renderSBA();renderScans();populateStudentDropdowns();renderUsers();loadAttStudents();updateDash();renderPendingApprovals();document.getElementById('att-cls').addEventListener('change',loadAttStudents);}
+function renderAll(){renderStudents();renderTeachers();renderGrades();renderAttRec();renderPapers();renderFees();renderProc();renderStores();renderFinance();renderPerf();renderProd();renderTimetable();renderSBA();renderScans();populateStudentDropdowns();renderUsers();loadAttStudents();updateDash();renderPendingApprovals();updateNotifBadge();updateMsgBadge();document.getElementById('att-cls').addEventListener('change',loadAttStudents);}
 
 // Init subject selects on welcome screen
 document.querySelectorAll('.subjectSelect').forEach(s=>{s.innerHTML=SUBJECTS.map(x=>`<option>${x}</option>`).join('');});
