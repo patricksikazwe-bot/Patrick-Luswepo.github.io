@@ -477,7 +477,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <div class="sc"><div class="sn" id="dp">0</div><div class="sl">📄 ECZ Papers</div></div>
       </div>
       <div class="g21">
-        <div class="card"><div class="ch"><div class="ct">👨‍🎓 Recently Enrolled</div><button class="btn boutline bsm" onclick="go('students')">All Students</button></div><table class="tbl" id="dash-stbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Class</th></tr></thead><tbody></tbody></table></div>
+        <div>
+          <div class="card"><div class="ch"><div class="ct">👨‍🎓 Recently Enrolled</div><button class="btn boutline bsm" onclick="go('students')">All Students</button></div><table class="tbl" id="dash-stbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Class</th></tr></thead><tbody></tbody></table></div>
+          <div class="card" id="dash-ann-card"><div class="ch"><div class="ct">🔔 Latest Announcements</div><button class="btn boutline bsm" onclick="go('announcements')">View All</button></div><div id="dash-ann" style="padding:8px 14px;"></div></div>
+        </div>
         <div class="card"><div class="ch"><div class="ct">📰 Activity</div></div><div id="dash-actf" style="padding:8px 12px;"></div></div>
       </div>
     </div>
@@ -485,7 +488,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     <!-- STUDENTS -->
     <div class="pg" id="pg-students">
       <div class="ph phr"><div class="ph"><h2>👨‍🎓 Students</h2><p>Enrolled learners</p></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn boutline bsm" onclick="go('class-enroll')">📋 By Class</button><button class="btn bprimary" id="addStuBtn" onclick="openM('smM')">＋ Enroll Student</button></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn boutline bsm" onclick="go('class-enroll')">📋 By Class</button>
+          <button class="btn bgold" onclick="openM('xlsxM')">📊 Bulk Import Excel</button>
+          <button class="btn bprimary" id="addStuBtn" onclick="openM('smM')">＋ Enroll Student</button>
+        </div>
       </div>
       <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb">
         <input class="si2" placeholder="🔍 Name or LW number..." oninput="renderStudents()">
@@ -719,10 +726,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
           <h3 id="lesson-room-title">Mathematics — Form 1A</h3>
           <div style="font-size:11px;color:var(--muted);margin-bottom:12px;" id="lesson-room-sub">Teacher: — &nbsp;|&nbsp; Started: —</div>
           <div class="video-area" id="lesson-video">
-            <div class="video-placeholder">
+            <video id="localVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:none;"></video>
+            <div id="video-placeholder" class="video-placeholder">
               <div style="font-size:48px;margin-bottom:10px;">📹</div>
               <div style="font-size:14px;font-weight:600;">Camera / Screen Share</div>
-              <div style="font-size:11px;opacity:.6;margin-top:4px;">Enable camera to begin broadcasting</div>
+              <div style="font-size:11px;opacity:.6;margin-top:4px;">Click 📷 Camera to enable your camera</div>
             </div>
           </div>
           <div class="video-controls">
@@ -953,7 +961,32 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 <div class="ov" id="prodM"><div class="modal"><div class="mt">🏭 Production Record</div><div class="fgrid"><div class="fg"><label>Unit</label><input id="prod-unit"></div><div class="fg"><label>Product</label><input id="prod-product"></div><div class="fg"><label>Qty</label><input type="number" id="prod-qty"></div><div class="fg"><label>Unit</label><select id="prod-unit2"><option>Kg</option><option>Bags</option><option>Litres</option><option>Units</option></select></div><div class="fg"><label>Date</label><input type="date" id="prod-date"></div><div class="fg"><label>Status</label><select id="prod-status"><option>Produced</option><option>In Progress</option><option>Sold</option><option>Stored</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('prodM')">Cancel</button><button class="btn bprimary" onclick="saveProd()">Add</button></div></div></div>
 <div class="ov" id="userM"><div class="modal"><div class="mt">👥 Add User</div><div class="fgrid"><div class="fg"><label>Full Name</label><input id="user-name"></div><div class="fg"><label>Username</label><input id="user-u"></div><div class="fg"><label>Default Password</label><input type="password" id="user-p"></div><div class="fg"><label>Role</label><select id="user-role"><option value="admin">Admin</option><option value="headteacher">Head Teacher</option><option value="deputy">Deputy HT</option><option value="hod">HOD</option><option value="teacher">Teacher</option></select></div></div><div class="ma"><button class="btn boutline" onclick="closeM('userM')">Cancel</button><button class="btn bprimary" onclick="saveUser()">Create</button></div></div></div>
 
-<!-- ANNOUNCEMENT MODAL -->
+<!-- EXCEL BULK IMPORT MODAL -->
+<div class="ov" id="xlsxM"><div class="modal modal-wide"><div class="mt">📊 Bulk Import Students from Excel</div>
+<div class="info-box" style="margin-bottom:12px;">
+  📋 <b>Expected columns (in order):</b> First Name, Last Name, Class, Gender, Date of Birth, School Code, ECZ Number, Exam Year, Guardian Name, Guardian Phone<br>
+  <span style="font-size:10px;">Row 1 should be headers. Each row after = one student. Enrollment numbers are auto-generated.</span>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+  <button class="btn bgold" onclick="downloadTemplate()">⬇ Download Template</button>
+  <div style="font-size:11px;color:var(--muted);align-self:center;">← Download blank template, fill it in Excel, then upload below</div>
+</div>
+<div class="uz" style="margin-bottom:12px;">
+  <input type="file" accept=".xlsx,.xls,.csv" onchange="handleExcelUpload(event)">
+  <div style="font-size:24px;margin-bottom:6px;">📊</div>
+  <div style="font-weight:600;font-size:13px;" id="xlsx-fn">Click to upload Excel or CSV file</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:4px;">.xlsx, .xls or .csv</div>
+</div>
+<!-- Preview table -->
+<div id="xlsx-preview" style="max-height:300px;overflow-y:auto;"></div>
+<div id="xlsx-summary" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
+<div class="ma">
+  <button class="btn boutline" onclick="closeM('xlsxM');xlsxRows=[];">Cancel</button>
+  <button class="btn bprimary" id="xlsx-import-btn" style="display:none;" onclick="importFromExcel()">✅ Import All Students</button>
+</div>
+</div></div>
+
+
 <div class="ov" id="annM"><div class="modal"><div class="mt">🔔 Post Announcement</div>
 <div class="fgrid">
   <div class="fg full"><label>Title</label><input id="ann-title" placeholder="Announcement title..."></div>
@@ -1292,6 +1325,13 @@ function updateDash(){
   document.querySelector('#dash-stbl tbody').innerHTML=students.slice(-5).reverse().map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td>${s.fn} ${s.ln}</td><td>${s.cls}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:14px">No students yet</td></tr>';
   const acts=[...students.slice(-2).map(s=>({i:'👨‍🎓',t:`${s.fn} ${s.ln} enrolled [${s.enroll}]`})),...grades.slice(-2).map(g=>({i:'📝',t:`Grade: ${g.sn} — ${g.sub} ${g.sc}%`})),...sba.slice(-2).map(b=>({i:'📊',t:`SBA: ${b.sn} ${b.type}`}))].slice(0,5);
   document.getElementById('dash-actf').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;gap:7px;padding:7px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><span>${a.i}</span><span>${a.t}</span></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:14px;font-size:11px;">No activity yet</div>';
+  // Show latest 3 announcements on dashboard
+  const dashAnn=document.getElementById('dash-ann');
+  if(dashAnn){
+    const catMap={urgent:'ann-urgent',info:'ann-info',event:'ann-event',general:'ann-general'};
+    const catLabel={urgent:'🔴',info:'🟡',event:'🟢',general:'🔵'};
+    dashAnn.innerHTML=announcements.slice(0,3).map(a=>`<div style="padding:8px 0;border-bottom:1px solid #EFF6FF;cursor:pointer;" onclick="go('announcements')"><div style="display:flex;align-items:center;gap:6px;"><span>${catLabel[a.cat]||'🔵'}</span><b style="font-size:12px;">${a.title}</b>${!a.readBy?.includes(curUser?.u)?'<span class="badge" style="background:var(--red);color:white;font-size:9px;">NEW</span>':''}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${a.date} — ${a.by}</div></div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:12px;font-size:11px;">No announcements yet</div>';
+  }
 }
 
 // ===== STUDENTS =====
@@ -1902,15 +1942,110 @@ function scheduleLesson(){const title=document.getElementById('ls-title').value.
 function startLiveLesson(){if(curRole==='student'||curRole==='parent'){toast('❌ Only teachers can start lessons','err');return;}const sub=prompt('Subject?','Mathematics');if(!sub)return;const cls=prompt('Class?','Form 1A');if(!cls)return;liveLesson={id:Date.now(),title:sub+' — '+cls,sub,cls,by:curUser.n,startTime:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),date:new Date().toLocaleDateString('en-GB'),status:'live',participants:[curUser.n]};lessons.unshift(liveLesson);DB.set('lessons',lessons);announcements.unshift({id:Date.now()+2,title:'🔴 LIVE NOW: '+sub,body:`${sub} live lesson for ${cls} is starting NOW!`,cat:'urgent',target:'students',by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]});DB.set('ann',announcements);updateNotifBadge();showLessonRoom();renderLessons();toast('🔴 LIVE! Students notified.','ok');}
 function showLessonRoom(){if(!liveLesson)return;document.getElementById('lesson-room').style.display='block';document.getElementById('lesson-room-title').textContent=liveLesson.title;document.getElementById('lesson-room-sub').textContent=`Teacher: ${liveLesson.by}  |  Started: ${liveLesson.startTime||'—'}`;document.getElementById('participant-count').textContent=liveLesson.participants?.length||1;document.getElementById('participants-list').innerHTML=(liveLesson.participants||[curUser.n]).map(p=>`<span class="badge bgr" style="font-size:10px;">${p}</span>`).join('');lessonChatMsgs=[{from:'System',text:'Lesson started. Welcome!',time:liveLesson.startTime||''}];renderLessonChat();}
 function joinLesson(id){const l=lessons.find(x=>x.id===id);if(!l||l.status!=='live'){toast('Lesson is not live','err');return;}liveLesson=l;if(!liveLesson.participants)liveLesson.participants=[];if(!liveLesson.participants.includes(curUser.n)){liveLesson.participants.push(curUser.n);DB.set('lessons',lessons);}showLessonRoom();lessonChatMsgs.push({from:curUser.n,text:'joined the lesson',time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})});renderLessonChat();toast('✅ Joined!','ok');}
-function endLesson(){if(!confirm('End this lesson?'))return;if(liveLesson){liveLesson.status='completed';liveLesson.endTime=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});DB.set('lessons',lessons);}document.getElementById('lesson-room').style.display='none';liveLesson=null;micOn=true;camOn=false;shareOn=false;renderLessons();toast('Lesson ended','ok');}
-function toggleMic(){micOn=!micOn;const b=document.getElementById('btn-mic');b.textContent=micOn?'🎤 Mic On':'🎙️ Mic Off';b.style.background=micOn?'#4B5563':'var(--red)';}
-function toggleCam(){camOn=!camOn;const b=document.getElementById('btn-cam');b.textContent=camOn?'📷 Camera On':'📵 Camera Off';b.style.background=camOn?'var(--green)':'#4B5563';document.getElementById('lesson-video').innerHTML=camOn?'<div style="text-align:center;color:white;padding:20px;"><div style="font-size:48px;">📹</div><div style="font-size:13px;font-weight:600;margin-top:8px;">Camera Active — Broadcasting</div></div>':'<div style="text-align:center;color:white;padding:20px;"><div style="font-size:48px;">📹</div><div style="font-size:13px;margin-top:8px;">Camera Off</div></div>';}
-function toggleShare(){shareOn=!shareOn;const b=document.getElementById('btn-share');b.textContent=shareOn?'🖥️ Sharing':'🖥️ Share Screen';b.style.background=shareOn?'var(--gold)':'var(--navy)';if(shareOn)toast('📺 Screen sharing active','ok');}
+function endLesson(){if(!confirm('End this lesson?'))return;if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}camOn=false;shareOn=false;if(liveLesson){liveLesson.status='completed';liveLesson.endTime=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});DB.set('lessons',lessons);}document.getElementById('lesson-room').style.display='none';liveLesson=null;micOn=true;renderLessons();toast('Lesson ended','ok');}
+let localStream=null,screenStream=null;
+function toggleMic(){micOn=!micOn;const b=document.getElementById('btn-mic');b.textContent=micOn?'🎤 Mic On':'🎙️ Mic Off';b.style.background=micOn?'#4B5563':'var(--red)';if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=micOn);}
+async function toggleCam(){
+  const b=document.getElementById('btn-cam');
+  const vid=document.getElementById('localVideo');
+  const ph=document.getElementById('video-placeholder');
+  if(!camOn){
+    try{
+      localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+      vid.srcObject=localStream;vid.style.display='block';if(ph)ph.style.display='none';
+      camOn=true;b.textContent='📷 Camera On';b.style.background='var(--green)';
+      toast('📷 Camera connected!','ok');
+    }catch(err){toast('❌ Camera: '+err.message+'. Allow camera in browser settings.','err');}
+  } else {
+    if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
+    if(vid){vid.srcObject=null;vid.style.display='none';}if(ph)ph.style.display='flex';
+    camOn=false;b.textContent='📷 Camera Off';b.style.background='#4B5563';
+  }
+}
+async function toggleShare(){
+  const b=document.getElementById('btn-share');
+  const vid=document.getElementById('localVideo');
+  const ph=document.getElementById('video-placeholder');
+  if(!shareOn){
+    try{
+      screenStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+      vid.srcObject=screenStream;vid.style.display='block';if(ph)ph.style.display='none';
+      shareOn=true;b.textContent='🖥️ Stop Sharing';b.style.background='var(--gold)';
+      screenStream.getVideoTracks()[0].onended=()=>{shareOn=false;b.textContent='🖥️ Share Screen';b.style.background='var(--navy)';if(vid){vid.style.display='none';}if(ph)ph.style.display='flex';screenStream=null;};
+      toast('📺 Screen sharing started','ok');
+    }catch(err){toast('❌ Screen share: '+err.message,'err');}
+  } else {
+    if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
+    if(vid){vid.srcObject=null;vid.style.display='none';}if(ph)ph.style.display='flex';
+    shareOn=false;b.textContent='🖥️ Share Screen';b.style.background='var(--navy)';
+  }
+}
 function sendLessonChat(){const inp=document.getElementById('lesson-chat-input');if(!inp)return;const text=inp.value.trim();if(!text)return;lessonChatMsgs.push({from:curUser.n,text,time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})});inp.value='';renderLessonChat();}
 function renderLessonChat(){const el=document.getElementById('lesson-chat-msgs');if(!el)return;el.innerHTML=lessonChatMsgs.map(m=>`<div style="margin-bottom:6px;"><b style="font-size:10px;color:var(--navy);">${m.from}</b> <span style="font-size:9px;color:var(--muted);">${m.time}</span><br><span style="font-size:12px;">${m.text}</span></div>`).join('');el.scrollTop=el.scrollHeight;}
 function renderLessons(){const liveLessons=lessons.filter(l=>l.status==='live');const scheduled=lessons.filter(l=>l.status==='scheduled');const past=lessons.filter(l=>l.status==='completed');if(liveLesson)showLessonRoom();const schEl=document.getElementById('scheduled-lessons');if(schEl)schEl.innerHTML=[...liveLessons.map(l=>`<div class="lesson-card"><div class="lesson-card-header"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>${l.title}</h3><span class="lesson-live">LIVE</span></div><div style="font-size:11px;opacity:.7;margin-top:3px;">${l.sub} | ${l.cls} | 👥 ${l.participants?.length||1}</div></div><div class="lesson-card-body"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;">👨‍🏫 ${l.by} | 📅 ${l.date} ${l.startTime||''}</div><button class="btn bgreen bsm" onclick="joinLesson(${l.id})">▶ Join Now</button></div></div>`),...scheduled.map(l=>`<div class="lesson-card"><div class="lesson-card-header"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>${l.title}</h3><span class="lesson-scheduled">SCHEDULED</span></div><div style="font-size:11px;opacity:.7;margin-top:3px;">${l.sub} | ${l.cls}</div></div><div class="lesson-card-body"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;">📅 ${l.date} ${l.time} | ⏱ ${l.duration} | 👨‍🏫 ${l.by}</div>${l.desc?`<div style="font-size:11px;margin-bottom:8px;color:var(--muted);">${l.desc}</div>`:''}<div style="display:flex;gap:6px;">${curRole!=='student'&&curRole!=='parent'?`<button class="btn bgreen bsm" onclick="startFromSchedule(${l.id})">🔴 Start</button><button class="btn bdanger bsm" onclick="deleteLesson(${l.id})">🗑</button>`:''}</div></div></div>`)].join('')||'<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">No upcoming lessons</div>';const pastEl=document.getElementById('past-lessons');if(pastEl)pastEl.innerHTML=past.slice(0,5).map(l=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><div style="font-weight:600;">${l.title}</div><div style="font-size:10px;color:var(--muted);">${l.date} | ${l.sub} | ${l.cls} | ${l.by}</div></div>`).join('')||'<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">No past lessons</div>';const se=document.getElementById('lesson-stats');if(se)se.innerHTML=`Total: <b>${lessons.length}</b><br>Live now: <b style="color:var(--red)">${liveLessons.length}</b><br>Scheduled: <b style="color:var(--navy)">${scheduled.length}</b><br>Completed: <b style="color:var(--green)">${past.length}</b>`;const la=document.getElementById('lesson-act');if(la)la.style.display=curRole==='student'||curRole==='parent'?'none':'';}
 function startFromSchedule(id){const l=lessons.find(x=>x.id===id);if(!l)return;l.status='live';l.startTime=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});l.participants=[curUser.n];liveLesson=l;DB.set('lessons',lessons);announcements.unshift({id:Date.now(),title:'🔴 LIVE: '+l.title,body:`${l.sub} for ${l.cls} is LIVE now!`,cat:'urgent',target:'students',by:curUser.n,byRole:curRole,date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),readBy:[]});DB.set('ann',announcements);updateNotifBadge();showLessonRoom();renderLessons();toast('🔴 Lesson is LIVE!','ok');}
 function deleteLesson(id){if(!confirm('Delete?'))return;lessons=lessons.filter(l=>l.id!==id);DB.set('lessons',lessons);renderLessons();toast('🗑 Deleted','');}
+
+// ===== EXCEL BULK IMPORT =====
+let xlsxRows=[];
+function downloadTemplate(){
+  const headers=['First Name','Last Name','Class','Gender','Date of Birth','School Code','ECZ Number','Exam Year','Guardian Name','Guardian Phone'];
+  const example=['John','Banda','Form 1A','Male','2010-01-15','LW/SEC/001','2025/0001','2025','Mary Banda','0977123456'];
+  const rows=[headers,example].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows);a.download='LumwanaWest_Student_Template.csv';a.click();
+  toast('📊 Template downloaded','ok');
+}
+function handleExcelUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  document.getElementById('xlsx-fn').textContent='✅ '+file.name;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const text=ev.target.result;
+    // Parse CSV
+    const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
+    if(lines.length<2){toast('⚠️ File appears empty','err');return;}
+    const headers=lines[0].split(',').map(h=>h.trim());
+    xlsxRows=[];
+    for(let i=1;i<lines.length;i++){
+      // Handle quoted commas
+      const cols=lines[i].match(/(".*?"|[^,]+)/g)||lines[i].split(',');
+      const clean=cols.map(c=>c.replace(/^"|"$/g,'').trim());
+      if(clean.length>=2&&clean[0]){
+        xlsxRows.push({fn:clean[0]||'',ln:clean[1]||'',cls:clean[2]||CLASSES[0],gender:clean[3]||'Male',dob:clean[4]||'',schoolCode:clean[5]||'',eczNum:clean[6]||'',examYear:clean[7]||'',guardian:clean[8]||'',phone:clean[9]||''});
+      }
+    }
+    previewExcel();
+  };
+  reader.readAsText(file);
+}
+function previewExcel(){
+  const el=document.getElementById('xlsx-preview');
+  const sum=document.getElementById('xlsx-summary');
+  const btn=document.getElementById('xlsx-import-btn');
+  if(!xlsxRows.length){el.innerHTML='<div style="color:var(--danger);padding:10px;">No valid rows found. Check your file format.</div>';return;}
+  // Check for invalid classes
+  const invalid=xlsxRows.filter(r=>!CLASSES.includes(r.cls));
+  el.innerHTML=`<table class="tbl"><thead><tr><th>#</th><th>First Name</th><th>Last Name</th><th>Class</th><th>Gender</th><th>DOB</th><th>School Code</th><th>ECZ No.</th><th>Guardian</th><th>Status</th></tr></thead><tbody>${xlsxRows.map((r,i)=>{const valid=CLASSES.includes(r.cls)||r.cls==='';return`<tr style="background:${valid?'white':'#FEF2F2'}"><td>${i+1}</td><td>${r.fn}</td><td>${r.ln}</td><td>${r.cls}</td><td>${r.gender}</td><td>${r.dob||'—'}</td><td>${r.schoolCode||'—'}</td><td>${r.eczNum||'—'}</td><td>${r.guardian||'—'}</td><td>${valid?'<span class="badge bgr">✅ Ready</span>':'<span class="badge br">⚠️ Check Class</span>'}</td></tr>`;}).join('')}</tbody></table>`;
+  sum.innerHTML=`<b>${xlsxRows.length}</b> students ready to import. ${invalid.length?`<span style="color:var(--red);">⚠️ ${invalid.length} have invalid class names — valid: ${CLASSES.join(', ')}</span>`:'<span style="color:var(--green);">All classes valid ✅</span>'}`;
+  btn.style.display='';
+}
+function importFromExcel(){
+  if(!xlsxRows.length){toast('⚠️ No data to import','err');return;}
+  let count=0,skipped=0;
+  xlsxRows.forEach(r=>{
+    if(!r.fn||!r.ln){skipped++;return;}
+    const cls=CLASSES.includes(r.cls)?r.cls:CLASSES[0];
+    const enroll=genEnroll();
+    students.push({id:Date.now()+Math.random(),enroll,fn:r.fn,ln:r.ln,cls,gender:r.gender||'Male',dob:r.dob||'',schoolCode:r.schoolCode||'',eczNum:r.eczNum||'',examYear:r.examYear||'',guardian:r.guardian||'',phone:r.phone||'',pwd:enroll,photo:null,enrolledAt:new Date().toLocaleDateString('en-GB')});
+    count++;
+  });
+  DB.set('students',students);
+  populateStudentDropdowns();renderStudents();loadClassList();updateDash();
+  closeM('xlsxM');xlsxRows=[];
+  document.getElementById('xlsx-fn').textContent='Click to upload Excel or CSV file';
+  document.getElementById('xlsx-preview').innerHTML='';
+  toast(`✅ ${count} students imported!${skipped?` (${skipped} skipped)`:''}  Default password = enrollment number`,'ok');
+}
 
 // ===== INIT =====
 function renderAll(){renderStudents();renderTeachers();renderGrades();renderAttRec();renderPapers();renderFees();renderProc();renderStores();renderFinance();renderPerf();renderProd();renderTimetable();renderSBA();renderScans();populateStudentDropdowns();renderUsers();loadAttStudents();updateDash();renderPendingApprovals();updateNotifBadge();updateMsgBadge();document.getElementById('att-cls').addEventListener('change',loadAttStudents);}
