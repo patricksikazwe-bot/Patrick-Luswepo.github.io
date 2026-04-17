@@ -204,6 +204,35 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 .scan-card input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
 .info-box{background:#EFF6FF;border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:var(--navy);margin-bottom:14px;}
 .change-pwd-card{background:linear-gradient(135deg,#EFF6FF,#F8FAFF);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+/* OFFICIAL ANALYSIS TABLES */
+.ana-report{background:white;padding:20px;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:14px;}
+.ana-report-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--navy);text-align:center;margin-bottom:2px;text-transform:uppercase;}
+.ana-report-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px;font-weight:600;}
+.ana-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px;padding:8px 12px;background:#EFF6FF;border-radius:8px;font-size:11px;}
+.ana-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.ana-tbl{border-collapse:collapse;font-size:9px;width:100%;}
+.ana-tbl th,.ana-tbl td{border:1px solid #444;padding:3px 5px;text-align:center;white-space:nowrap;}
+.ana-tbl thead th{background:var(--navy);color:white;font-weight:700;font-size:8px;}
+.ana-tbl thead th.bh-b{background:#1a56a8;}
+.ana-tbl thead th.bh-g{background:#b91c1c;}
+.ana-tbl thead th.bh-t{background:#15803d;}
+.ana-tbl tbody td:first-child{text-align:left;font-weight:600;font-size:10px;white-space:normal;min-width:110px;background:#F8FAFF;padding:4px 8px;}
+.ana-tbl tbody td.b-col{background:#EFF6FF;}
+.ana-tbl tbody td.g-col{background:#FFF0F0;}
+.ana-tbl tbody td.t-col{background:#F0FFF4;font-weight:700;}
+.ana-tbl tfoot td{background:#EFF6FF;font-weight:700;border-top:2px solid var(--navy);}
+.ana-tbl tbody tr:nth-child(even) td:first-child{background:#F0F4FF;}
+.ana-summary{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;padding:10px 14px;background:#EFF6FF;border-radius:8px;}
+.ana-summary div{font-size:11px;color:var(--navy);}
+.ana-summary div b{font-size:16px;display:block;font-family:'Syne',sans-serif;}
+@media print{
+  .ana-report{box-shadow:none;padding:10px;}
+  .ana-tbl{font-size:7px;}
+  .ana-tbl th,.ana-tbl td{padding:2px 3px;}
+  .sidebar,.tb,.sf,button,.btn,.ov,#welcomeScreen,.hamburger,.ph,.phr{display:none!important;}
+  .mc{margin-left:0!important;}
+}
+
 /* ANNOUNCEMENTS */
 .ann-card{background:white;border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-left:5px solid var(--navy);}
 .ann-card.urgent{border-left-color:var(--red);}
@@ -603,6 +632,36 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <div class="fg" style="min-width:180px;"><label>Filter by Class</label><select id="ana-cls" onchange="renderAnalytics()" class="fs"><option value="">All Classes</option></select></div>
       </div>
       <div id="analytics-cnt"></div>
+    </div>
+
+    <!-- SENIOR RESULTS ANALYSIS (Grade 10-12) — matches official template -->
+    <div class="pg" id="pg-senior-analysis">
+      <div class="ph phr">
+        <div class="ph"><h2>📊 Senior Analysis (Grade 10–12)</h2><p>Official results analysis format — GCE grading</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <select class="fs" id="sa-cls" onchange="renderSeniorAnalysis()"><option value="">All Senior Classes</option><option>Grade 10A</option><option>Grade 11A</option><option>Grade 12A</option></select>
+          <select class="fs" id="sa-term" onchange="renderSeniorAnalysis()"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+          <select class="fs" id="sa-year" onchange="renderSeniorAnalysis()"><option value="">All Years</option><option>2025</option><option>2026</option></select>
+          <button class="btn bgold" onclick="window.print()">🖨 Print</button>
+          <button class="btn bprimary" onclick="renderSeniorAnalysis()">🔄 Generate</button>
+        </div>
+      </div>
+      <div id="senior-analysis-out"></div>
+    </div>
+
+    <!-- JUNIOR RESULTS ANALYSIS (Forms 1-3) — matches official template -->
+    <div class="pg" id="pg-junior-analysis">
+      <div class="ph phr">
+        <div class="ph"><h2>📋 Junior Analysis (Forms 1–3)</h2><p>Official results analysis format — JSC Division grading</p></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <select class="fs" id="ja-cls" onchange="renderJuniorAnalysis()"><option value="">All Junior Classes</option><option>Form 1A</option><option>Form 1B</option><option>Form 2A</option><option>Form 2B</option><option>Form 2C</option></select>
+          <select class="fs" id="ja-term" onchange="renderJuniorAnalysis()"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+          <select class="fs" id="ja-year" onchange="renderJuniorAnalysis()"><option value="">All Years</option><option>2025</option><option>2026</option></select>
+          <button class="btn bgold" onclick="window.print()">🖨 Print</button>
+          <button class="btn bprimary" onclick="renderJuniorAnalysis()">🔄 Generate</button>
+        </div>
+      </div>
+      <div id="junior-analysis-out"></div>
     </div>
 
     <!-- HOD MONITORING PAGE -->
@@ -1190,11 +1249,11 @@ function doLogout(){
 
 // ===== ROLE NAVIGATION CONFIG =====
 const NAVS={
-  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'analytics',i:'📈',l:'Results Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'homework',i:'📚',l:'Homework'},{id:'timetable',i:'📅',l:'Timetable'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis (10-12)'},{id:'junior-analysis',i:'📋',l:'Junior Analysis (Forms)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis (10-12)'},{id:'junior-analysis',i:'📋',l:'Junior Analysis (Forms)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'homework',i:'📚',l:'Homework'},{id:'timetable',i:'📅',l:'Timetable'},{s:'Analysis'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
   student:[{s:'My Portal'},{id:'student-portal',i:'🏠',l:'My Dashboard'},{id:'homework',i:'📚',l:'Homework'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
   parent:[{s:'My Portal'},{id:'parent-portal',i:'🏠',l:"Child's Report"},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'}]
 };
@@ -1235,7 +1294,7 @@ function go(page){
   // close sidebar on mobile
   document.querySelector('.sidebar')?.classList.remove('open');
   document.getElementById('mobOverlay')?.classList.remove('show');
-  const titles={dashboard:'Dashboard','students':'Students','class-enroll':'Class Enrollment',teachers:'Staff Management',attendance:'Attendance Register',grades:'Grades & Results',sba:'School Based Assessments',reports:'Report Cards',idcards:'Student ID Cards',timetable:'Timetable',homework:'Homework & Assignments',analytics:'Results Analysis',promotion:'Student Promotion','hod-monitor':'HOD Monitor','deputy-monitor':'Deputy Oversight',ecz:'ECZ Past Papers',fees:'Fee Payments',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance Evaluations',production:'Production',users:'User Management',changepassword:'Change Password','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal',announcements:'Announcements',messages:'Messages',lessons:'Online Lessons'};
+  const titles={dashboard:'Dashboard','students':'Students','class-enroll':'Class Enrollment',teachers:'Staff Management',attendance:'Attendance Register',grades:'Grades & Results',sba:'School Based Assessments',reports:'Report Cards',idcards:'Student ID Cards',timetable:'Timetable',homework:'Homework & Assignments',analytics:'Results Overview',promotion:'Student Promotion','hod-monitor':'HOD Monitor','deputy-monitor':'Deputy Oversight',ecz:'ECZ Past Papers',fees:'Fee Payments',procurement:'Procurement',stores:'Stores',finance:'Finance',performance:'Performance Evaluations',production:'Production',users:'User Management',changepassword:'Change Password','teacher-portal':'Teacher Portal','student-portal':'Student Portal','parent-portal':'Parent Portal',announcements:'Announcements',messages:'Messages',lessons:'Online Lessons','senior-analysis':'Senior Results Analysis (Grade 10-12)','junior-analysis':'Junior Results Analysis (Forms 1-3)'};
   document.getElementById('tbt').textContent=titles[page]||page;
   if(page==='timetable')renderTimetable();
   if(page==='dashboard')updateDash();
@@ -1245,6 +1304,8 @@ function go(page){
   if(page==='sba'){populateStudentDropdowns();renderSBA();}
   if(page==='reports'){populateStudentDropdowns();renderScans();}
   if(page==='analytics')renderAnalytics();
+  if(page==='senior-analysis')renderSeniorAnalysis();
+  if(page==='junior-analysis')renderJuniorAnalysis();
   if(page==='promotion')renderStuDist();
   if(page==='class-enroll')loadClassList();
   if(page==='teacher-portal')loadTeacherPortal();
@@ -2045,6 +2106,243 @@ function importFromExcel(){
   document.getElementById('xlsx-fn').textContent='Click to upload Excel or CSV file';
   document.getElementById('xlsx-preview').innerHTML='';
   toast(`✅ ${count} students imported!${skipped?` (${skipped} skipped)`:''}  Default password = enrollment number`,'ok');
+}
+
+// ===== SENIOR RESULTS ANALYSIS (Grade 10-12) — GCE Grading =====
+// Grade bands: 1=75-100, 2=70-74, 3=65-69, 4=60-64, 5=55-59, 6=50-54, 7=45-49, 8=40-44, 9=00-39
+const SENIOR_BANDS=[
+  {label:'1',range:'75-100',min:75,max:100},
+  {label:'2',range:'70-74',min:70,max:74},
+  {label:'3',range:'65-69',min:65,max:69},
+  {label:'4',range:'60-64',min:60,max:64},
+  {label:'5',range:'55-59',min:55,max:59},
+  {label:'6',range:'50-54',min:50,max:54},
+  {label:'7',range:'45-49',min:45,max:49},
+  {label:'8',range:'40-44',min:40,max:44},
+  {label:'9',range:'00-39',min:0,max:39}
+];
+const SENIOR_CLASSES=['Grade 10A','Grade 11A','Grade 12A'];
+const JUNIOR_CLASSES=['Form 1A','Form 1B','Form 2A','Form 2B','Form 2C'];
+
+function getStuGender(sid){const st=students.find(s=>s.id==sid);return st?.gender||'Male';}
+
+function renderSeniorAnalysis(){
+  const clsF=document.getElementById('sa-cls')?.value||'';
+  const termF=document.getElementById('sa-term')?.value||'';
+  const yearF=document.getElementById('sa-year')?.value||'';
+  const el=document.getElementById('senior-analysis-out');if(!el)return;
+  el.innerHTML='';
+
+  const clsList=clsF?[clsF]:SENIOR_CLASSES;
+  clsList.forEach(cls=>{
+    // Get all grades for this class
+    const stuInCls=students.filter(s=>s.cls===cls);
+    if(!stuInCls.length)return;
+    let filtGrades=grades.filter(g=>stuInCls.find(s=>s.id==g.sid)&&(!termF||g.term===termF));
+
+    // Build rows per subject
+    const rows=SUBJECTS.map(sub=>{
+      const sg=filtGrades.filter(g=>g.sub===sub);
+      if(!sg.length)return null;
+      const boys=sg.filter(g=>getStuGender(g.sid)==='Male');
+      const girls=sg.filter(g=>getStuGender(g.sid)==='Female');
+      // Entered = enrolled in this class
+      const entB=stuInCls.filter(s=>s.gender==='Male').length;
+      const entG=stuInCls.filter(s=>s.gender==='Female').length;
+      // SAT = those who have a grade
+      const satB=boys.length,satG=girls.length,satT=sg.length;
+      // ABSENT = entered - sat
+      const absB=Math.max(0,entB-satB),absG=Math.max(0,entG-satG),absT=absB+absG;
+      // Band counts
+      const bandData=SENIOR_BANDS.map(band=>{
+        const b=boys.filter(g=>g.sc>=band.min&&g.sc<=band.max).length;
+        const gi=girls.filter(g=>g.sc>=band.min&&g.sc<=band.max).length;
+        return{b,g:gi,t:b+gi};
+      });
+      // Pass = grade 1-6 (50+)
+      const passB=boys.filter(g=>g.sc>=50).length;
+      const passG=girls.filter(g=>g.sc>=50).length;
+      return{sub,entB,entG,entT:entB+entG,satB,satG,satT,absB,absG,absT,bandData,passB,passG,passT:passB+passG};
+    }).filter(Boolean);
+
+    if(!rows.length)return;
+
+    // Totals row
+    const tot={entB:0,entG:0,entT:0,satB:0,satG:0,satT:0,absB:0,absG:0,absT:0,passB:0,passG:0,passT:0,bandData:SENIOR_BANDS.map(()=>({b:0,g:0,t:0}))};
+    rows.forEach(r=>{tot.entB+=r.entB;tot.entG+=r.entG;tot.entT+=r.entT;tot.satB+=r.satB;tot.satG+=r.satG;tot.satT+=r.satT;tot.absB+=r.absB;tot.absG+=r.absG;tot.absT+=r.absT;tot.passB+=r.passB;tot.passG+=r.passG;tot.passT+=r.passT;r.bandData.forEach((b,i)=>{tot.bandData[i].b+=b.b;tot.bandData[i].g+=b.g;tot.bandData[i].t+=b.t;});});
+
+    const bgtHead='<th class="bh-b">B</th><th class="bh-g">G</th><th class="bh-t">T</th>';
+    const bgtCell=(b,g,t)=>`<td class="b-col">${b||''}</td><td class="g-col">${g||''}</td><td class="t-col">${t||''}</td>`;
+    const rowHTML=r=>`<tr><td>${r.sub}</td>${bgtCell(r.entB,r.entG,r.entT)}${bgtCell(r.satB,r.satG,r.satT)}${bgtCell(r.absB,r.absG,r.absT)}${r.bandData.map(b=>bgtCell(b.b,b.g,b.t)).join('')}${bgtCell(r.passB,r.passG,r.passT)}</tr>`;
+
+    const teacher=teachers.find(t=>t.cls===cls)||{fn:'',ln:''};
+    const div=document.createElement('div');
+    div.className='ana-report';
+    div.innerHTML=`
+      <div class="ana-report-title">LUMWANA WEST DAY SECONDARY SCHOOL</div>
+      <div class="ana-report-sub">ANALYSIS FOR SENIOR CLASSES (10–12)</div>
+      <div class="ana-meta-row">
+        <span>SUBJECT: <b>All Subjects</b></span>
+        <span>GRADE/CLASS: <b>${cls}</b></span>
+        <span>TEACHER: <b>${teacher.fn} ${teacher.ln}</b></span>
+        <span>TERM: <b>${termF||'—'}</b></span>
+        <span>YEAR: <b>${yearF||new Date().getFullYear()}</b></span>
+      </div>
+      <div class="ana-tbl-wrap">
+        <table class="ana-tbl">
+          <thead>
+            <tr>
+              <th rowspan="2" style="min-width:110px;">Subject</th>
+              <th colspan="3">Entered</th>
+              <th colspan="3">No. who SAT</th>
+              <th colspan="3">No. ABSENT</th>
+              ${SENIOR_BANDS.map(b=>`<th colspan="3">${b.label}<br><small>${b.range}</small></th>`).join('')}
+              <th colspan="3">Pass</th>
+            </tr>
+            <tr>
+              ${Array(12+SENIOR_BANDS.length).fill(0).map(()=>bgtHead).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(rowHTML).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:#EFF6FF;font-weight:700;">
+              <td>TOTALS</td>
+              ${bgtCell(tot.entB,tot.entG,tot.entT)}${bgtCell(tot.satB,tot.satG,tot.satT)}${bgtCell(tot.absB,tot.absG,tot.absT)}
+              ${tot.bandData.map(b=>bgtCell(b.b,b.g,b.t)).join('')}
+              ${bgtCell(tot.passB,tot.passG,tot.passT)}
+            </tr>
+            <tr>
+              <td colspan="${3*12+3*SENIOR_BANDS.length+1}" style="font-size:10px;color:var(--muted);text-align:left;padding:6px 8px;">
+                Pass Rate: <b>${tot.satT?Math.round(tot.passT/tot.satT*100):0}%</b> &nbsp;|&nbsp; 
+                Fail: <b>${tot.satT-tot.passT}</b> (${tot.satT?Math.round((tot.satT-tot.passT)/tot.satT*100):0}%) &nbsp;|&nbsp;
+                Grades 1-6 = Pass (50%+) &nbsp;|&nbsp; Grade 9 = Fail (below 40%)
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>`;
+    el.appendChild(div);
+  });
+  if(!el.innerHTML)el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">No grades recorded for senior classes yet. Enter grades first.</div>';
+}
+
+// ===== JUNIOR RESULTS ANALYSIS (Forms 1-3) — JSC Division Grading =====
+// Division 1: 75-100, Division 2: 65-74, Division 3: 50-64, Division 4: 40-49, Fail (U): 0-39
+const JUNIOR_DIVS=[
+  {label:'1',min:75,max:100},
+  {label:'2',min:65,max:74},
+  {label:'3',min:50,max:64},
+  {label:'4',min:40,max:49}
+];
+
+function renderJuniorAnalysis(){
+  const clsF=document.getElementById('ja-cls')?.value||'';
+  const termF=document.getElementById('ja-term')?.value||'';
+  const yearF=document.getElementById('ja-year')?.value||'';
+  const el=document.getElementById('junior-analysis-out');if(!el)return;
+  el.innerHTML='';
+
+  const clsList=clsF?[clsF]:JUNIOR_CLASSES;
+  clsList.forEach(cls=>{
+    const stuInCls=students.filter(s=>s.cls===cls);
+    if(!stuInCls.length)return;
+    let filtGrades=grades.filter(g=>stuInCls.find(s=>s.id==g.sid)&&(!termF||g.term===termF));
+
+    const rows=SUBJECTS.map(sub=>{
+      const sg=filtGrades.filter(g=>g.sub===sub);
+      if(!sg.length)return null;
+      const boys=sg.filter(g=>getStuGender(g.sid)==='Male');
+      const girls=sg.filter(g=>getStuGender(g.sid)==='Female');
+      const entB=stuInCls.filter(s=>s.gender==='Male').length;
+      const entG=stuInCls.filter(s=>s.gender==='Female').length;
+      const satB=boys.length,satG=girls.length,satT=sg.length;
+      const absB=Math.max(0,entB-satB),absG=Math.max(0,entG-satG);
+      const divData=JUNIOR_DIVS.map(div=>{
+        const b=boys.filter(g=>g.sc>=div.min&&g.sc<=div.max).length;
+        const gi=girls.filter(g=>g.sc>=div.min&&g.sc<=div.max).length;
+        return{b,g:gi,t:b+gi};
+      });
+      const passB=boys.filter(g=>g.sc>=40).length;
+      const passG=girls.filter(g=>g.sc>=40).length;
+      const failB=boys.filter(g=>g.sc<40).length;
+      const failG=girls.filter(g=>g.sc<40).length;
+      return{sub,entB,entG,entT:entB+entG,satB,satG,satT,absB,absG,absT:absB+absG,divData,passB,passG,passT:passB+passG,failB,failG,failT:failB+failG};
+    }).filter(Boolean);
+
+    if(!rows.length)return;
+
+    // Totals
+    const tot={satB:0,satG:0,satT:0,passB:0,passG:0,passT:0,failB:0,failG:0,failT:0,divData:JUNIOR_DIVS.map(()=>({b:0,g:0,t:0}))};
+    rows.forEach(r=>{tot.satB+=r.satB;tot.satG+=r.satG;tot.satT+=r.satT;tot.passB+=r.passB;tot.passG+=r.passG;tot.passT+=r.passT;tot.failB+=r.failB;tot.failG+=r.failG;tot.failT+=r.failT;r.divData.forEach((d,i)=>{tot.divData[i].b+=d.b;tot.divData[i].g+=d.g;tot.divData[i].t+=d.t;});});
+
+    const bgtHead='<th class="bh-b">B</th><th class="bh-g">G</th><th class="bh-t">T</th>';
+    const bgtCell=(b,g,t)=>`<td class="b-col">${b||''}</td><td class="g-col">${g||''}</td><td class="t-col">${t||''}</td>`;
+    const rowHTML=r=>`<tr><td>${r.sub}</td>${bgtCell(r.satB,r.satG,r.satT)}${bgtCell(r.absB,r.absG,r.absT)}${r.divData.map(d=>bgtCell(d.b,d.g,d.t)).join('')}${bgtCell(r.passB,r.passG,r.passT)}${bgtCell(r.failB,r.failG,r.failT)}</tr>`;
+
+    const teacher=teachers.find(t=>t.cls===cls)||{fn:'',ln:''};
+    const d1pct=tot.satT?Math.round(tot.divData[0].t/tot.satT*100):0;
+    const d2pct=tot.satT?Math.round(tot.divData[1].t/tot.satT*100):0;
+    const d3pct=tot.satT?Math.round(tot.divData[2].t/tot.satT*100):0;
+    const d4pct=tot.satT?Math.round(tot.divData[3].t/tot.satT*100):0;
+    const passpct=tot.satT?Math.round(tot.passT/tot.satT*100):0;
+    const failpct=tot.satT?Math.round(tot.failT/tot.satT*100):0;
+
+    const div=document.createElement('div');
+    div.className='ana-report';
+    div.innerHTML=`
+      <div class="ana-report-title">LUMWANA WEST DAY SECONDARY SCHOOL</div>
+      <div class="ana-report-sub">ANALYSIS FOR JUNIOR CLASSES (FORMS 1–3)</div>
+      <div class="ana-meta-row">
+        <span>LEVEL/FORM: <b>${cls}</b></span>
+        <span>TEACHER: <b>${teacher.fn} ${teacher.ln}</b></span>
+        <span>TERM: <b>${termF||'—'}</b></span>
+        <span>YEAR: <b>${yearF||new Date().getFullYear()}</b></span>
+      </div>
+      <div class="ana-tbl-wrap">
+        <table class="ana-tbl">
+          <thead>
+            <tr>
+              <th rowspan="2" style="min-width:110px;">Subject</th>
+              <th colspan="3">No. of those who SAT</th>
+              <th colspan="3">No. of those ABSENT</th>
+              <th colspan="3" style="background:#1a56a8;">DIVISION 1<br><small>75-100</small></th>
+              <th colspan="3" style="background:#2563eb;">DIVISION 2<br><small>65-74</small></th>
+              <th colspan="3" style="background:#3b82f6;">DIVISION 3<br><small>50-64</small></th>
+              <th colspan="3" style="background:#60a5fa;color:#1e3a8a;">DIVISION 4<br><small>40-49</small></th>
+              <th colspan="3" style="background:#15803d;">PASS<br><small>40+</small></th>
+              <th colspan="3" style="background:#b91c1c;">FAIL<br><small>0-39</small></th>
+            </tr>
+            <tr>
+              ${Array(8).fill(0).map(()=>bgtHead).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(rowHTML).join('')}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td><b>TOTALS</b></td>
+              ${bgtCell(tot.satB,tot.satG,tot.satT)}${bgtCell('','','')}
+              ${tot.divData.map(d=>bgtCell(d.b,d.g,d.t)).join('')}
+              ${bgtCell(tot.passB,tot.passG,tot.passT)}${bgtCell(tot.failB,tot.failG,tot.failT)}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="ana-summary">
+        <div><b>${d1pct}%</b>DIVISION 1</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;"><b>${d2pct}%</b>DIVISION 2</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;"><b>${d3pct}%</b>DIVISION 3</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;"><b>${d4pct}%</b>DIVISION 4</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;"><b>${passpct}%</b>PASS</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;color:var(--red);"><b>${failpct}%</b>FAIL</div>
+        <div style="border-left:1px solid #ccc;padding-left:10px;"><b>${tot.satT?Math.round((d1pct+d2pct+d3pct+d4pct+passpct)/5):0}%</b>TOTAL PERCENTAGE</div>
+      </div>`;
+    el.appendChild(div);
+  });
+  if(!el.innerHTML)el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">No grades recorded for junior classes yet. Enter grades first.</div>';
 }
 
 // ===== INIT =====
