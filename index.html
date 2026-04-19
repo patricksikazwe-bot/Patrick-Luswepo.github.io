@@ -784,12 +784,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
           <div class="lesson-live" id="lesson-live-badge">🔴 LIVE</div>
           <h3 id="lesson-room-title">Mathematics — Form 1A</h3>
           <div style="font-size:11px;color:var(--muted);margin-bottom:12px;" id="lesson-room-sub">Teacher: — &nbsp;|&nbsp; Started: —</div>
-          <div class="video-area" id="lesson-video">
-            <video id="localVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:none;"></video>
-            <div id="video-placeholder" class="video-placeholder">
-              <div style="font-size:48px;margin-bottom:10px;">📹</div>
-              <div style="font-size:14px;font-weight:600;">Camera / Screen Share</div>
-              <div style="font-size:11px;opacity:.6;margin-top:4px;">Click 📷 Camera to enable your camera</div>
+          <div style="position:relative;background:#1a1a2e;border-radius:10px;overflow:hidden;width:100%;aspect-ratio:16/9;margin-bottom:10px;" id="lesson-video">
+            <video id="localVideo" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;display:none;z-index:2;"></video>
+            <div id="video-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;z-index:1;text-align:center;padding:16px;">
+              <div style="font-size:42px;margin-bottom:8px;">📹</div>
+              <div style="font-size:13px;font-weight:600;">Camera / Screen Share</div>
+              <div style="font-size:11px;opacity:.5;margin-top:4px;">Click <b>📷 Camera</b> below to start</div>
+              <div style="font-size:10px;opacity:.4;margin-top:3px;">Allow camera access in your browser when prompted</div>
             </div>
           </div>
           <div class="video-controls">
@@ -1249,8 +1250,8 @@ function doLogout(){
 
 // ===== ROLE NAVIGATION CONFIG =====
 const NAVS={
-  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis (10-12)'},{id:'junior-analysis',i:'📋',l:'Junior Analysis (Forms)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
-  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'homework',i:'📚',l:'Homework'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis (10-12)'},{id:'junior-analysis',i:'📋',l:'Junior Analysis (Forms)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  admin:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior (Grade 10-12)'},{id:'junior-analysis',i:'📋',l:'Junior (Form 1-3)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Administration'},{id:'fees',i:'💰',l:'Fees'},{id:'procurement',i:'🛒',l:'Procurement'},{id:'stores',i:'📦',l:'Stores'},{id:'finance',i:'💼',l:'Finance'},{id:'performance',i:'⭐',l:'Performance'},{id:'production',i:'🏭',l:'Production'},{id:'users',i:'👥',l:'Users'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
+  headteacher:[{s:'Academic'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'class-enroll',i:'📋',l:'Class Enrollment'},{id:'teachers',i:'👨‍🏫',l:'Staff Management'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{id:'idcards',i:'🪪',l:'ID Cards'},{id:'timetable',i:'📅',l:'Timetable'},{id:'promotion',i:'🎓',l:'Promotion'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior (Grade 10-12)'},{id:'junior-analysis',i:'📋',l:'Junior (Form 1-3)'},{id:'ecz',i:'📄',l:'ECZ Papers'},{id:'performance',i:'⭐',l:'Performance'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
   deputy:[{s:'Academic Oversight'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'students',i:'👨‍🎓',l:'Students'},{id:'teachers',i:'👨‍🏫',l:'Teachers'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'deputy-monitor',i:'🗂️',l:'Monitor Overview'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
   hod:[{s:'Department'},{id:'dashboard',i:'📊',l:'Dashboard'},{id:'hod-monitor',i:'🗂️',l:'HOD Monitor'},{id:'attendance',i:'✅',l:'Attendance'},{id:'grades',i:'📝',l:'Grades'},{id:'sba',i:'📊',l:'SBAs'},{id:'reports',i:'📋',l:'Report Cards'},{s:'Analysis'},{id:'analytics',i:'📈',l:'Overview'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'performance',i:'⭐',l:'Teacher Performance'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
   teacher:[{s:'My Portal'},{id:'teacher-portal',i:'🏠',l:'Dashboard'},{id:'class-enroll',i:'📋',l:'My Class'},{id:'attendance',i:'✅',l:'Attendance Register'},{id:'grades',i:'📝',l:'Enter Grades'},{id:'sba',i:'📊',l:'SBA Entry'},{id:'reports',i:'📋',l:'Report Cards'},{id:'homework',i:'📚',l:'Homework'},{id:'timetable',i:'📅',l:'Timetable'},{s:'Analysis'},{id:'senior-analysis',i:'📊',l:'Senior Analysis'},{id:'junior-analysis',i:'📋',l:'Junior Analysis'},{id:'ecz',i:'📄',l:'ECZ Papers'},{s:'Communication'},{id:'announcements',i:'🔔',l:'Announcements'},{id:'messages',i:'💬',l:'Messages'},{id:'lessons',i:'🎥',l:'Online Lessons'},{s:'Account'},{id:'changepassword',i:'🔑',l:'Change Password'}],
@@ -1383,15 +1384,24 @@ function updateDash(){
   const fc=fees.filter(f=>f.status==='Paid').reduce((a,f)=>a+parseFloat(f.amount||0),0);
   document.getElementById('df').textContent='K'+fc.toLocaleString();
   const lr=attendance.slice(-1)[0];document.getElementById('da').textContent=lr?Math.round(lr.present/(lr.present+lr.absent||1)*100)+'%':'—';
+  // Recently enrolled table
   document.querySelector('#dash-stbl tbody').innerHTML=students.slice(-5).reverse().map(s=>`<tr><td><span class="enroll-badge">${s.enroll}</span></td><td>${s.fn} ${s.ln}</td><td>${s.cls}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:14px">No students yet</td></tr>';
-  const acts=[...students.slice(-2).map(s=>({i:'👨‍🎓',t:`${s.fn} ${s.ln} enrolled [${s.enroll}]`})),...grades.slice(-2).map(g=>({i:'📝',t:`Grade: ${g.sn} — ${g.sub} ${g.sc}%`})),...sba.slice(-2).map(b=>({i:'📊',t:`SBA: ${b.sn} ${b.type}`}))].slice(0,5);
+  // Activity feed — role-appropriate
+  let acts=[];
+  if(curRole==='admin'||curRole==='headteacher'){
+    acts=[...students.slice(-2).map(s=>({i:'👨‍🎓',t:`${s.fn} ${s.ln} enrolled [${s.enroll}]`})),...grades.slice(-2).map(g=>({i:'📝',t:`Grade: ${g.sn} — ${g.sub} ${g.sc}%`})),...fees.slice(-2).map(f=>({i:'💰',t:`Fee: ${f.sn} K${f.amount} — ${f.status}`})),...announcements.slice(-1).map(a=>({i:'🔔',t:`Announcement: ${a.title}`}))].slice(0,5);
+  } else if(curRole==='deputy'){
+    acts=[...grades.slice(-3).map(g=>({i:'📝',t:`Grade: ${g.sn} — ${g.sub} ${g.sc}%`})),...attendance.slice(-2).map(a=>({i:'✅',t:`Attendance: ${a.cls} — ${a.present} present`}))].slice(0,5);
+  } else if(curRole==='hod'){
+    const acc2=accounts.find(a=>a.id===curUser.id);const dept=acc2?.sub||'';
+    acts=grades.filter(g=>g.sub===dept).slice(-5).map(g=>({i:'📝',t:`${g.sn} — ${g.sub} ${g.sc}%`}));
+  }
   document.getElementById('dash-actf').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;gap:7px;padding:7px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><span>${a.i}</span><span>${a.t}</span></div>`).join(''):'<div style="text-align:center;color:var(--muted);padding:14px;font-size:11px;">No activity yet</div>';
-  // Show latest 3 announcements on dashboard
+  // Latest 3 announcements on dashboard
   const dashAnn=document.getElementById('dash-ann');
   if(dashAnn){
-    const catMap={urgent:'ann-urgent',info:'ann-info',event:'ann-event',general:'ann-general'};
     const catLabel={urgent:'🔴',info:'🟡',event:'🟢',general:'🔵'};
-    dashAnn.innerHTML=announcements.slice(0,3).map(a=>`<div style="padding:8px 0;border-bottom:1px solid #EFF6FF;cursor:pointer;" onclick="go('announcements')"><div style="display:flex;align-items:center;gap:6px;"><span>${catLabel[a.cat]||'🔵'}</span><b style="font-size:12px;">${a.title}</b>${!a.readBy?.includes(curUser?.u)?'<span class="badge" style="background:var(--red);color:white;font-size:9px;">NEW</span>':''}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${a.date} — ${a.by}</div></div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:12px;font-size:11px;">No announcements yet</div>';
+    dashAnn.innerHTML=announcements.slice(0,3).map(a=>`<div style="padding:8px 0;border-bottom:1px solid #EFF6FF;cursor:pointer;" onclick="go('announcements')"><div style="display:flex;align-items:center;gap:6px;"><span>${catLabel[a.cat]||'🔵'}</span><b style="font-size:12px;">${a.title}</b>${!a.readBy?.includes(curUser?.u)?'<span class="badge" style="background:var(--red);color:white;font-size:9px;padding:1px 5px;">NEW</span>':''}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${a.date} — ${a.by}</div></div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:12px;font-size:11px;">No announcements yet</div>';
   }
 }
 
@@ -2013,13 +2023,22 @@ async function toggleCam(){
   if(!camOn){
     try{
       localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-      vid.srcObject=localStream;vid.style.display='block';if(ph)ph.style.display='none';
-      camOn=true;b.textContent='📷 Camera On';b.style.background='var(--green)';
+      vid.srcObject=localStream;
+      vid.style.display='block';
+      if(ph)ph.style.display='none';
+      camOn=true;
+      b.textContent='📷 Camera On';b.style.background='var(--green)';
       toast('📷 Camera connected!','ok');
-    }catch(err){toast('❌ Camera: '+err.message+'. Allow camera in browser settings.','err');}
+    }catch(err){
+      let msg='Camera error: '+err.message;
+      if(err.name==='NotAllowedError')msg='❌ Camera blocked. Click the camera icon in your browser address bar and allow access, then try again.';
+      else if(err.name==='NotFoundError')msg='❌ No camera found on this device.';
+      toast(msg,'err');
+    }
   } else {
     if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
-    if(vid){vid.srcObject=null;vid.style.display='none';}if(ph)ph.style.display='flex';
+    if(vid){vid.srcObject=null;vid.style.display='none';}
+    if(ph)ph.style.display='flex';
     camOn=false;b.textContent='📷 Camera Off';b.style.background='#4B5563';
   }
 }
@@ -2030,14 +2049,22 @@ async function toggleShare(){
   if(!shareOn){
     try{
       screenStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
-      vid.srcObject=screenStream;vid.style.display='block';if(ph)ph.style.display='none';
+      vid.srcObject=screenStream;
+      vid.style.display='block';
+      if(ph)ph.style.display='none';
       shareOn=true;b.textContent='🖥️ Stop Sharing';b.style.background='var(--gold)';
-      screenStream.getVideoTracks()[0].onended=()=>{shareOn=false;b.textContent='🖥️ Share Screen';b.style.background='var(--navy)';if(vid){vid.style.display='none';}if(ph)ph.style.display='flex';screenStream=null;};
+      screenStream.getVideoTracks()[0].onended=()=>{
+        shareOn=false;b.textContent='🖥️ Share Screen';b.style.background='var(--navy)';
+        if(vid){vid.srcObject=null;vid.style.display='none';}
+        if(ph)ph.style.display='flex';
+        screenStream=null;
+      };
       toast('📺 Screen sharing started','ok');
-    }catch(err){toast('❌ Screen share: '+err.message,'err');}
+    }catch(err){toast('❌ Screen share cancelled or blocked.','err');}
   } else {
     if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
-    if(vid){vid.srcObject=null;vid.style.display='none';}if(ph)ph.style.display='flex';
+    if(vid){vid.srcObject=null;vid.style.display='none';}
+    if(ph)ph.style.display='flex';
     shareOn=false;b.textContent='🖥️ Share Screen';b.style.background='var(--navy)';
   }
 }
