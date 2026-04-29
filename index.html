@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumwana West Day Secondary School</title>
+<title>Lumwana West Day Secondary School Edu System v6</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#003580;--red:#CC0000;--gold:#F0A500;--green:#007A33;--light:#F0F4FF;--text:#111827;--muted:#6B7A99;--border:#DBEAFE;--success:#16A34A;--danger:#DC2626;--warning:#D97706;--sw:220px;}
@@ -233,7 +233,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
   .mc{margin-left:0!important;}
 }
 
-/* ANNOUNCEMENTS */
+/* Role guards — these pages never show unless explicitly activated */
+#pg-homework,#pg-teacher-portal{display:none;}
+#pg-homework.active{display:block;}
+#pg-teacher-portal.active{display:block;}
 .ann-card{background:white;border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-left:5px solid var(--navy);}
 .ann-card.urgent{border-left-color:var(--red);}
 .ann-card.info{border-left-color:var(--gold);}
@@ -1932,6 +1935,8 @@ function saveHomework(){
 }
 function delHW(id){if(!confirm('Remove?'))return;homework=homework.filter(h=>h.id!==id);DB.set('homework',homework);renderHomework();toast('🗑 Removed','');}
 function renderHomework(){
+  // Only teachers and students see homework
+  if(curRole==='admin'||curRole==='headteacher'||curRole==='deputy'){return;}
   const cf=document.getElementById('hw-cls-f')?.value||'';
   const sf=document.getElementById('hw-sub-f')?.value||'';
   // For teacher: only their class
