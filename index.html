@@ -436,10 +436,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <div class="lf"><label>Full Name</label><input id="su-name"></div>
         <div class="lf"><label>Email Address</label><input type="email" id="su-u" placeholder="your@email.com"></div>
         <div class="lf"><label>Choose Password</label><input type="password" id="su-p"></div>
-        <div class="lf"><label>Subject / Department</label><select id="su-sub" class="subjectSelect"></select></div>
-        <div class="lf"><label>Assigned Class (optional)</label><select id="su-cls"><option value="">-- Select Class --</option></select></div>
-        <div style="font-size:10px;color:var(--muted);margin-bottom:10px;">⚠️ Requires admin approval before login.</div>
-        <button class="lbtn gr" onclick="doSignup()">Create Account</button>
+        <div class="lf" id="su-sub-wrap"><label>Subject / Department</label><select id="su-sub" class="subjectSelect"></select></div>
+        <div class="lf" id="su-cls-wrap"><label>Assigned Class (optional)</label><select id="su-cls"><option value="">-- Select Class --</option></select></div>
+        <div id="su-approval-note" style="font-size:10px;color:var(--muted);margin-bottom:10px;">⚠️ Requires admin approval before login.</div>
+        <button class="lbtn" id="su-submit-btn" onclick="doSignup()">Create Account →</button>
       </div>
       <div id="form-forgot" style="display:none;">
         <div class="lf"><label>Your Email</label><input type="email" id="fo-u" placeholder="your@email.com"></div>
@@ -1226,6 +1226,19 @@ function setRole(r,el){
   const hints={admin:'First time? Use <b>Sign Up</b> tab to create your admin account with your email.',headteacher:'First time? Use <b>Sign Up</b> tab to create your account with your email.',deputy:'First time? Use <b>Sign Up</b> tab to create your account with your email.',hod:'First time? Use <b>Sign Up</b> tab to create your account with your email.',teacher:'Sign in with your credentials, or Sign Up for a new account',student:'Username = Enrollment # (e.g. LW001), Password = enrollment #'};
   document.getElementById('defaultInfo').innerHTML=hints[r]||'Enter your credentials';
   if(r==='parent')filterChildren();
+  // Show/hide teacher-only signup fields
+  const isTeacher = r==='teacher';
+  const subWrap = document.getElementById('su-sub-wrap');
+  const clsWrap = document.getElementById('su-cls-wrap');
+  const approvalNote = document.getElementById('su-approval-note');
+  const submitBtn = document.getElementById('su-submit-btn');
+  if(subWrap) subWrap.style.display = isTeacher ? '' : 'none';
+  if(clsWrap) clsWrap.style.display = isTeacher ? '' : 'none';
+  if(approvalNote) approvalNote.style.display = isTeacher ? '' : 'none';
+  if(submitBtn){
+    submitBtn.textContent = isTeacher ? 'Create Account' : 'Create '+((r==='admin'||r==='principal')?'Admin':'My')+' Account →';
+    submitBtn.style.background = isTeacher ? 'var(--green)' : 'var(--navy)';
+  }
 }
 
 function setTeacherTab(t){
@@ -1281,9 +1294,9 @@ function doSignup(){
   if(!name||!email||!pass){showErr('Fill all required fields.');return;}
   if(pass.length<6){showErr('Password must be at least 6 characters.');return;}
   showErr('');
-  document.querySelector('#form-signup .lbtn').textContent='Creating…';
+  document.getElementById('su-submit-btn').textContent='Creating…';
   firebaseSignUp(email,pass,name,selRole).catch(err=>{
-    document.querySelector('#form-signup .lbtn').textContent='Create Account';
+    document.getElementById('su-submit-btn').textContent='Create Account';
     showErr('❌ '+(err.message||'Error creating account.'));
   });
 }
