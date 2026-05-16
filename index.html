@@ -1291,14 +1291,41 @@ function doSignup(){
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-u').value.trim();
   const pass=document.getElementById('su-p').value;
-  if(!name||!email||!pass){showErr('Fill all required fields.');return;}
+  if(!name||!email||!pass){showErr('Fill in your name, email and password.');return;}
   if(pass.length<6){showErr('Password must be at least 6 characters.');return;}
   showErr('');
   document.getElementById('su-submit-btn').textContent='Creating…';
-  firebaseSignUp(email,pass,name,selRole).catch(err=>{
-    document.getElementById('su-submit-btn').textContent='Create Account';
-    showErr('❌ '+(err.message||'Error creating account.'));
-  });
+  // Flag prevents onAuthStateChanged from interfering mid-signup
+  window._fbSigningUp=true;
+  firebaseSignUp(email,pass,name,selRole)
+    .then(({role,isAdmin,userName})=>{
+      window._fbSigningUp=false;
+      document.getElementById('su-submit-btn').textContent='Create Account →';
+      if(role==='teacher'){
+        showSuccess('✅ Account created! Awaiting admin approval before you can sign in.');
+        setTeacherTab('signin');
+      } else {
+        // Admin / HT / Deputy / HOD — auto-approved, log straight in
+        showSuccess('✅ Account created! Logging you in…');
+        const u=window.firebaseAuth.currentUser;
+        if(u){
+          curUser={id:u.uid,u:u.email,n:userName,r:role};
+          curRole=role;
+          setTimeout(()=>launchApp(),600);
+        }
+      }
+    })
+    .catch(err=>{
+      window._fbSigningUp=false;
+      document.getElementById('su-submit-btn').textContent='Create Account →';
+      if(err.code==='auth/email-already-in-use'){
+        showErr('❌ That email already has an account. Use Sign In instead.');
+      } else if(err.code==='permission-denied'||String(err.message).includes('permission')){
+        showErr('❌ Firebase rules are blocking the signup. Please set Firestore rules to allow authenticated writes, then try again.');
+      } else {
+        showErr('❌ '+(err.message||'Error creating account. Check your internet connection.'));
+      }
+    });
 }
 
 function doForgot(){
@@ -1326,6 +1353,9 @@ function showErr(m){const e=document.getElementById('lerr');e.innerHTML=m;e.styl
 function showSuccess(m){const e=document.getElementById('lsuc');e.textContent=m;e.style.display='block';document.getElementById('lerr').style.display='none';}
 
 function launchApp(){
+  // Sync window globals set by Firebase module into local variables
+  if(window.curUser) curUser = window.curUser;
+  if(window.curRole) curRole = window.curRole;
   document.getElementById('welcomeScreen').style.display='none';
   document.getElementById('app').style.display='block';
   setupRole();renderAll();setDates();
@@ -2597,15 +2627,21 @@ window.firebaseSignUp = async (email,pass,name,role) => {
   const cred = await createUserWithEmailAndPassword(fbAuth,email,pass);
   await updateProfile(cred.user,{displayName:name});
   const isAdmin = role==='admin'||role==='principal';
-  await setDoc(doc(fbDB,'users',cred.user.uid),{name,email,role,createdAt:serverTimestamp(),active:true,approved:isAdmin});
-  // Mirror into localStorage accounts so the admin pending-approvals panel can see this user
+  try {
+    await setDoc(doc(fbDB,'users',cred.user.uid),{name,email,role,createdAt:serverTimestamp(),active:true,approved:isAdmin});
+  } catch(fsErr) {
+    // Firestore write failed — sign out the auth account so user isn't in a broken state
+    await signOut(fbAuth);
+    throw fsErr;
+  }
+  // Mirror into localStorage so admin pending-approvals panel can see this user
   const accs = JSON.parse(localStorage.getItem('lw5_accounts')||'[]');
   if(!accs.find(a=>a.u===email)){
     accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,approved:isAdmin,mustChange:false,fbUid:cred.user.uid});
     localStorage.setItem('lw5_accounts',JSON.stringify(accs));
-    // Refresh in-memory accounts array if available
     if(typeof accounts !== 'undefined') accounts.splice(0,accounts.length,...accs);
   }
+  return {user:cred.user, role, isAdmin, userName:name};
 };
 
 window.firebaseForgotPassword = (email) =>
@@ -2632,6 +2668,7 @@ const FB_TO_ROLE={principal:'admin',admin:'admin',headteacher:'headteacher',
 
 onAuthStateChanged(fbAuth, async user=>{
   if(!user) return; // user not logged in — welcome screen stays
+  if(window._fbSigningUp) return; // signup in progress — doSignup() handles the launch
 
   try{
     const snap = await getDoc(doc(fbDB,'users',user.uid));
