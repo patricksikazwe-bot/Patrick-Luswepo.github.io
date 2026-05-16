@@ -1681,21 +1681,41 @@ function loadClassList(){
 }
 
 // ===== TEACHERS =====
-function renderPendingApprovals(){
-  const pending=accounts.filter(a=>a.r==='teacher'&&!a.approved);
-  const card=document.getElementById('pendingCard');if(card)card.style.display=pending.length?'block':'none';
+async function renderPendingApprovals(){
+  const card=document.getElementById('pendingCard');
   const tb=document.querySelector('#pending-tbl tbody');
-  if(tb)tb.innerHTML=pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button></td></tr>`).join('');
+  if(!card||!tb) return;
+
+  let pending=[];
+  // Fetch from Firestore first (works across all devices)
+  if(window.firebaseFetchPendingTeachers){
+    try{ pending=await window.firebaseFetchPendingTeachers(); }catch(e){}
+  }
+  // Merge any localStorage-only pending (fallback / offline)
+  accounts.filter(a=>a.r==='teacher'&&!a.approved).forEach(a=>{
+    if(!pending.find(p=>p.u===a.u)) pending.push(a);
+  });
+
+  card.style.display=pending.length?'block':'none';
+  tb.innerHTML=pending.length
+    ? pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button></td></tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:12px">No pending approvals</td></tr>';
 }
 function approveTeacher(id){
-  const acc=accounts.find(a=>String(a.id)===String(id));if(!acc)return;
-  acc.approved=true;
-  const parts=acc.n.split(' ');
-  teachers.push({id:Date.now(),fn:parts[0],ln:parts.slice(1).join(' ')||'',u:acc.u,sub:acc.sub||'',cls:acc.cls||'',role:'teacher',status:'Active'});
-  DB.set('teachers',teachers);DB.set('accounts',accounts);
-  // If this teacher registered via Firebase, also update their Firestore approved flag
-  if(acc.fbUid && window.firebaseUpdateApproval){window.firebaseUpdateApproval(acc.fbUid).catch(()=>{});}
-  renderTeachers();renderPendingApprovals();toast('✅ Teacher approved','ok');
+  // Update localStorage if record exists there
+  const acc=accounts.find(a=>String(a.id)===String(id));
+  if(acc){
+    acc.approved=true;
+    const parts=acc.n.split(' ');
+    if(!teachers.find(t=>t.u===acc.u)){
+      teachers.push({id:Date.now(),fn:parts[0],ln:parts.slice(1).join(' ')||'',u:acc.u,sub:acc.sub||'',cls:acc.cls||'',role:'teacher',status:'Active'});
+      DB.set('teachers',teachers);
+    }
+    DB.set('accounts',accounts);
+  }
+  // Always update Firestore — for Firebase-registered teachers, id IS the Firebase UID
+  if(window.firebaseUpdateApproval){window.firebaseUpdateApproval(id).catch(()=>{});}
+  renderTeachers();renderPendingApprovals();toast('✅ Teacher approved — they can now log in','ok');
 }
 function rejectTeacher(id){if(!confirm('Reject account?'))return;accounts=accounts.filter(a=>String(a.id)!==String(id));DB.set('accounts',accounts);renderPendingApprovals();toast('❌ Rejected','');}
 function saveTeacher(){
@@ -2651,7 +2671,7 @@ import { initializeApp }   from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
          updateProfile, signOut, onAuthStateChanged, sendPasswordResetEmail }
          from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 
 const firebaseConfig={
   apiKey:"AIzaSyA35FEm4CkI9MXBtA97Q6ggYzpUEdh4kqg",
@@ -2676,8 +2696,9 @@ window.firebaseSignUp = async (email,pass,name,role) => {
   const cred = await createUserWithEmailAndPassword(fbAuth,email,pass);
   await updateProfile(cred.user,{displayName:name});
   const isAdmin = role==='admin'||role==='principal';
+  const needsApproval = role==='teacher'; // only teachers wait for approval
   try {
-    await setDoc(doc(fbDB,'users',cred.user.uid),{name,email,role,createdAt:serverTimestamp(),active:true,approved:isAdmin});
+    await setDoc(doc(fbDB,'users',cred.user.uid),{name,email,role,createdAt:serverTimestamp(),active:true,approved:!needsApproval});
   } catch(fsErr) {
     // Firestore write failed — sign out the auth account so user isn't in a broken state
     await signOut(fbAuth);
@@ -2686,7 +2707,7 @@ window.firebaseSignUp = async (email,pass,name,role) => {
   // Mirror into localStorage so admin pending-approvals panel can see this user
   const accs = JSON.parse(localStorage.getItem('lw5_accounts')||'[]');
   if(!accs.find(a=>a.u===email)){
-    accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,approved:isAdmin,mustChange:false,fbUid:cred.user.uid});
+    accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,approved:!needsApproval,mustChange:false,fbUid:cred.user.uid});
     localStorage.setItem('lw5_accounts',JSON.stringify(accs));
     if(typeof accounts !== 'undefined') accounts.splice(0,accounts.length,...accs);
   }
@@ -2708,6 +2729,19 @@ window.firebaseSignOut = () => signOut(fbAuth);
 // Update a teacher's approved status in Firestore (called when admin approves via pending panel)
 window.firebaseUpdateApproval = async (uid) => {
   await updateDoc(doc(fbDB,'users',uid),{approved:true});
+};
+
+// Fetch all unapproved teachers from Firestore (works across all devices)
+window.firebaseFetchPendingTeachers = async () => {
+  const q = query(collection(fbDB,'users'), where('role','==','teacher'), where('approved','==',false));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({
+    id: d.id, fbUid: d.id,
+    n: d.data().name||'Unknown',
+    u: d.data().email||'',
+    sub: d.data().subject||'',
+    r: 'teacher', approved: false
+  }));
 };
 
 // Firebase → internal role mapping
