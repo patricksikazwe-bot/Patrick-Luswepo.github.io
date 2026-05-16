@@ -522,6 +522,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <div>
           <div class="card"><div class="ch"><div class="ct">👨‍🎓 Recently Enrolled</div><button class="btn boutline bsm" onclick="go('students')">All Students</button></div><table class="tbl" id="dash-stbl"><thead><tr><th>Enroll #</th><th>Name</th><th>Class</th></tr></thead><tbody></tbody></table></div>
           <div class="card" id="dash-ann-card"><div class="ch"><div class="ct">🔔 Latest Announcements</div><button class="btn boutline bsm" onclick="go('announcements')">View All</button></div><div id="dash-ann" style="padding:8px 14px;"></div></div>
+          <div class="card" id="dash-danger-zone" style="border:2px solid #e53935;display:none;"><div class="ch"><div class="ct" style="color:#e53935;">🚨 Admin Danger Zone</div></div><div style="padding:12px 14px;"><p style="font-size:13px;color:var(--muted);margin-bottom:10px;">These actions cannot be undone. Use only when you want to start the system fresh.</p><button class="btn bdanger" style="width:100%;padding:12px;font-size:14px;" onclick="resetAllData()">🗑️ Reset All School Data (Start Fresh)</button></div></div>
         </div>
         <div class="card"><div class="ch"><div class="ct">📰 Activity</div></div><div id="dash-actf" style="padding:8px 12px;"></div></div>
       </div>
@@ -727,8 +728,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     </div>
 
     <!-- FEES -->
-    <div class="pg" id="pg-fees"><div class="ph phr"><div class="ph"><h2>💰 Fee Payments</h2></div><button class="btn bprimary" onclick="openM('feeM')">＋ Record</button></div><div class="sg" style="grid-template-columns:repeat(3,1fr);"><div class="sc"><div class="sn" id="fee-c">K0</div><div class="sl">Collected</div></div><div class="sc"><div class="sn" id="fee-p">K0</div><div class="sl">Pending</div></div><div class="sc"><div class="sn" id="fee-n">0</div><div class="sl">Records</div></div></div><div class="card"><table class="tbl" id="fee-tbl"><thead><tr><th>#</th><th>Student</th><th>Amount</th><th>Type</th><th>Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
-    <div class="pg" id="pg-procurement"><div class="ph phr"><div class="ph"><h2>🛒 Procurement</h2></div><button class="btn bprimary" onclick="openM('procM')">＋ New</button></div><div class="card"><table class="tbl" id="proc-tbl"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Vendor</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-fees"><div class="ph phr"><div class="ph"><h2>💰 Fee Payments</h2></div><button class="btn bprimary" onclick="openM('feeM')">＋ Record</button></div><div class="sg" style="grid-template-columns:repeat(3,1fr);"><div class="sc"><div class="sn" id="fee-c">K0</div><div class="sl">Collected</div></div><div class="sc"><div class="sn" id="fee-p">K0</div><div class="sl">Pending</div></div><div class="sc"><div class="sn" id="fee-n">0</div><div class="sl">Records</div></div></div><div class="card"><table class="tbl" id="fee-tbl"><thead><tr><th>#</th><th>Student</th><th>Amount</th><th>Type</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-procurement"><div class="ph phr"><div class="ph"><h2>🛒 Procurement</h2></div><button class="btn bprimary" onclick="openM('procM')">＋ New</button></div><div class="card"><table class="tbl" id="proc-tbl"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Vendor</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="pg" id="pg-stores"><div class="ph phr"><div class="ph"><h2>📦 Stores</h2></div><button class="btn bprimary" onclick="openM('storeM')">＋ Add</button></div><div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderStores()"></div></div><table class="tbl" id="store-tbl"><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Reorder</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="pg" id="pg-finance"><div class="ph phr"><div class="ph"><h2>💼 Finance</h2></div><button class="btn bprimary" onclick="openM('finM')">＋ Add</button></div><div class="sg" style="grid-template-columns:repeat(3,1fr);"><div class="sc"><div class="sn" id="fin-i">K0</div><div class="sl">Income</div></div><div class="sc"><div class="sn" id="fin-e">K0</div><div class="sl">Expenses</div></div><div class="sc"><div class="sn" id="fin-b">K0</div><div class="sl">Balance</div></div></div><div class="card"><table class="tbl" id="fin-tbl"><thead><tr><th>#</th><th>Description</th><th>Type</th><th>Amount</th><th>Category</th><th>Date</th></tr></thead><tbody></tbody></table></div></div>
     <div class="pg" id="pg-performance"><div class="ph phr"><div class="ph"><h2>⭐ Performance Evaluations</h2></div><button class="btn bprimary" onclick="openM('perfM')">＋ Evaluate</button></div><div class="card"><table class="tbl" id="perf-tbl"><thead><tr><th>#</th><th>Employee</th><th>Role</th><th>Score</th><th>Rating</th><th>Reviewer</th></tr></thead><tbody></tbody></table></div></div>
@@ -1339,7 +1340,7 @@ function doRoleSetup(){
   if(!name){showErr('Please enter your full name.');return;}
   document.querySelector('#form-rolesetup .lbtn').textContent='Saving…';
   firebaseSaveProfile(name,selRole).then(()=>{
-    curUser={id:firebaseAuth.currentUser.uid,u:firebaseAuth.currentUser.email,n:name,r:selRole};
+    curUser={id:window.firebaseAuth.currentUser.uid,u:window.firebaseAuth.currentUser.email,n:name,r:selRole};
     curRole=selRole;
     document.querySelector('#form-rolesetup .lbtn').textContent='Complete Setup & Enter System →';
     launchApp();
@@ -1403,6 +1404,9 @@ function setupRole(){
   populateAll();populateStudentDropdowns();
   if(curRole==='parent')loadParentPortal();
   if(curRole==='student')loadStudentPortal();
+  // Show admin danger zone only for admin
+  const dz=document.getElementById('dash-danger-zone');
+  if(dz)dz.style.display=(curRole==='admin'||curRole==='principal')?'':'none';
   if(curRole==='teacher')loadTeacherPortal();
   if(curRole==='hod')loadHODMonitor();
   if(curRole==='deputy')loadDeputyMonitor();
@@ -1540,6 +1544,40 @@ function saveStudent(){
   document.getElementById('sm-photo-name').textContent='Click to upload photo';
   document.getElementById('sm-photo-prev').innerHTML='';
   toast(`✅ ${fn} ${ln} enrolled as ${enroll}`,'ok');
+}
+let editingStudentId=null;
+function editStudent(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  editingStudentId=id;
+  document.getElementById('sm-fn').value=s.fn||'';
+  document.getElementById('sm-ln').value=s.ln||'';
+  document.getElementById('sm-gender').value=s.gender||'Male';
+  document.getElementById('sm-cls').value=s.cls||'';
+  document.getElementById('sm-dob').value=s.dob||'';
+  document.getElementById('sm-guardian').value=s.guardian||'';
+  document.getElementById('sm-phone').value=s.phone||'';
+  const btn=document.querySelector('#smM .btn.bprimary');
+  if(btn){btn.textContent='💾 Update Student';btn.onclick=()=>updateStudent();}
+  document.querySelector('#smM .mt').textContent='✏️ Edit Student';
+  openM('smM');
+}
+function updateStudent(){
+  if(!editingStudentId)return;
+  const s=students.find(x=>x.id===editingStudentId);if(!s)return;
+  s.fn=document.getElementById('sm-fn').value.trim();
+  s.ln=document.getElementById('sm-ln').value.trim();
+  s.gender=document.getElementById('sm-gender').value;
+  s.cls=document.getElementById('sm-cls').value;
+  s.dob=document.getElementById('sm-dob').value;
+  s.guardian=document.getElementById('sm-guardian').value.trim();
+  s.phone=document.getElementById('sm-phone').value.trim();
+  DB.set('students',students);
+  editingStudentId=null;
+  // Reset modal back to Add mode
+  const btn=document.querySelector('#smM .btn.bprimary');
+  if(btn){btn.textContent='Enroll Student';btn.onclick=()=>saveStudent();}
+  document.querySelector('#smM .mt').textContent='👤 New Student';
+  closeM('smM');renderStudents();populateStudentDropdowns();toast('✅ Student updated','ok');
 }
 function delStudent(id){if(!confirm('Remove this student?'))return;students=students.filter(s=>s.id!==id);DB.set('students',students);renderStudents();populateStudentDropdowns();updateDash();loadClassList();toast('🗑 Student removed','');}
 function renderStudents(){
@@ -2585,6 +2623,17 @@ function renderJuniorAnalysis(){
 }
 
 // ===== INIT =====
+function resetAllData(){
+  if(!confirm('WARNING: This will delete ALL students, fees, teachers, grades, attendance and all other records. Your admin account stays. Are you absolutely sure?'))return;
+  if(!confirm('Final confirmation: Delete everything and start fresh?'))return;
+  const keys=['students','teachers','fees','grades','attendance','timetable','tt','papers','proc','stores','finance','perf','prod','homework','messages','notifs','sba','scans'];
+  keys.forEach(k=>{try{localStorage.removeItem('lw5_'+k);}catch(e){}});
+  // Keep accounts but only admin
+  const adminAcc=accounts.filter(a=>a.r==='admin'||a.r==='principal');
+  localStorage.setItem('lw5_accounts',JSON.stringify(adminAcc));
+  toast('✅ All data cleared. Reloading...','ok');
+  setTimeout(()=>location.reload(),1200);
+}
 function renderAll(){renderStudents();renderTeachers();renderGrades();renderAttRec();renderPapers();renderFees();renderProc();renderStores();renderFinance();renderPerf();renderProd();renderTimetable();renderSBA();renderScans();populateStudentDropdowns();renderUsers();loadAttStudents();updateDash();renderPendingApprovals();updateNotifBadge();updateMsgBadge();document.getElementById('att-cls').addEventListener('change',loadAttStudents);}
 
 // Init subject selects on welcome screen
@@ -2602,7 +2651,7 @@ import { initializeApp }   from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
          updateProfile, signOut, onAuthStateChanged, sendPasswordResetEmail }
          from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig={
   apiKey:"AIzaSyA35FEm4CkI9MXBtA97Q6ggYzpUEdh4kqg",
@@ -2658,7 +2707,6 @@ window.firebaseSignOut = () => signOut(fbAuth);
 
 // Update a teacher's approved status in Firestore (called when admin approves via pending panel)
 window.firebaseUpdateApproval = async (uid) => {
-  const { updateDoc } = await import('firebase/firestore');
   await updateDoc(doc(fbDB,'users',uid),{approved:true});
 };
 
