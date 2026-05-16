@@ -2549,6 +2549,8 @@ document.querySelectorAll('.subjectSelect').forEach(s=>{s.innerHTML=SUBJECTS.map
 document.querySelectorAll('.classSelect').forEach(s=>{s.innerHTML=CLASSES.map(x=>`<option>${x}</option>`).join('');});
 document.getElementById('su-cls').innerHTML='<option value="">-- Select Class --</option>'+CLASSES.map(c=>`<option>${c}</option>`).join('');
 setDates();
+// Initialize login panel to match the default selected role (Admin)
+setRole('admin', document.getElementById('rc-admin'));
 </script>
 
 <!-- ===== FIREBASE AUTH MODULE ===== -->
