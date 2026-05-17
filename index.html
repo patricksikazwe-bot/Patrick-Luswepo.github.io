@@ -1359,8 +1359,10 @@ async function doSignup(){
   }
   // Flag prevents onAuthStateChanged from interfering mid-signup
   window._fbSigningUp=true;
-  firebaseSignUp(email,pass,name,selRole)
-    .then(({role,isAdmin,userName})=>{
+  const sub = selRole==='teacher' ? (document.getElementById('su-sub')?.value||'') : '';
+  const cls = selRole==='teacher' ? (document.getElementById('su-cls')?.value||'') : '';
+  firebaseSignUp(email,pass,name,selRole,sub,cls)
+    .then(({role,userName,sub,cls})=>{
       window._fbSigningUp=false;
       document.getElementById('su-submit-btn').textContent='Create Account →';
       if(role==='teacher'){
@@ -1371,7 +1373,7 @@ async function doSignup(){
         showSuccess('✅ Account created! Logging you in…');
         const u=window.firebaseAuth.currentUser;
         if(u){
-          curUser={id:u.uid,u:u.email,n:userName,r:role};
+          curUser={id:u.uid,u:u.email,n:userName,r:role,sub:sub||'',cls:cls||''};
           curRole=role;
           setTimeout(()=>launchApp(),600);
         }
@@ -2181,8 +2183,8 @@ function loadTeacherPortal(){
   document.querySelector('#tp-grades tbody').innerHTML=myG.length?myG.map(g=>{const gd=gg(g.sc);return`<tr><td><b>${g.sn}</b></td><td>${g.sub}</td><td>${g.term}</td><td><b style="color:${gc(g.sc)}">${g.sc}%</b></td><td><span class="badge ${gd.c}">${gd.g}</span></td></tr>`}).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:12px">No grades yet</td></tr>';
   const lr=attendance.slice(-1)[0];
   document.getElementById('tp-att').innerHTML=lr?`Last: <b>${lr.date}</b> (${lr.cls})<br>Present: <b style="color:var(--green)">${lr.present}</b> | Absent: <b style="color:var(--red)">${lr.absent}</b>`:'No registers yet. <a href="#" onclick="go(\'attendance\')" style="color:var(--navy)">Mark first →</a>';
-  const acc=accounts.find(a=>a.id===curUser.id);
-  const myCls=acc?.cls||teachers.find(t=>t.u===curUser.u)?.cls||'';
+  const acc=accounts.find(a=>String(a.id)===String(curUser.id));
+  const myCls=curUser.cls||acc?.cls||teachers.find(t=>t.u===curUser.u)?.cls||'';
   const myStuList=myCls?students.filter(s=>s.cls===myCls):[];
   document.getElementById('tp-myclass').innerHTML=myCls?`<b style="color:var(--navy);">${myCls}</b> — ${myStuList.length} students<br><br>`+myStuList.slice(0,5).map(s=>`<div style="padding:4px 0;border-bottom:1px solid #EFF6FF;font-size:11px;"><span class="enroll-badge">${s.enroll}</span> ${s.fn} ${s.ln}</div>`).join('')+(myStuList.length>5?`<div style="font-size:10px;color:var(--muted);margin-top:4px;">+${myStuList.length-5} more</div>`:''):'<div style="color:var(--muted);font-size:11px;">No class assigned.</div>';
   document.getElementById('tp-stats').innerHTML=`Students: <b>${students.length}</b><br>Grades entered: <b>${grades.length}</b><br>SBA records: <b>${sba.length}</b>`;
@@ -2287,7 +2289,7 @@ function renderHomework(){
   const sf=document.getElementById('hw-sub-f')?.value||'';
   // For teacher: only their class
   let acc=accounts.find(a=>a.id===curUser.id);
-  const myCls=acc?.cls||teachers.find(t=>t.u===curUser.u)?.cls||'';
+  const myCls=curUser.cls||acc?.cls||teachers.find(t=>t.u===curUser.u)?.cls||'';
   let list=homework.filter(h=>(!cf||h.cls===cf)&&(!sf||h.sub===sf));
   if(curRole==='teacher'&&myCls)list=list.filter(h=>h.cls===myCls);
   if(curRole==='student'){
@@ -2834,26 +2836,29 @@ window.fsVerifyPin = async (pin) => {
 window.firebaseSignIn = (email,pass) =>
   signInWithEmailAndPassword(fbAuth,email,pass);
 
-window.firebaseSignUp = async (email,pass,name,role) => {
+window.firebaseSignUp = async (email,pass,name,role,sub='',cls='') => {
   const cred = await createUserWithEmailAndPassword(fbAuth,email,pass);
   await updateProfile(cred.user,{displayName:name});
-  const isAdmin = role==='admin'||role==='principal';
-  const needsApproval = role==='teacher'; // only teachers wait for approval
+  const needsApproval = role==='teacher';
   try {
-    await setDoc(doc(fbDB,'users',cred.user.uid),{name,email,role,createdAt:serverTimestamp(),active:true,approved:!needsApproval});
+    await setDoc(doc(fbDB,'users',cred.user.uid),{
+      name,email,role,subject:sub,cls,
+      createdAt:serverTimestamp(),active:true,approved:!needsApproval
+    });
   } catch(fsErr) {
-    // Firestore write failed — sign out the auth account so user isn't in a broken state
     await signOut(fbAuth);
     throw fsErr;
   }
   // Mirror into localStorage so admin pending-approvals panel can see this user
   const accs = JSON.parse(localStorage.getItem('lw5_accounts')||'[]');
   if(!accs.find(a=>a.u===email)){
-    accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,approved:!needsApproval,mustChange:false,fbUid:cred.user.uid});
+    accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,sub,cls,approved:!needsApproval,mustChange:false,fbUid:cred.user.uid});
     localStorage.setItem('lw5_accounts',JSON.stringify(accs));
     if(typeof accounts !== 'undefined') accounts.splice(0,accounts.length,...accs);
+    // Also sync updated accounts to Firestore cloud
+    if(window.fsWrite) window.fsWrite('accounts',accs).catch(()=>{});
   }
-  return {user:cred.user, role, isAdmin, userName:name};
+  return {user:cred.user, role, userName:name, sub, cls};
 };
 
 window.firebaseForgotPassword = (email) =>
@@ -2910,7 +2915,14 @@ onAuthStateChanged(fbAuth, async user=>{
         return;
       }
 
-      window.curUser = {id:user.uid, u:user.email, n:data.name||user.displayName||user.email, r:role};
+      window.curUser = {
+        id:   user.uid,
+        u:    user.email,
+        n:    data.name||user.displayName||user.email,
+        r:    role,
+        sub:  data.subject||data.sub||'',
+        cls:  data.cls||''
+      };
       window.curRole = role;
       launchApp();
 
