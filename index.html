@@ -69,6 +69,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 .ur{font-size:9px;text-transform:uppercase;letter-spacing:1px;}
 .ss{padding:7px 12px 2px;font-size:8px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:2px;font-weight:600;}
 .ni{display:flex;align-items:center;gap:7px;padding:7px 12px;margin:1px 6px;border-radius:7px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.6);transition:.2s;font-weight:500;}
+.ni-badge{background:#F59E0B;color:#000;font-size:9px;font-weight:800;border-radius:20px;padding:1px 6px;margin-left:auto;}
 .ni:hover{background:rgba(255,255,255,.08);color:white;}
 .ni.active{background:var(--red);color:white;}
 .sf{margin-top:auto;padding:10px;border-top:1px solid rgba(255,255,255,.1);}
@@ -1758,29 +1759,44 @@ function loadClassList(){
 async function renderPendingApprovals(){
   const card=document.getElementById('pendingCard');
   const tb=document.querySelector('#pending-tbl tbody');
+  const dashAlert=document.getElementById('dash-pending-alert');
 
   let pending=[];
+  let queryError=null;
+
+  // Fetch from Firestore users collection (works across all devices)
   if(window.firebaseFetchPendingTeachers){
-    try{ pending=await window.firebaseFetchPendingTeachers(); }catch(e){}
+    try{ pending=await window.firebaseFetchPendingTeachers(); }
+    catch(e){ queryError=e.message; }
   }
+  // Merge localStorage pending as fallback
   accounts.filter(a=>a.r==='teacher'&&!a.approved).forEach(a=>{
     if(!pending.find(p=>p.u===a.u)) pending.push(a);
   });
 
-  // Dashboard alert banner (admin only)
-  const dashAlert=document.getElementById('dash-pending-alert');
+  const count=pending.length;
+
+  // 1. Dashboard alert banner
   if(dashAlert){
-    if(pending.length&&(curRole==='admin'||curRole==='headteacher')){
+    if(count>0){
       dashAlert.style.display='block';
-      dashAlert.innerHTML=`<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b style="color:#92400E">⏳ ${pending.length} Teacher${pending.length>1?'s':''} Waiting for Approval</b><div style="font-size:12px;color:#78350F;margin-top:2px">Go to Staff Management to approve them</div></div><button class="btn bprimary bsm" onclick="go('teachers')">Approve Now →</button></div>`;
+      dashAlert.innerHTML=`<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="color:#92400E">⏳ ${count} Teacher${count>1?'s':''} Waiting for Your Approval</b><div style="font-size:12px;color:#78350F;margin-top:3px;">${pending.map(p=>p.n).join(', ')}</div></div><button class="btn bprimary" style="white-space:nowrap" onclick="go('teachers')">✅ Approve Now</button></div>`;
     } else {
       dashAlert.style.display='none';
+      if(queryError) dashAlert.style.display='block', dashAlert.innerHTML=`<div style="background:#FEE2E2;border:1px solid #F87171;border-radius:8px;padding:10px 14px;font-size:12px;color:#991B1B;">⚠️ Could not check pending approvals: ${queryError}. Go to <b>Staff Management</b> manually.</div>`;
     }
   }
 
-  if(!card||!tb) return;
-  card.style.display=pending.length?'block':'none';
-  tb.innerHTML=pending.length
+  // 2. Sidebar nav badge on Staff Management
+  const staffNavItem=document.querySelector('.ni[onclick*="teachers"]');
+  if(staffNavItem){
+    const old=staffNavItem.querySelector('.ni-badge');if(old)old.remove();
+    if(count>0) staffNavItem.insertAdjacentHTML('beforeend',`<span class="ni-badge">${count}</span>`);
+  }
+
+  // 3. Pending card on the Staff Management page itself
+  if(card) card.style.display=count>0?'block':'none';
+  if(tb) tb.innerHTML=count>0
     ? pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button></td></tr>`).join('')
     : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:12px">No pending approvals</td></tr>';
 }
@@ -2880,15 +2896,20 @@ window.firebaseUpdateApproval = async (uid) => {
 
 // Fetch all unapproved teachers from Firestore (works across all devices)
 window.firebaseFetchPendingTeachers = async () => {
-  const q = query(collection(fbDB,'users'), where('role','==','teacher'), where('approved','==',false));
+  // Query only by role (single field = no composite index needed)
+  const q = query(collection(fbDB,'users'), where('role','==','teacher'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({
-    id: d.id, fbUid: d.id,
-    n: d.data().name||'Unknown',
-    u: d.data().email||'',
-    sub: d.data().subject||'',
-    r: 'teacher', approved: false
-  }));
+  // Filter unapproved in JavaScript
+  return snap.docs
+    .filter(d => d.data().approved === false)
+    .map(d => ({
+      id: d.id, fbUid: d.id,
+      n: d.data().name||'Unknown',
+      u: d.data().email||'',
+      sub: d.data().subject||'',
+      cls: d.data().cls||'',
+      r: 'teacher', approved: false
+    }));
 };
 
 // Firebase → internal role mapping
