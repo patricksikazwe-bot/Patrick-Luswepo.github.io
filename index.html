@@ -356,6 +356,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 <body>
 
 <!-- ===== WELCOME / LOGIN SCREEN ===== -->
+<!-- Cloud loading overlay -->
+<div id="cloud-loading" style="display:none;position:fixed;inset:0;background:rgba(0,30,80,0.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:52px;height:52px;border:5px solid rgba(255,255,255,0.3);border-top-color:#F0A500;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="color:#fff;font-weight:700;font-size:17px;font-family:'Syne',sans-serif;">Syncing school data…</div>
+  <div style="color:rgba(255,255,255,0.6);font-size:13px;">Loading from cloud, please wait</div>
+</div>
+
 <div id="welcomeScreen">
 <div class="ws-inner">
   <div class="ws-header">
@@ -438,6 +445,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <div class="lf"><label>Choose Password</label><input type="password" id="su-p"></div>
         <div class="lf" id="su-sub-wrap"><label>Subject / Department</label><select id="su-sub" class="subjectSelect"></select></div>
         <div class="lf" id="su-cls-wrap"><label>Assigned Class (optional)</label><select id="su-cls"><option value="">-- Select Class --</option></select></div>
+        <div class="lf" id="su-pin-wrap" style="display:none">
+          <label>School Registration Code</label>
+          <input type="text" id="su-pin" placeholder="Enter the code given by your principal" autocomplete="off">
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;">Ask your principal for this code before signing up.</div>
+        </div>
         <div id="su-approval-note" style="font-size:10px;color:var(--muted);margin-bottom:10px;">⚠️ Requires admin approval before login.</div>
         <button class="lbtn" id="su-submit-btn" onclick="doSignup()">Create Account →</button>
       </div>
@@ -510,6 +522,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
 
     <!-- DASHBOARD -->
     <div class="pg active" id="pg-dashboard">
+      <div id="dash-pending-alert" style="display:none;padding:0 0 12px 0;"></div>
       <div class="sg">
         <div class="sc"><div class="sn" id="ds">0</div><div class="sl">👨‍🎓 Students</div></div>
         <div class="sc"><div class="sn" id="dt">0</div><div class="sl">👨‍🏫 Teachers</div></div>
@@ -933,7 +946,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     </div>
 
     <!-- USERS -->
-    <div class="pg" id="pg-users"><div class="ph phr"><div class="ph"><h2>👥 User Management</h2></div><button class="btn bprimary" onclick="openM('userM')">＋ Add User</button></div><div class="card"><table class="tbl" id="user-tbl"><thead><tr><th>#</th><th>Username</th><th>Name</th><th>Role</th><th>Class/Dept</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="pg" id="pg-users">
+<div class="ph phr"><div class="ph"><h2>👥 User Management</h2></div><button class="btn bprimary" onclick="openM('userM')">＋ Add User</button></div>
+<!-- School Registration PIN card -->
+<div class="card" style="border:2px solid #003580;margin-bottom:12px;">
+  <div class="ch"><div class="ct">🔐 School Registration Code</div></div>
+  <div style="padding:12px 14px;">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Teachers must enter this code when signing up. Share it only with your staff — it prevents unauthorized accounts.</p>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input id="school-pin-input" type="text" class="si2" placeholder="e.g. LWDSS2025" style="max-width:200px;" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn bprimary" onclick="saveSchoolPin()">Save Code</button>
+      <button class="btn boutline" onclick="loadSchoolPin()">View Current</button>
+    </div>
+    <div id="pin-status" style="font-size:12px;margin-top:8px;color:var(--success);display:none;"></div>
+  </div>
+</div><div class="card"><table class="tbl" id="user-tbl"><thead><tr><th>#</th><th>Username</th><th>Name</th><th>Role</th><th>Class/Dept</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div>
 
   </div>
 </div>
@@ -1169,11 +1196,32 @@ const ROLE_LABELS={admin:'Principal/Admin',headteacher:'Head Teacher',deputy:'De
 const ROLE_COLORS={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#D97706',teacher:'#8B5CF6',student:'#0891B2',parent:'#D97706'};
 
 // ===== DB =====
-const DB={get(k){try{return JSON.parse(localStorage.getItem('lw5_'+k)||'[]');}catch{return[];}},set(k,v){localStorage.setItem('lw5_'+k,JSON.stringify(v));}};
+// ===== CLOUD-SYNCED DB =====
+// Reads from localStorage (instant), writes to localStorage + Firestore
+const DB={
+  get(k){try{return JSON.parse(localStorage.getItem('lw5_'+k)||'[]');}catch{return[];}},
+  set(k,v){
+    localStorage.setItem('lw5_'+k,JSON.stringify(v));
+    // Fire-and-forget cloud sync (non-blocking)
+    if(window.fsWrite) window.fsWrite(k,v).catch(e=>console.warn('☁️ Sync fail ['+k+']:',e.message));
+  }
+};
 let students=DB.get('students'),teachers=DB.get('teachers'),grades=DB.get('grades'),attendance=DB.get('att'),fees=DB.get('fees'),procurement=DB.get('proc'),stores=DB.get('stores'),finance=DB.get('finance'),performance=DB.get('perf'),production=DB.get('prod'),papers=DB.get('papers'),sba=DB.get('sba'),scans=DB.get('scans'),homework=DB.get('homework'),announcements=DB.get('ann'),messages=DB.get('msgs'),lessons=DB.get('lessons');
 let timetable=DB.get('tt')[0]||{},curClass='Form 1A',curRole='admin',curUser=null,eczFile='',scanData=null,scanFileName='';
 let accounts=DB.get('accounts');
 if(!accounts.length){accounts=[{id:1,u:'admin',p:'admin123',n:'Principal',r:'admin',approved:true,mustChange:false}];DB.set('accounts',accounts);}
+
+// Reload all in-memory arrays from localStorage (called after Firestore preload)
+function reloadArrays(){
+  students=DB.get('students');teachers=DB.get('teachers');grades=DB.get('grades');
+  attendance=DB.get('att');fees=DB.get('fees');procurement=DB.get('proc');
+  stores=DB.get('stores');finance=DB.get('finance');performance=DB.get('perf');
+  production=DB.get('prod');papers=DB.get('papers');sba=DB.get('sba');
+  scans=DB.get('scans');homework=DB.get('homework');announcements=DB.get('ann');
+  messages=DB.get('msgs');lessons=DB.get('lessons');
+  accounts=DB.get('accounts');
+  const ttArr=DB.get('tt');timetable=ttArr[0]||{};
+}
 
 let studentPhotoData=null,hwImageData=null;
 function handleStudentPhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{studentPhotoData=ev.target.result;document.getElementById('sm-photo-name').textContent='✅ '+f.name;document.getElementById('sm-photo-prev').innerHTML=`<img src="${studentPhotoData}" style="width:70px;height:84px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin-top:8px;">`};r.readAsDataURL(f);}
@@ -1236,6 +1284,8 @@ function setRole(r,el){
   if(subWrap) subWrap.style.display = isTeacher ? '' : 'none';
   if(clsWrap) clsWrap.style.display = isTeacher ? '' : 'none';
   if(approvalNote) approvalNote.style.display = isTeacher ? '' : 'none';
+  const pinWrap=document.getElementById('su-pin-wrap');
+  if(pinWrap) pinWrap.style.display = isTeacher ? '' : 'none';
   if(submitBtn){
     submitBtn.textContent = isTeacher ? 'Create Account' : 'Create '+((r==='admin'||r==='principal')?'Admin':'My')+' Account →';
     submitBtn.style.background = isTeacher ? 'var(--green)' : 'var(--navy)';
@@ -1288,7 +1338,7 @@ function doParentLogin(){
   curUser={id:st.id,u:'parent_'+st.id,n:'Parent of '+st.fn+' '+st.ln,r:'parent',childId:st.id};curRole='parent';launchApp();
 }
 
-function doSignup(){
+async function doSignup(){
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-u').value.trim();
   const pass=document.getElementById('su-p').value;
@@ -1296,6 +1346,17 @@ function doSignup(){
   if(pass.length<6){showErr('Password must be at least 6 characters.');return;}
   showErr('');
   document.getElementById('su-submit-btn').textContent='Creating…';
+  // For teachers: verify school registration code before proceeding
+  if(selRole==='teacher'){
+    const pin=document.getElementById('su-pin').value.trim();
+    if(!pin){showErr('❌ Enter the School Registration Code given by your principal.');document.getElementById('su-submit-btn').textContent='Create Account →';return;}
+    if(window.fsVerifyPin){
+      try{
+        const ok=await window.fsVerifyPin(pin);
+        if(!ok){showErr('❌ Incorrect School Registration Code. Ask your principal for the correct code.');document.getElementById('su-submit-btn').textContent='Create Account →';return;}
+      }catch(e){/* If no PIN set, allow through */}
+    }
+  }
   // Flag prevents onAuthStateChanged from interfering mid-signup
   window._fbSigningUp=true;
   firebaseSignUp(email,pass,name,selRole)
@@ -1353,11 +1414,22 @@ function doRoleSetup(){
 function showErr(m){const e=document.getElementById('lerr');e.innerHTML=m;e.style.display=m?'block':'none';document.getElementById('lsuc').style.display='none';}
 function showSuccess(m){const e=document.getElementById('lsuc');e.textContent=m;e.style.display='block';document.getElementById('lerr').style.display='none';}
 
-function launchApp(){
-  // Sync window globals set by Firebase module into local variables
-  if(window.curUser) curUser = window.curUser;
-  if(window.curRole) curRole = window.curRole;
+async function launchApp(){
+  if(window.curUser) curUser=window.curUser;
+  if(window.curRole) curRole=window.curRole;
   document.getElementById('welcomeScreen').style.display='none';
+  // Show loading overlay while fetching cloud data
+  const ov=document.getElementById('cloud-loading');if(ov)ov.style.display='flex';
+  if(window.fsReadAll){
+    try{
+      const data=await window.fsReadAll();
+      Object.entries(data).forEach(([k,v])=>{
+        if(v!==null) localStorage.setItem('lw5_'+k,JSON.stringify(v));
+      });
+      reloadArrays();
+    }catch(e){console.warn('☁️ Cloud load failed, using local data:',e.message);}
+  }
+  if(ov)ov.style.display='none';
   document.getElementById('app').style.display='block';
   setupRole();renderAll();setDates();
 }
@@ -1684,18 +1756,27 @@ function loadClassList(){
 async function renderPendingApprovals(){
   const card=document.getElementById('pendingCard');
   const tb=document.querySelector('#pending-tbl tbody');
-  if(!card||!tb) return;
 
   let pending=[];
-  // Fetch from Firestore first (works across all devices)
   if(window.firebaseFetchPendingTeachers){
     try{ pending=await window.firebaseFetchPendingTeachers(); }catch(e){}
   }
-  // Merge any localStorage-only pending (fallback / offline)
   accounts.filter(a=>a.r==='teacher'&&!a.approved).forEach(a=>{
     if(!pending.find(p=>p.u===a.u)) pending.push(a);
   });
 
+  // Dashboard alert banner (admin only)
+  const dashAlert=document.getElementById('dash-pending-alert');
+  if(dashAlert){
+    if(pending.length&&(curRole==='admin'||curRole==='headteacher')){
+      dashAlert.style.display='block';
+      dashAlert.innerHTML=`<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b style="color:#92400E">⏳ ${pending.length} Teacher${pending.length>1?'s':''} Waiting for Approval</b><div style="font-size:12px;color:#78350F;margin-top:2px">Go to Staff Management to approve them</div></div><button class="btn bprimary bsm" onclick="go('teachers')">Approve Now →</button></div>`;
+    } else {
+      dashAlert.style.display='none';
+    }
+  }
+
+  if(!card||!tb) return;
   card.style.display=pending.length?'block':'none';
   tb.innerHTML=pending.length
     ? pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button></td></tr>`).join('')
@@ -2643,6 +2724,30 @@ function renderJuniorAnalysis(){
 }
 
 // ===== INIT =====
+async function saveSchoolPin(){
+  const pin=document.getElementById('school-pin-input').value.trim().toUpperCase();
+  if(!pin){toast('⚠️ Enter a registration code first','err');return;}
+  if(pin.length<4){toast('⚠️ Code must be at least 4 characters','err');return;}
+  const st=document.getElementById('pin-status');
+  if(window.fsSetSchoolPin){
+    try{
+      await window.fsSetSchoolPin(pin);
+      st.style.display='block';st.style.color='var(--success)';
+      st.textContent='✅ Registration code saved! Share "'+pin+'" with your teachers only.';
+    }catch(e){st.style.display='block';st.style.color='var(--danger)';st.textContent='❌ Error: '+e.message;}
+  }
+}
+async function loadSchoolPin(){
+  const st=document.getElementById('pin-status');
+  if(window.fsGetSchoolPin){
+    try{
+      const pin=await window.fsGetSchoolPin();
+      const inp=document.getElementById('school-pin-input');
+      if(pin){inp.value=pin;st.style.display='block';st.style.color='#003580';st.textContent='🔐 Current code: '+pin;}
+      else{st.style.display='block';st.style.color='var(--muted)';st.textContent='No code set yet. Teachers can sign up without a code.';}
+    }catch(e){st.style.display='block';st.style.color='var(--danger)';st.textContent='❌ '+e.message;}
+  }
+}
 function resetAllData(){
   if(!confirm('WARNING: This will delete ALL students, fees, teachers, grades, attendance and all other records. Your admin account stays. Are you absolutely sure?'))return;
   if(!confirm('Final confirmation: Delete everything and start fresh?'))return;
@@ -2688,6 +2793,43 @@ const fbDB   = getFirestore(fbApp);
 
 // Expose to global scope so non-module scripts can call them
 window.firebaseAuth = fbAuth;
+window.firebaseDB  = fbDB;
+
+// ===== CLOUD DATA LAYER =====
+const SCHOOL_ID = 'lwdss'; // School identifier — change for each school deployment
+const schoolData = (k) => doc(fbDB,'schools',SCHOOL_ID,'data',k);
+const schoolCfg  = (k) => doc(fbDB,'schools',SCHOOL_ID,'config',k);
+
+// Write one data collection to cloud
+window.fsWrite = (k,arr) => setDoc(schoolData(k),{items:arr,updatedAt:serverTimestamp()});
+
+// Read ALL data collections in parallel on login
+window.fsReadAll = async () => {
+  const KEYS=['students','teachers','grades','att','fees','proc','stores',
+    'finance','perf','prod','papers','sba','scans','homework',
+    'ann','msgs','lessons','tt','accounts'];
+  const pairs = await Promise.all(KEYS.map(async k=>{
+    try{
+      const snap=await getDoc(schoolData(k));
+      return [k, snap.exists()?(snap.data().items||[]):null];
+    }catch(e){return [k,null];}
+  }));
+  return Object.fromEntries(pairs.filter(([,v])=>v!==null));
+};
+
+// School Registration PIN (set by admin, required by teachers to sign up)
+window.fsSetSchoolPin = async (pin) => {
+  await setDoc(schoolCfg('settings'),{pin,updatedAt:serverTimestamp()});
+};
+window.fsGetSchoolPin = async () => {
+  const snap=await getDoc(schoolCfg('settings'));
+  return snap.exists()?snap.data().pin:null;
+};
+window.fsVerifyPin = async (pin) => {
+  const snap=await getDoc(schoolCfg('settings'));
+  if(!snap.exists()||!snap.data().pin) return true; // No PIN set — allow
+  return snap.data().pin===pin;
+};
 
 window.firebaseSignIn = (email,pass) =>
   signInWithEmailAndPassword(fbAuth,email,pass);
