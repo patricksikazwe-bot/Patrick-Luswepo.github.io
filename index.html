@@ -517,6 +517,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
         <span id="msg-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--green);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">0</span>
       </div>
       <span class="rbadge" id="rbadge">Admin</span>
+      <span id="cloud-status" style="font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;" title="Cloud sync status">☁️ …</span>
     </div>
   </div>
   <div class="ca">
@@ -590,7 +591,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
     <!-- TEACHERS -->
     <div class="pg" id="pg-teachers">
       <div class="ph phr"><div class="ph"><h2>👨‍🏫 Teachers & Staff</h2></div><button class="btn bprimary" id="addTchBtn" onclick="openM('tmM')">＋ Add Teacher</button></div>
-      <div class="card" id="pendingCard" style="display:none;border:2px solid var(--gold);"><div class="ch"><div class="ct" style="color:var(--warning);">⏳ Pending Approvals</div></div><table class="tbl" id="pending-tbl"><thead><tr><th>Name</th><th>Username</th><th>Subject</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+      <div class="card" style="border:2px solid var(--gold);margin-bottom:10px;"><div class="ch"><div class="ct" style="color:var(--warning);">⏳ Pending Teacher Approvals</div><button class="btn bsm boutline" onclick="renderPendingApprovals()">🔄 Refresh</button></div><div id="pending-check-msg" style="padding:6px 14px;font-size:12px;color:var(--muted);"></div><div id="pendingCard" style="display:none;"><table class="tbl" id="pending-tbl"><thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Actions</th></tr></thead><tbody></tbody></table></div></div>
       <div class="card"><div class="cb" style="padding-bottom:0"><div class="fb"><input class="si2" placeholder="🔍 Search..." oninput="renderTeachers()"></div></div>
       <table class="tbl" id="tch-tbl"><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Subject/Dept</th><th>Class</th><th>Username</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
     </div>
@@ -1199,14 +1200,45 @@ const ROLE_COLORS={admin:'#003580',headteacher:'#007A33',deputy:'#CC0000',hod:'#
 // ===== DB =====
 // ===== CLOUD-SYNCED DB =====
 // Reads from localStorage (instant), writes to localStorage + Firestore
+// Write queue — holds writes that happen before Firebase module loads
+const _dbQueue=[];
+let _fsReady=false;
+
 const DB={
   get(k){try{return JSON.parse(localStorage.getItem('lw5_'+k)||'[]');}catch{return[];}},
   set(k,v){
     localStorage.setItem('lw5_'+k,JSON.stringify(v));
-    // Fire-and-forget cloud sync (non-blocking)
-    if(window.fsWrite) window.fsWrite(k,v).catch(e=>console.warn('☁️ Sync fail ['+k+']:',e.message));
+    // accounts must NEVER be synced to cloud (it is rebuilt from Firestore users collection)
+    if(k==='accounts') return;
+    if(_fsReady && window.fsWrite){
+      window.fsWrite(k,v)
+        .then(()=>updateCloudStatus(true))
+        .catch(e=>{ console.warn('☁️ Sync fail ['+k+']:',e.message); updateCloudStatus(false,e.message); });
+    } else {
+      _dbQueue.push({k,v}); // queue for when Firebase is ready
+    }
   }
 };
+
+// Called by Firebase module once it is fully loaded
+function _onFsReady(){
+  _fsReady=true;
+  // Flush queued writes
+  const batch=[..._dbQueue]; _dbQueue.length=0;
+  batch.forEach(({k,v})=>{
+    if(window.fsWrite) window.fsWrite(k,v)
+      .then(()=>updateCloudStatus(true))
+      .catch(e=>updateCloudStatus(false,e.message));
+  });
+}
+
+function updateCloudStatus(ok,msg=''){
+  const el=document.getElementById('cloud-status');
+  if(!el) return;
+  el.textContent = ok ? '☁️ Online' : '❌ Offline';
+  el.style.color  = ok ? 'var(--green)' : 'var(--danger)';
+  el.title = msg||'';
+}
 let students=DB.get('students'),teachers=DB.get('teachers'),grades=DB.get('grades'),attendance=DB.get('att'),fees=DB.get('fees'),procurement=DB.get('proc'),stores=DB.get('stores'),finance=DB.get('finance'),performance=DB.get('perf'),production=DB.get('prod'),papers=DB.get('papers'),sba=DB.get('sba'),scans=DB.get('scans'),homework=DB.get('homework'),announcements=DB.get('ann'),messages=DB.get('msgs'),lessons=DB.get('lessons');
 let timetable=DB.get('tt')[0]||{},curClass='Form 1A',curRole='admin',curUser=null,eczFile='',scanData=null,scanFileName='';
 let accounts=DB.get('accounts');
@@ -1220,7 +1252,7 @@ function reloadArrays(){
   production=DB.get('prod');papers=DB.get('papers');sba=DB.get('sba');
   scans=DB.get('scans');homework=DB.get('homework');announcements=DB.get('ann');
   messages=DB.get('msgs');lessons=DB.get('lessons');
-  accounts=DB.get('accounts');
+  // NOTE: accounts is NOT reloaded here — it is rebuilt from Firestore users collection in launchApp
   const ttArr=DB.get('tt');timetable=ttArr[0]||{};
 }
 
@@ -1421,8 +1453,9 @@ async function launchApp(){
   if(window.curUser) curUser=window.curUser;
   if(window.curRole) curRole=window.curRole;
   document.getElementById('welcomeScreen').style.display='none';
-  // Show loading overlay while fetching cloud data
   const ov=document.getElementById('cloud-loading');if(ov)ov.style.display='flex';
+
+  // 1. Load all school data from Firestore (students, grades, fees, etc.)
   if(window.fsReadAll){
     try{
       const data=await window.fsReadAll();
@@ -1430,8 +1463,27 @@ async function launchApp(){
         if(v!==null) localStorage.setItem('lw5_'+k,JSON.stringify(v));
       });
       reloadArrays();
-    }catch(e){console.warn('☁️ Cloud load failed, using local data:',e.message);}
+      updateCloudStatus(true);
+    }catch(e){
+      console.warn('Cloud load failed:',e.message);
+      updateCloudStatus(false,e.message);
+    }
   }
+
+  // 2. Rebuild accounts from Firestore users collection (safe cross-device)
+  if(window.fsLoadAllUsers){
+    try{
+      const fsUsers=await window.fsLoadAllUsers();
+      if(fsUsers.length){
+        // Keep any local-only admin-created accounts not in Firestore
+        const localOnly=accounts.filter(a=>!a.fbUid&&!fsUsers.find(u=>u.u===a.u));
+        const merged=[...fsUsers,...localOnly];
+        localStorage.setItem('lw5_accounts',JSON.stringify(merged));
+        accounts=merged;
+      }
+    }catch(e){ console.warn('Users load failed:',e.message); }
+  }
+
   if(ov)ov.style.display='none';
   document.getElementById('app').style.display='block';
   setupRole();renderAll();setDates();
@@ -1757,48 +1809,70 @@ function loadClassList(){
 
 // ===== TEACHERS =====
 async function renderPendingApprovals(){
-  const card=document.getElementById('pendingCard');
-  const tb=document.querySelector('#pending-tbl tbody');
-  const dashAlert=document.getElementById('dash-pending-alert');
+  const card   = document.getElementById('pendingCard');
+  const tb     = document.querySelector('#pending-tbl tbody');
+  const msg    = document.getElementById('pending-check-msg');
+  const dashAlert = document.getElementById('dash-pending-alert');
+  let pending  = [];
+  let queryError = null;
 
-  let pending=[];
-  let queryError=null;
+  if(msg) msg.textContent = 'Checking Firestore for pending teachers…';
 
-  // Fetch from Firestore users collection (works across all devices)
+  // Fetch from Firestore (works across ALL devices)
   if(window.firebaseFetchPendingTeachers){
-    try{ pending=await window.firebaseFetchPendingTeachers(); }
-    catch(e){ queryError=e.message; }
+    try{
+      pending = await window.firebaseFetchPendingTeachers();
+    }catch(e){
+      queryError = e.message;
+      console.warn('Pending query error:', e);
+    }
   }
-  // Merge localStorage pending as fallback
+  // Also merge any localStorage-only pending (offline fallback)
   accounts.filter(a=>a.r==='teacher'&&!a.approved).forEach(a=>{
     if(!pending.find(p=>p.u===a.u)) pending.push(a);
   });
 
-  const count=pending.length;
+  const count = pending.length;
 
-  // 1. Dashboard alert banner
+  // Status message on teachers page
+  if(msg){
+    if(queryError)
+      msg.innerHTML = `<span style="color:var(--danger)">⚠️ Firestore query failed: ${queryError}</span>`;
+    else if(count===0)
+      msg.innerHTML = `<span style="color:var(--muted)">✅ No pending approvals — all teachers have been approved.</span>`;
+    else
+      msg.textContent = '';
+  }
+
+  // Dashboard alert banner
   if(dashAlert){
     if(count>0){
       dashAlert.style.display='block';
-      dashAlert.innerHTML=`<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="color:#92400E">⏳ ${count} Teacher${count>1?'s':''} Waiting for Your Approval</b><div style="font-size:12px;color:#78350F;margin-top:3px;">${pending.map(p=>p.n).join(', ')}</div></div><button class="btn bprimary" style="white-space:nowrap" onclick="go('teachers')">✅ Approve Now</button></div>`;
-    } else {
+      dashAlert.innerHTML=`<div style="background:#FEF3C7;border:2px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="color:#92400E">⏳ ${count} Teacher${count>1?'s':''} Waiting for Approval</b><div style="font-size:12px;color:#78350F;margin-top:4px;">${pending.map(p=>'👤 '+p.n).join(' &nbsp;•&nbsp; ')}</div></div><button class="btn bprimary" style="white-space:nowrap" onclick="go('teachers')">✅ Approve Now →</button></div>`;
+    }else{
       dashAlert.style.display='none';
-      if(queryError) dashAlert.style.display='block', dashAlert.innerHTML=`<div style="background:#FEE2E2;border:1px solid #F87171;border-radius:8px;padding:10px 14px;font-size:12px;color:#991B1B;">⚠️ Could not check pending approvals: ${queryError}. Go to <b>Staff Management</b> manually.</div>`;
     }
   }
 
-  // 2. Sidebar nav badge on Staff Management
-  const staffNavItem=document.querySelector('.ni[onclick*="teachers"]');
+  // Sidebar nav badge
+  const staffNavItem = document.querySelector('.ni[onclick*="teachers"]');
   if(staffNavItem){
-    const old=staffNavItem.querySelector('.ni-badge');if(old)old.remove();
+    const old=staffNavItem.querySelector('.ni-badge'); if(old) old.remove();
     if(count>0) staffNavItem.insertAdjacentHTML('beforeend',`<span class="ni-badge">${count}</span>`);
   }
 
-  // 3. Pending card on the Staff Management page itself
-  if(card) card.style.display=count>0?'block':'none';
-  if(tb) tb.innerHTML=count>0
-    ? pending.map(a=>`<tr><td>${a.n}</td><td>${a.u}</td><td>${a.sub||'—'}</td><td><button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button> <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button></td></tr>`).join('')
-    : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:12px">No pending approvals</td></tr>';
+  // Table inside teachers page
+  if(card) card.style.display = count>0 ? 'block' : 'none';
+  if(tb) tb.innerHTML = count>0
+    ? pending.map(a=>`<tr>
+        <td><b>${a.n}</b></td>
+        <td style="font-size:11px;">${a.u}</td>
+        <td>${a.sub||'—'}</td>
+        <td>
+          <button class="btn bsm bgreen" onclick="approveTeacher('${a.id}')">✅ Approve</button>
+          <button class="btn bsm bdanger" onclick="rejectTeacher('${a.id}')">❌ Reject</button>
+        </td></tr>`).join('')
+    : '';
 }
 function approveTeacher(id){
   // Update localStorage if record exists there
@@ -2812,6 +2886,8 @@ const fbDB   = getFirestore(fbApp);
 // Expose to global scope so non-module scripts can call them
 window.firebaseAuth = fbAuth;
 window.firebaseDB  = fbDB;
+// Signal the main script that Firebase is loaded and flush the write queue
+if(typeof _onFsReady === 'function') _onFsReady();
 
 // ===== CLOUD DATA LAYER =====
 const SCHOOL_ID = 'lwdss'; // School identifier — change for each school deployment
@@ -2823,9 +2899,10 @@ window.fsWrite = (k,arr) => setDoc(schoolData(k),{items:arr,updatedAt:serverTime
 
 // Read ALL data collections in parallel on login
 window.fsReadAll = async () => {
+  // NOTE: 'accounts' intentionally excluded — rebuilt from Firestore users collection
   const KEYS=['students','teachers','grades','att','fees','proc','stores',
     'finance','perf','prod','papers','sba','scans','homework',
-    'ann','msgs','lessons','tt','accounts'];
+    'ann','msgs','lessons','tt'];
   const pairs = await Promise.all(KEYS.map(async k=>{
     try{
       const snap=await getDoc(schoolData(k));
@@ -2849,6 +2926,23 @@ window.fsVerifyPin = async (pin) => {
   return snap.data().pin===pin;
 };
 
+// Load all registered users from Firestore users collection
+// Called on login to rebuild the accounts array cross-device
+window.fsLoadAllUsers = async () => {
+  const snap = await getDocs(collection(fbDB,'users'));
+  return snap.docs.map(d => ({
+    id:       d.id,
+    fbUid:    d.id,
+    u:        d.data().email||'',
+    n:        d.data().name||'Unknown',
+    r:        d.data().role||'teacher',
+    sub:      d.data().subject||'',
+    cls:      d.data().cls||'',
+    approved: d.data().approved !== false,
+    p:        ''
+  }));
+};
+
 window.firebaseSignIn = (email,pass) =>
   signInWithEmailAndPassword(fbAuth,email,pass);
 
@@ -2857,6 +2951,7 @@ window.firebaseSignUp = async (email,pass,name,role,sub='',cls='') => {
   await updateProfile(cred.user,{displayName:name});
   const needsApproval = role==='teacher';
   try {
+    // Save full profile to Firestore users collection (source of truth for users)
     await setDoc(doc(fbDB,'users',cred.user.uid),{
       name,email,role,subject:sub,cls,
       createdAt:serverTimestamp(),active:true,approved:!needsApproval
@@ -2865,14 +2960,13 @@ window.firebaseSignUp = async (email,pass,name,role,sub='',cls='') => {
     await signOut(fbAuth);
     throw fsErr;
   }
-  // Mirror into localStorage so admin pending-approvals panel can see this user
+  // Mirror into THIS device's localStorage only (do NOT sync accounts to cloud —
+  // that would overwrite other devices' user lists. Cloud users come from fsLoadAllUsers)
   const accs = JSON.parse(localStorage.getItem('lw5_accounts')||'[]');
   if(!accs.find(a=>a.u===email)){
     accs.push({id:cred.user.uid,u:email,p:'',n:name,r:role,sub,cls,approved:!needsApproval,mustChange:false,fbUid:cred.user.uid});
     localStorage.setItem('lw5_accounts',JSON.stringify(accs));
     if(typeof accounts !== 'undefined') accounts.splice(0,accounts.length,...accs);
-    // Also sync updated accounts to Firestore cloud
-    if(window.fsWrite) window.fsWrite('accounts',accs).catch(()=>{});
   }
   return {user:cred.user, role, userName:name, sub, cls};
 };
