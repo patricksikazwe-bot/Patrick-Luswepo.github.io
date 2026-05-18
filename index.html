@@ -2293,33 +2293,47 @@ function delUser(id){
 function changeUserRole(id){
   const acc=accounts.find(a=>String(a.id)===String(id));
   if(!acc)return;
-  const roles=['teacher','headteacher','deputy','hod','admin'];
-  const newRole=prompt(`Change role for ${acc.n}.\nCurrent: ${acc.r}\nEnter new role:\n${roles.join(', ')}`);
-  if(!newRole||!roles.includes(newRole.toLowerCase().trim())){toast('⚠️ Invalid role entered','err');return;}
-  acc.r=newRole.toLowerCase().trim();
+  const roleOptions=['teacher','headteacher','deputy','hod'];
+  const choice=prompt(`Change role for ${acc.n} (current: ${acc.r})\n\nType one of:\n• teacher\n• headteacher\n• deputy\n• hod`);
+  if(!choice)return;
+  const newRole=choice.toLowerCase().trim();
+  if(!roleOptions.includes(newRole)){toast('⚠️ Invalid role. Use: teacher, headteacher, deputy, or hod','err');return;}
+  acc.r=newRole;acc.approved=true;
   DB.set('accounts',accounts);
-  // Update Firestore user profile role too
-  if(window.fsUpdateUserRole) window.fsUpdateUserRole(String(id),acc.r).catch(()=>{});
-  renderUsers();toast(`✅ ${acc.n} is now ${acc.r}`,'ok');
+  if(window.fsUpdateUserRole) window.fsUpdateUserRole(String(id),newRole).catch(()=>{});
+  renderUsers();toast(`✅ ${acc.n} changed to ${ROLE_LABELS[newRole]||newRole}`,'ok');
 }
 function renderUsers(){
   const rb={admin:'bb',headteacher:'bgr',deputy:'bred',hod:'bo',teacher:'bp',student:'bx'};
-  document.querySelector('#user-tbl tbody').innerHTML=accounts.map((a,i)=>{
-    const isMe = a.u===curUser.u || a.id===curUser.id;
-    const canDelete = !isMe; // can delete anyone except yourself
-    const actions = canDelete
-      ? `<button class="btn bsm bdanger" onclick="delUser('${a.id}')">🗑</button>
-         <button class="btn bsm boutline" style="font-size:10px;" onclick="changeUserRole('${a.id}')">✏️ Role</button>`
-      : '<span style="font-size:10px;color:var(--muted);">You</span>';
-    return `<tr>
-      <td>${i+1}</td>
-      <td><b>${a.u}</b></td>
-      <td>${a.n}</td>
-      <td><span class="badge ${rb[a.r]||'bx'}">${ROLE_LABELS[a.r]||a.r}</span></td>
-      <td style="font-size:10px;">${a.cls||a.sub||'—'}</td>
-      <td><span class="badge ${a.approved?'bgr':'bo'}">${a.approved?'Active':'Pending'}</span></td>
-      <td style="white-space:nowrap;">${actions}</td>
-    </tr>`;
+  const container=document.querySelector('#user-tbl tbody');
+  if(!container)return;
+  if(!accounts.length){container.innerHTML='<tr><td colspan="2" style="text-align:center;padding:20px;color:var(--muted);">No users yet</td></tr>';return;}
+  // Mobile-friendly card layout (replaces wide table)
+  container.closest('table').style.display='none';
+  let cards=document.getElementById('user-cards');
+  if(!cards){cards=document.createElement('div');cards.id='user-cards';container.closest('.card').appendChild(cards);}
+  cards.innerHTML=accounts.map((a,i)=>{
+    const isMe=a.u===curUser.u||String(a.id)===String(curUser.id);
+    const canAct=!isMe;
+    return `<div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">${(a.n||a.u)[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.n||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.u}</div>
+        </div>
+        ${isMe?'<span style="font-size:10px;background:#EFF6FF;color:var(--navy);padding:2px 8px;border-radius:20px;font-weight:600;">YOU</span>':''}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <span class="badge ${rb[a.r]||'bx'}">${ROLE_LABELS[a.r]||a.r}</span>
+        <span class="badge ${a.approved?'bgr':'bo'}">${a.approved?'Active':'Pending'}</span>
+        ${a.sub||a.cls?`<span style="font-size:11px;color:var(--muted);">${a.sub||''} ${a.cls||''}</span>`:''}
+      </div>
+      ${canAct?`<div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn boutline bsm" style="flex:1;" onclick="changeUserRole('${a.id}')">✏️ Change Role</button>
+        <button class="btn bdanger bsm" style="flex:1;" onclick="delUser('${a.id}')">🗑 Remove</button>
+      </div>`:''}
+    </div>`;
   }).join('');
 }
 
