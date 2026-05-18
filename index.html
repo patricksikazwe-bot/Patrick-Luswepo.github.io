@@ -452,7 +452,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy);}
           <div style="font-size:10px;color:var(--muted);margin-top:4px;">Ask your principal for this code before signing up.</div>
         </div>
         <div id="su-approval-note" style="font-size:10px;color:var(--muted);margin-bottom:10px;">⚠️ Requires admin approval before login.</div>
-        <button class="lbtn" id="su-submit-btn" onclick="doSignup()">Create Account →</button>
+        <button class="lbtn" id="su-submit-btn" onclick="doSignup()" style="position:sticky;bottom:0;margin-top:12px;">Create Account →</button>
       </div>
       <div id="form-forgot" style="display:none;">
         <div class="lf"><label>Your Email</label><input type="email" id="fo-u" placeholder="your@email.com"></div>
@@ -1301,8 +1301,11 @@ function setRole(r,el){
   document.getElementById('panel-standard').style.display=r==='parent'?'none':'block';
   document.getElementById('panel-parent').style.display=r==='parent'?'block':'none';
   // Show tabs for all staff roles that use Firebase auth (not parent/student)
+  const isAdminRole = r==='admin'||r==='principal';
   const showTabs = r !== 'parent' && r !== 'student';
   document.getElementById('teacherTabs').style.display = showTabs ? 'flex' : 'none';
+  // Admin can only Sign In or reset password — Sign Up is permanently hidden for admin
+  document.getElementById('tt-signup').style.display = isAdminRole ? 'none' : '';
   if(showTabs) setTeacherTab('signin');
   // Show default credentials hint
   const hints={admin:'First time? Use <b>Sign Up</b> tab to create your admin account with your email.',headteacher:'First time? Use <b>Sign Up</b> tab to create your account with your email.',deputy:'First time? Use <b>Sign Up</b> tab to create your account with your email.',hod:'First time? Use <b>Sign Up</b> tab to create your account with your email.',teacher:'Sign in with your credentials, or Sign Up for a new account',student:'Username = Enrollment # (e.g. LW001), Password = enrollment #'};
@@ -1377,6 +1380,11 @@ async function doSignup(){
   const pass=document.getElementById('su-p').value;
   if(!name||!email||!pass){showErr('Fill in your name, email and password.');return;}
   if(pass.length<6){showErr('Password must be at least 6 characters.');return;}
+  // Hard block: admin/principal accounts cannot be self-registered
+  if(selRole==='admin'||selRole==='principal'){
+    showErr('❌ Principal/Admin accounts cannot be created here. Contact your system administrator.');
+    return;
+  }
   showErr('');
   document.getElementById('su-submit-btn').textContent='Creating…';
   // For teachers: verify school registration code before proceeding
@@ -2263,8 +2271,57 @@ function renderProd(){const rc={'Produced':'bgr','In Progress':'bo','Sold':'bb',
 
 // ===== USERS =====
 function saveUser(){const n=document.getElementById('user-name').value.trim(),u=document.getElementById('user-u').value.trim(),p=document.getElementById('user-p').value,r=document.getElementById('user-role').value;if(!n||!u||!p){toast('⚠️ Fill fields','err');return;}if(accounts.find(a=>a.u===u)){toast('⚠️ Username taken','err');return;}accounts.push({id:Date.now(),u,p,n,r,approved:true,mustChange:true});DB.set('accounts',accounts);renderUsers();closeM('userM');['user-name','user-u','user-p'].forEach(id=>document.getElementById(id).value='');toast(`✅ ${ROLE_LABELS[r]} created. Login: ${u} / ${p}`,'ok');}
-function delUser(id){if(id===1){toast('⚠️ Cannot delete default admin','err');return;}if(!confirm('Delete?'))return;accounts=accounts.filter(a=>a.id!==id);DB.set('accounts',accounts);renderUsers();toast('🗑 Deleted','');}
-function renderUsers(){const rb={admin:'bb',headteacher:'bgr',deputy:'bred',hod:'bo',teacher:'bp',student:'bx'};document.querySelector('#user-tbl tbody').innerHTML=accounts.map((a,i)=>`<tr><td>${i+1}</td><td><b>${a.u}</b></td><td>${a.n}</td><td><span class="badge ${rb[a.r]||'bx'}">${ROLE_LABELS[a.r]||a.r}</span></td><td style="font-size:10px;">${a.cls||a.sub||'—'}</td><td><span class="badge ${a.approved?'bgr':'bo'}">${a.approved?'Active':'Pending'}</span></td><td>${a.id>1?`<button class="btn bsm bdanger" onclick="delUser(${a.id})">🗑</button>`:''}</td></tr>`).join('');}
+function delUser(id){
+  if(!confirm('Delete this user? They will no longer be able to log in.'))return;
+  accounts=accounts.filter(a=>String(a.id)!==String(id));
+  DB.set('accounts',accounts);
+  // Mark inactive in Firestore if it's a Firebase UID
+  if(window.firebaseUpdateApproval && typeof id==='string' && id.length>10){
+    // We don't have deleteUser in client SDK, so mark as inactive in Firestore
+    if(window.firebaseDB){
+      const {doc,updateDoc}=window;
+      if(window.fsWrite){
+        // Update user profile to mark inactive
+        import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+          .then(({doc:d,updateDoc:u})=>u(d(window.firebaseDB,'users',id),{active:false,approved:false}))
+          .catch(()=>{});
+      }
+    }
+  }
+  renderUsers();toast('🗑 User removed','');
+}
+function changeUserRole(id){
+  const acc=accounts.find(a=>String(a.id)===String(id));
+  if(!acc)return;
+  const roles=['teacher','headteacher','deputy','hod','admin'];
+  const newRole=prompt(`Change role for ${acc.n}.\nCurrent: ${acc.r}\nEnter new role:\n${roles.join(', ')}`);
+  if(!newRole||!roles.includes(newRole.toLowerCase().trim())){toast('⚠️ Invalid role entered','err');return;}
+  acc.r=newRole.toLowerCase().trim();
+  DB.set('accounts',accounts);
+  // Update Firestore user profile role too
+  if(window.fsUpdateUserRole) window.fsUpdateUserRole(String(id),acc.r).catch(()=>{});
+  renderUsers();toast(`✅ ${acc.n} is now ${acc.r}`,'ok');
+}
+function renderUsers(){
+  const rb={admin:'bb',headteacher:'bgr',deputy:'bred',hod:'bo',teacher:'bp',student:'bx'};
+  document.querySelector('#user-tbl tbody').innerHTML=accounts.map((a,i)=>{
+    const isMe = a.u===curUser.u || a.id===curUser.id;
+    const canDelete = !isMe; // can delete anyone except yourself
+    const actions = canDelete
+      ? `<button class="btn bsm bdanger" onclick="delUser('${a.id}')">🗑</button>
+         <button class="btn bsm boutline" style="font-size:10px;" onclick="changeUserRole('${a.id}')">✏️ Role</button>`
+      : '<span style="font-size:10px;color:var(--muted);">You</span>';
+    return `<tr>
+      <td>${i+1}</td>
+      <td><b>${a.u}</b></td>
+      <td>${a.n}</td>
+      <td><span class="badge ${rb[a.r]||'bx'}">${ROLE_LABELS[a.r]||a.r}</span></td>
+      <td style="font-size:10px;">${a.cls||a.sub||'—'}</td>
+      <td><span class="badge ${a.approved?'bgr':'bo'}">${a.approved?'Active':'Pending'}</span></td>
+      <td style="white-space:nowrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+}
 
 // ===== TEACHER PORTAL =====
 function loadTeacherPortal(){
@@ -2986,6 +3043,10 @@ window.firebaseSignOut = () => signOut(fbAuth);
 // Update a teacher's approved status in Firestore (called when admin approves via pending panel)
 window.firebaseUpdateApproval = async (uid) => {
   await updateDoc(doc(fbDB,'users',uid),{approved:true});
+};
+
+window.fsUpdateUserRole = async (uid, role) => {
+  await updateDoc(doc(fbDB,'users',uid),{role, approved: role!=='teacher'});
 };
 
 // Fetch all unapproved teachers from Firestore (works across all devices)
